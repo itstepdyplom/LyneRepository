@@ -703,3 +703,7 @@ Lyne.API/obj/rider.project.restore.info
 Lyne.API/obj/rider.project.model.nuget.info
 Lyne.API/obj/Debug/net9.0/Lyne.API.AssemblyInfoInputs.cache
 Lyne.API/obj/Debug/net9.0/Lyne.API.AssemblyInfo.cs
+*.info
+Lyne.Domain/obj/Debug/net9.0/Lyne.Domain.AssemblyInfo.cs
+*.cache
+/Lyne.Domain/obj
