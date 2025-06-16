@@ -1,0 +1,6 @@
+@Lyne.API_HostAddress = http://localhost:5196
+
+GET {{Lyne.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
