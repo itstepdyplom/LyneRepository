@@ -2,7 +2,62 @@
 # .NET Core build folders
 bin/
 obj/
+[Bb]uild/
+[Ll]ogs/
+*.log
+## Rider files
+.idea/
+*.sln.iml
 
+## User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## ASP.NET Secrets folder
+secrets.json
+
+## VSCode config
+.vscode/
+
+## Dotnet-generated files
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Auto-generated files
+*.GeneratedMSBuildEditorConfig.editorconfig
+*.AssemblyInfo.cs
+*.AssemblyAttributes.cs
+*.g.cs
+*.g.i.cs
+*.nuget.g.props
+*.nuget.g.targets
+*.nuget.dgspec.json
+*.nuget.cache
+*.assets.cache
+*.csproj.FileListAbsolute.txt
+*.csproj.CopyComplete
+
+## Rider NuGet
+rider.project.model.nuget.info
+rider.project.restore.info
+
+# Others
+*.db
+*.sdf
+*.sqlite
+*.cache
+*.pidb
+*.pdb
+*.tmp
+*.bak
+*.orig
+*.swo
+*.swp
+.DS_Store
+Thumbs.db
 # Common node modules locations
 /node_modules
 /wwwroot/node_modules
@@ -707,3 +762,4 @@ Lyne.API/obj/Debug/net9.0/Lyne.API.AssemblyInfo.cs
 Lyne.Domain/obj/Debug/net9.0/Lyne.Domain.AssemblyInfo.cs
 *.cache
 /Lyne.Domain/obj
+*.cache
