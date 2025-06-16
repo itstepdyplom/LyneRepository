@@ -677,3 +677,29 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+Lyne.API/obj/Debug/net9.0/Lyne.API.AssemblyInfo.cs
+Lyne.API/obj/Debug/net9.0/Lyne.API.AssemblyInfo.cs
+Lyne.API/obj/Debug/net9.0/Lyne.API.AssemblyInfoInputs.cache
+/Lyne.API/obj
+Lyne.Infrastructure/obj/rider.project.restore.info
+Lyne.API/obj/Debug/net9.0/Lyne.API.AssemblyInfo.cs
+*.cache
+*.info
+*.props
+Lyne.Infrastructure/obj/rider.project.restore.info
+Lyne.Infrastructure/obj/rider.project.model.nuget.info
+Lyne.Infrastructure/obj/Debug/net9.0/Lyne.Infrastructure.AssemblyInfoInputs.cache
+Lyne.Infrastructure/obj/Debug/net9.0/Lyne.Infrastructure.AssemblyInfo.cs
+Lyne.Domain/obj/rider.project.restore.info
+Lyne.Domain/obj/rider.project.model.nuget.info
+Lyne.Domain/obj/Lyne.Domain.csproj.nuget.g.props
+Lyne.Domain/obj/Debug/net9.0/Lyne.Domain.AssemblyInfoInputs.cache
+Lyne.Domain/obj/Debug/net9.0/Lyne.Domain.AssemblyInfo.cs
+Lyne.Application/obj/rider.project.restore.info
+Lyne.Application/obj/rider.project.model.nuget.info
+Lyne.Application/obj/Debug/net9.0/Lyne.Application.AssemblyInfoInputs.cache
+Lyne.Application/obj/Debug/net9.0/Lyne.Application.AssemblyInfo.cs
+Lyne.API/obj/rider.project.restore.info
+Lyne.API/obj/rider.project.model.nuget.info
+Lyne.API/obj/Debug/net9.0/Lyne.API.AssemblyInfoInputs.cache
+Lyne.API/obj/Debug/net9.0/Lyne.API.AssemblyInfo.cs
