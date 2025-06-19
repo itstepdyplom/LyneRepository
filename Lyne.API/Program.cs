@@ -1,18 +1,16 @@
+using Lyne.Application.Extensions;
+using Lyne.Application.Mapping;
+using Lyne.Infrastructure.Extensions;
 using Lyne.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-builder.Services.AddDbContext<AppDbContext>(opt =>
-{
-    opt.UseSqlite("Data Source=LyneDb.sqlite");
-});
+builder.Services.AddApplicationServices()
+    .AddInfrastructureServices(builder.Configuration);
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
 
 using (var scope = app.Services.CreateScope())
