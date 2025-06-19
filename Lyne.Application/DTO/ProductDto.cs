@@ -1,20 +1,14 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Lyne.Domain.Entities;
 
-namespace Lyne.Domain.Entities;
+namespace Lyne.Application.DTO;
 
-public class Product
+public class ProductDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = "";
-    public string Brand { get; set; }= "";
-    [Range(0,double.MaxValue)]
+    public string Brand { get; set; } = "";
     public decimal Price { get; set; }
     public Guid CategoryId { get; set; }
-    
-    [ForeignKey("CategoryId")]
-    public Category? Category { get; set; }
-    
     public string Description { get; set; } = "";
     public int StockQuantity { get; set; }
     public string ImageUrl { get; set; } = "";
