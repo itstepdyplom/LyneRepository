@@ -10,6 +10,7 @@ public class User
     public required string Name { get; set; } = "";
     public required string ForName { get; set; } = "";
     public string Genre { get; set; }
+    [NotMapped]
     public HashCode PasswordHash { get; set; }
     public DateTime DateOfBirth { get; set; }
 
