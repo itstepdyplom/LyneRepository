@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using FluentAssertions;
+using Lyne.Application.Services;
 using Lyne.Domain.Entities;
+using Lyne.Domain.IRepositories;
 using Moq;
 
 namespace Lyne.Tests;
