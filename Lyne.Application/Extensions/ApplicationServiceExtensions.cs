@@ -9,7 +9,6 @@ public static class ApplicationServiceExtensions
     {
         //services.AddScoped<IUserService, UserService>();
         services.AddAutoMapper(typeof(MappingProfile));
-
         return services;
     }
 }
