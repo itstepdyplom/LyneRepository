@@ -11,7 +11,7 @@ public class User
     public required string ForName { get; set; } = "";
     public string Genre { get; set; }
     [NotMapped]
-    public HashCode PasswordHash { get; set; }
+    public string PasswordHash { get; set; }
     public DateTime DateOfBirth { get; set; }
 
     [Phone]

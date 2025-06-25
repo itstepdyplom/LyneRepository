@@ -10,9 +10,11 @@ public class MappingProfile : Profile
     {
         // User → UserDto
         CreateMap<User, UserDto>()
-            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+            .ForMember(dest => dest.OrderIds, opt => opt.MapFrom(src => src.Orders.Select(o => o.Id)));
         CreateMap<UserDto, User>()
-            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+            .ForMember(dest => dest.Orders, opt => opt.Ignore());
         
         // RegisterUserDto → User
         CreateMap<RegisterUserDto, User>()

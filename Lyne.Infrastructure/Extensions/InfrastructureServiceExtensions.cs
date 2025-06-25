@@ -1,4 +1,6 @@
+using Lyne.Domain.IRepositories;
 using Lyne.Infrastructure.Persistence;
+using Lyne.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +15,8 @@ public static class InfrastructureServiceExtensions
             options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
-        
+        services.AddScoped<IUserRepository, UserRepository>();
+
         return services;
     }
     //repository service, Redis, RabbitMQ etc.
