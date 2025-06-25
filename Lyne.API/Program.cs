@@ -1,5 +1,4 @@
 using Lyne.Application.Extensions;
-using Lyne.Application.Mapping;
 using Lyne.Infrastructure.Extensions;
 using Lyne.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,8 @@ builder.Services.AddApplicationServices()
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-
+app.UseSwagger();
+app.UseSwaggerUI();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
