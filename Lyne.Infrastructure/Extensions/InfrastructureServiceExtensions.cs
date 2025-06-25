@@ -11,7 +11,9 @@ public static class InfrastructureServiceExtensions
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
-
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+        
         return services;
     }
     //repository service, Redis, RabbitMQ etc.
