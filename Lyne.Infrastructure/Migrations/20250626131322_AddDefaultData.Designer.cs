@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lyne.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250626125631_AddSeedData")]
-    partial class AddSeedData
+    [Migration("20250626131322_AddDefaultData")]
+    partial class AddDefaultData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,6 +49,26 @@ namespace Lyne.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Address");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            City = "Львів",
+                            Country = "Україна",
+                            State = "Львівська",
+                            Street = "вул. Січових Стрільців, 12",
+                            Zip = "79000"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            City = "Київ",
+                            Country = "Україна",
+                            State = "Київська",
+                            Street = "вул. Тараса Шевченка, 115",
+                            Zip = "01001"
+                        });
                 });
 
             modelBuilder.Entity("Lyne.Domain.Entities.Category", b =>
@@ -67,6 +87,20 @@ namespace Lyne.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Description = "Куртки, футболки, штани та інший одяг для чоловіків",
+                            Name = "Чоловічий одяг"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Description = "Сукні, спідниці, топи, костюми для жінок",
+                            Name = "Жіночий одяг"
+                        });
                 });
 
             modelBuilder.Entity("Lyne.Domain.Entities.Order", b =>
@@ -167,6 +201,40 @@ namespace Lyne.Infrastructure.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("Products");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            Brand = "Zara",
+                            CategoryId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Color = "Білий",
+                            CreatedAt = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Класична футболка з бавовни, біла",
+                            ImageUrl = "https://example.com/images/mens-tshirt.jpg",
+                            IsActive = true,
+                            Name = "Футболка чоловіча BASIC",
+                            Price = 599.00m,
+                            Size = "L",
+                            StockQuantity = 100,
+                            UpdatedAt = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("aaaaaaa2-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            Brand = "Mango",
+                            CategoryId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Color = "Синій",
+                            CreatedAt = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Вечірня сукня з відкритими плечима, синя",
+                            ImageUrl = "https://example.com/images/womens-dress.jpg",
+                            IsActive = true,
+                            Name = "Сукня вечірня ELEGANT",
+                            Price = 1599.00m,
+                            Size = "M",
+                            StockQuantity = 50,
+                            UpdatedAt = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("Lyne.Domain.Entities.User", b =>
@@ -211,6 +279,34 @@ namespace Lyne.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AddressId = 1,
+                            CreatedAt = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(2002, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "kosacho@gmail.com",
+                            ForName = "Косач",
+                            Genre = "Жіноча",
+                            Name = "Ольга",
+                            PhoneNumber = "+380501234567",
+                            UpdatedAt = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AddressId = 2,
+                            CreatedAt = new DateTime(2025, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateTime(2000, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "alekskochmar18@gmail.com",
+                            ForName = "Кочмар",
+                            Genre = "Чоловіча",
+                            Name = "Алекс",
+                            PhoneNumber = "+380986199887",
+                            UpdatedAt = new DateTime(2025, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("Lyne.Domain.Entities.Order", b =>
