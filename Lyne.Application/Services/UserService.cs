@@ -1,11 +1,13 @@
+using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Lyne.Application.DTO;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
+using Microsoft.Extensions.Logging;
 
 namespace Lyne.Application.Services;
 
-public class UserService(IUserRepository userRepository,IMapper mapper)
+public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<UserService> logger)
 {
     public async Task<List<UserDto>> GetAllAsync()
     {
@@ -19,13 +21,27 @@ public class UserService(IUserRepository userRepository,IMapper mapper)
         return mapper.Map<UserDto>(user);
     }
 
-    public async Task AddAsync(UserDto dto)
+    public async Task<bool> AddAsync(UserDto dto)
     {
+        var validationContext = new ValidationContext(dto);
+        var validationResults = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(dto, validationContext, validationResults, true);
+
+        if (!isValid)
+        {
+            foreach (var error in validationResults)
+            {
+                logger.LogWarning("Validation failed: {ErrorMessage}", error.ErrorMessage);
+            }
+            return false;
+        }
+
         var user = mapper.Map<User>(dto);
         user.CreatedAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
 
-        await userRepository.AddAsync(user);
+        var result = await userRepository.AddAsync(user);
+        return result;
     }
 
     public async Task<bool> UpdateAsync(UserDto dto)
@@ -36,8 +52,8 @@ public class UserService(IUserRepository userRepository,IMapper mapper)
         var user = mapper.Map<User>(dto);
         user.UpdatedAt = DateTime.UtcNow;
 
-        userRepository.Update(user);
-        return true;
+        var result = userRepository.Update(user);
+        return result.Result;
     }
 
     public async Task<bool> DeleteAsync(int id)
@@ -45,7 +61,7 @@ public class UserService(IUserRepository userRepository,IMapper mapper)
         var user = await userRepository.GetByIdAsync(id);
         if (user == null) return false;
 
-        userRepository.Delete(user);
-        return true;
+        var result = userRepository.Delete(user);
+        return result.Result;
     }
 }
