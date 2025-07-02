@@ -34,10 +34,82 @@ public class AppDbContext:DbContext
                 State = "Київська",
                 Zip = "01001",
                 Country = "Україна"
+            },
+            new Address
+            {
+                Id = 3,
+                Street = "вул. Хрещатик, 1",
+                City = "Київ",
+                State = "Київська", 
+                Zip = "01001",
+                Country = "Україна"
+            },
+            new Address
+            {
+                Id = 4,
+                Street = "вул. Дерибасівська, 10",
+                City = "Одеса",
+                State = "Одеська",
+                Zip = "65000",
+                Country = "Україна"
+            },
+            new Address
+            {
+                Id = 5,
+                Street = "Default Address",
+                City = "Default City",
+                State = "Default State",
+                Zip = "00000",
+                Country = "Україна"
+            },
+            new Address
+            {
+                Id = 6,
+                Street = "вул. Соборна, 25",
+                City = "Дніпро",
+                State = "Дніпропетровська",
+                Zip = "49000",
+                Country = "Україна"
+            },
+            new Address
+            {
+                Id = 7,
+                Street = "вул. Сумська, 50",
+                City = "Харків",
+                State = "Харківська",
+                Zip = "61000",
+                Country = "Україна"
+            },
+            new Address
+            {
+                Id = 8,
+                Street = "вул. Героїв Майдану, 33",
+                City = "Запоріжжя",
+                State = "Запорізька",
+                Zip = "69000",
+                Country = "Україна"
+            },
+            new Address
+            {
+                Id = 9,
+                Street = "вул. Центральна, 15",
+                City = "Полтава",
+                State = "Полтавська",
+                Zip = "36000",
+                Country = "Україна"
+            },
+            new Address
+            {
+                Id = 10,
+                Street = "вул. Миру, 8",
+                City = "Чернівці",
+                State = "Чернівецька",
+                Zip = "58000",
+                Country = "Україна"
             }
         );
 
-        //Seed Users
+        //Seed Users with static password hashes (password: password123)
         modelBuilder.Entity<User>().HasData(
            new User
            {
@@ -45,6 +117,7 @@ public class AppDbContext:DbContext
                Name = "Ольга",
                ForName = "Косач",
                Genre = "Жіноча",
+               PasswordHash = "hashedpassword123",
                DateOfBirth = new DateTime(2002, 3, 15),
                PhoneNumber = "+380501234567",
                Email = "kosacho@gmail.com",
@@ -58,12 +131,13 @@ public class AppDbContext:DbContext
                 Name = "Алекс",
                 ForName = "Кочмар",
                 Genre = "Чоловіча",
+                PasswordHash = "hashedpassword123",
                 DateOfBirth = new DateTime(2000, 6, 18),
                 PhoneNumber = "+380986199887",
                 Email = "alekskochmar18@gmail.com",
                 AddressId = 2,
-                CreatedAt = new DateTime(2025, 2, 15),
-                UpdatedAt = new DateTime(2025, 2, 15)
+                CreatedAt = new DateTime(2024, 2, 15),
+                UpdatedAt = new DateTime(2024, 2, 15)
             }
         );
 
