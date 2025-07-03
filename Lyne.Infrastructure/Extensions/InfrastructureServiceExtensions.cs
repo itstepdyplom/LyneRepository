@@ -1,6 +1,7 @@
 using Lyne.Domain.IRepositories;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
+using Lyne.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,8 @@ public static class InfrastructureServiceExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IAuthRepository, AuthRepository>();
+        services.AddScoped<IJwtService, JwtService>();
 
         return services;
     }
