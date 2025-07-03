@@ -9,6 +9,7 @@ public class AppDbContext:DbContext
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<Address> Addresses => Set<Address>();
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 

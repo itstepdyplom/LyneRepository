@@ -19,22 +19,29 @@ public class UserService(IUserRepository userRepository,IMapper mapper)
         return mapper.Map<UserDto>(user);
     }
 
-    public async Task AddAsync(UserDto dto)
+    public async Task<bool> AddAsync(UserDto dto)
     {
         var user = mapper.Map<User>(dto);
         user.CreatedAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
 
+        if (!await userRepository.ValidateForCreateAsync(user))
+            return false;
+    
         await userRepository.AddAsync(user);
+        return true;
     }
 
     public async Task<bool> UpdateAsync(UserDto dto)
     {
         if (!await userRepository.ExistsAsync(dto.Id))
             return false;
-
+        
         var user = mapper.Map<User>(dto);
         user.UpdatedAt = DateTime.UtcNow;
+        
+        if (!await userRepository.ValidateForUpdateAsync(user))
+            return false;
 
         userRepository.Update(user);
         return true;
