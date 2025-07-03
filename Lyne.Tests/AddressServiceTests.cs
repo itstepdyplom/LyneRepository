@@ -40,6 +40,8 @@ public class AddressServiceTests
             AddressId = 1,
             Name = "John",
             ForName = "Doe",
+            Email = "test@gmail.com",
+            PasswordHash = "test"
         };
         var expectedAddress = new Address { Id = addressId, City = "Test",Country = "Test",State = "Test",Street = "Test",User = user,Zip = "Test"};
         _addressRepoMock.Setup(r => r.GetByIdAsync(addressId)).ReturnsAsync(expectedAddress);
@@ -79,6 +81,8 @@ public class AddressServiceTests
             AddressId = addressId,
             Name = "John",
             ForName = "Doe",
+            Email = "test@gmail.com",
+            PasswordHash = "test"
         };
         var address = new Address()
         {
@@ -90,8 +94,7 @@ public class AddressServiceTests
             User = user,
             Zip = "Test"
         };
-        _addressRepoMock.Setup(r => r.ExistsAsync(addressId)).ReturnsAsync(true);
-        _addressRepoMock.Setup(r => r.ValidateAsync(It.IsAny<Address>())).ReturnsAsync(true);
+        _addressRepoMock.Setup(r => r.ValidateForCreateAsync(It.IsAny<Address>())).ReturnsAsync(true);
         _addressRepoMock.Setup(r => r.AddAsync(It.IsAny<Address>())).ReturnsAsync(true);
 
         // Act
@@ -113,6 +116,8 @@ public class AddressServiceTests
             AddressId = addressId,
             Name = "John",
             ForName = "Doe",
+            Email = "test@gmail.com",
+            PasswordHash = "test"
         };
         var address = new Address()
         {
@@ -124,7 +129,8 @@ public class AddressServiceTests
             User = user,
             Zip = "Test"
         };
-        _addressRepoMock.Setup(r => r.AddAsync(It.IsAny<Address>())).ReturnsAsync(false);
+        _addressRepoMock.Setup(r => r.AddAsync(It.IsAny<Address>())).ReturnsAsync(true);
+        _addressRepoMock.Setup(r => r.ValidateForCreateAsync(It.IsAny<Address>())).ReturnsAsync(false);
 
         // Act
         var addressDto = _mapper.Map<AddressDto>(address);
@@ -145,6 +151,8 @@ public class AddressServiceTests
             AddressId = addressId,
             Name = "John",
             ForName = "Doe",
+            Email = "test@gmail.com",
+            PasswordHash = "test"
         };
         var address = new Address()
         {
@@ -158,7 +166,7 @@ public class AddressServiceTests
         };
         _addressRepoMock.Setup(r => r.Update(It.IsAny<Address>())).ReturnsAsync(true);
         _addressRepoMock.Setup(r => r.ExistsAsync(address.Id)).ReturnsAsync(true);
-        _addressRepoMock.Setup(r => r.ValidateAsync(It.IsAny<Address>())).ReturnsAsync(true);
+        _addressRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Address>())).ReturnsAsync(true);
 
         // Act
         var addressDto = _mapper.Map<AddressDto>(address);
@@ -179,6 +187,8 @@ public class AddressServiceTests
             AddressId = addressId,
             Name = "John",
             ForName = "Doe",
+            Email = "test@gmail.com",
+            PasswordHash = "test"
         };
         var address = new Address()
         {
@@ -191,7 +201,7 @@ public class AddressServiceTests
             Zip = "Test"
         };
         _addressRepoMock.Setup(r => r.Update(It.IsAny<Address>())).ReturnsAsync(true);
-        _addressRepoMock.Setup(r => r.ValidateAsync(It.IsAny<Address>())).ReturnsAsync(false);
+        _addressRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Address>())).ReturnsAsync(false);
         _addressRepoMock.Setup(r => r.ExistsAsync(user.Id)).ReturnsAsync(true);
 
         // Act
@@ -212,6 +222,8 @@ public class AddressServiceTests
             AddressId = addressId,
             Name = "John",
             ForName = "Doe",
+            Email = "test@gmail.com",
+            PasswordHash = "test"
         };
         var address = new Address()
         {
@@ -224,7 +236,7 @@ public class AddressServiceTests
             Zip = "Test"
         };
         _addressRepoMock.Setup(r => r.Update(It.IsAny<Address>())).ReturnsAsync(true);
-        _addressRepoMock.Setup(r => r.ValidateAsync(It.IsAny<Address>())).ReturnsAsync(true);
+        _addressRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Address>())).ReturnsAsync(true);
         _addressRepoMock.Setup(r => r.ExistsAsync(user.Id)).ReturnsAsync(false);
 
         // Act
@@ -245,6 +257,8 @@ public class AddressServiceTests
             AddressId = addressId,
             Name = "John",
             ForName = "Doe",
+            Email = "test@gmail.com",
+            PasswordHash = "test"
         };
         var address = new Address()
         {
@@ -257,7 +271,7 @@ public class AddressServiceTests
             Zip = "Test"
         };
         _addressRepoMock.Setup(r => r.ExistsAsync(user.Id)).ReturnsAsync(true);
-        _addressRepoMock.Setup(r => r.ValidateAsync(It.IsAny<Address>())).ReturnsAsync(true);
+        _addressRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Address>())).ReturnsAsync(true);
         _addressRepoMock.Setup(r => r.DeleteAsync(It.IsAny<Address>())).ReturnsAsync(true);
 
         // Act
@@ -279,6 +293,9 @@ public class AddressServiceTests
             AddressId = addressId,
             Name = "John",
             ForName = "Doe",
+            Email = "test@gmail.com",
+            PasswordHash = "test"
+            
         };
         var address = new Address()
         {
@@ -292,7 +309,7 @@ public class AddressServiceTests
         };
         _addressRepoMock.Setup(r => r.DeleteAsync(It.IsAny<Address>())).ReturnsAsync(true);
         _addressRepoMock.Setup(r => r.ExistsAsync(address.Id)).ReturnsAsync(true);
-        _addressRepoMock.Setup(r => r.ValidateAsync(address)).ReturnsAsync(false);
+        _addressRepoMock.Setup(r => r.ValidateForUpdateAsync(address)).ReturnsAsync(false);
 
         // Act
         var addressDto = _mapper.Map<AddressDto>(address);
@@ -312,6 +329,8 @@ public class AddressServiceTests
             AddressId = addressId,
             Name = "John",
             ForName = "Doe",
+            Email = "test@gmail.com",
+            PasswordHash = "test"
         };
         var address = new Address()
         {
@@ -325,7 +344,7 @@ public class AddressServiceTests
         };
         _addressRepoMock.Setup(r => r.DeleteAsync(It.IsAny<Address>())).ReturnsAsync(true);
         _addressRepoMock.Setup(r => r.ExistsAsync(address.Id)).ReturnsAsync(false);
-        _addressRepoMock.Setup(r => r.ValidateAsync(address)).ReturnsAsync(true);
+        _addressRepoMock.Setup(r => r.ValidateForUpdateAsync(address)).ReturnsAsync(true);
 
         // Act
         var addressDto = _mapper.Map<AddressDto>(address);

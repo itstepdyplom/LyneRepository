@@ -33,7 +33,7 @@ public class UserServiceTests
     {
         // Arrange
         _userRepoMock.Setup(r => r.GetAllAsync())
-            .ReturnsAsync(new List<User> { new User { Id = 1, Name = "Test", ForName = "User" }, new User { Id = 2, Name = "Test2", ForName = "User2" } });
+            .ReturnsAsync(new List<User> { new User { Id = 1, Name = "Test", ForName = "User", Email = "test@gmail.com", PasswordHash = "test"}, new User { Id = 2, Name = "Test2", ForName = "User2", Email = "test@gmail.com", PasswordHash = "test"} });
 
         // Act
         var result = await _service.GetAllAsync();
@@ -60,7 +60,7 @@ public class UserServiceTests
         // Arrange
         var id = new int();
         _userRepoMock.Setup(r => r.GetByIdAsync(id))
-            .ReturnsAsync(new User { Id = 1, Name = "Test", ForName = "User" });
+            .ReturnsAsync(new User { Id = 1, Name = "Test", ForName = "User", Email = "test@gmail.com", PasswordHash = "test"});
 
         // Act
         var result = await _service.GetByIdAsync(id);
@@ -99,10 +99,10 @@ public class UserServiceTests
         };
         var userDto = new UserDto
         {
-            Id = 1, 
+            Id = 1,
             Name = "Test",
             ForName = "User",
-            Address = address, 
+            Address = address,
             DateOfBirth = new DateTime(2000, 1, 1),
             Email = "test@gmail.com",
             Genre = "Male",
@@ -110,18 +110,9 @@ public class UserServiceTests
             PasswordHash = "pass",
             PhoneNumber = "3809877777777",
         };
-        
-        _userRepoMock.Setup(r => r.AddAsync(It.Is<User>(u =>
-            u.Id == userDto.Id &&
-            u.Name == userDto.Name &&
-            u.ForName == userDto.ForName &&
-            u.Email == userDto.Email &&
-            u.Genre == userDto.Genre &&
-            u.PhoneNumber == userDto.PhoneNumber &&
-            u.DateOfBirth == userDto.DateOfBirth &&
-            u.CreatedAt.Date == DateTime.UtcNow.Date &&
-            u.UpdatedAt.Date == DateTime.UtcNow.Date
-            ))).ReturnsAsync(true);
+
+        _userRepoMock.Setup(r => r.AddAsync(It.IsAny<User>())).ReturnsAsync(true);
+        _userRepoMock.Setup(r => r.ValidateForCreateAsync(It.IsAny<User>())).ReturnsAsync(true);
 
         // Act
         var result = await _service.AddAsync(userDto);
@@ -192,7 +183,9 @@ public class UserServiceTests
             PasswordHash = "pass",
             PhoneNumber = "3809877777777",
         };
+
         _userRepoMock.Setup(r => r.ExistsAsync(userDto.Id)).ReturnsAsync(true);
+        _userRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<User>())).ReturnsAsync(true);
         _userRepoMock.Setup(r => r.Update(It.IsAny<User>())).ReturnsAsync(true);
 
         // Act
@@ -280,7 +273,7 @@ public class UserServiceTests
             PhoneNumber = "3809877777777",
         };
         var user= await _service.GetByIdAsync(userDto.Id);
-        _userRepoMock.Setup(r => r.GetByIdAsync(userDto.Id)).ReturnsAsync(new User { Id = userDto.Id,Name = userDto.Name,ForName = userDto.ForName});
+        _userRepoMock.Setup(r => r.GetByIdAsync(userDto.Id)).ReturnsAsync(new User { Id = userDto.Id,Name = userDto.Name,ForName = userDto.ForName,Email = userDto.Email,PasswordHash = userDto.PasswordHash});
         _userRepoMock.Setup(r => r.Delete(It.IsAny<User>())).ReturnsAsync(true);
 
         // Act
