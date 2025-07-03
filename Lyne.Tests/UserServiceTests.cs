@@ -14,7 +14,6 @@ public class UserServiceTests
     private readonly Mock<IUserRepository> _userRepoMock;
     private readonly UserService _service;
     private readonly IMapper _mapper;
-    private readonly Mock<ILogger<UserService>> _loggerMock;
 
     public UserServiceTests()
     {
@@ -24,11 +23,10 @@ public class UserServiceTests
         {
             cfg.AddProfile<Lyne.Application.Mapping.MappingProfile>();
         });
-        var mapper = config.CreateMapper();
+        _mapper = config.CreateMapper();
 
-        _loggerMock = new Mock<ILogger<UserService>>();
 
-        _service = new UserService(_userRepoMock.Object, mapper, _loggerMock.Object);
+        _service = new UserService(_userRepoMock.Object, _mapper);
     }
     [Fact]
     public async Task GetAllAsync_ReturnsListOfUsers_WhenUsersExists()
@@ -206,6 +204,31 @@ public class UserServiceTests
     
     [Fact]
     public async Task UpdateAsync_ReturnsFalse_WhenUserNotExists()
+    {
+        // Arrange
+        
+        var userDto = new UserDto
+        {
+            Id = 1, 
+            Name = "Test",
+            ForName = "User",
+            DateOfBirth = new DateTime(2000, 1, 1),
+            Genre = "Male",
+            OrderIds = new List<int> { 1 },
+            PasswordHash = "pass",
+            PhoneNumber = "3809877777777",
+        };
+        _userRepoMock.Setup(r => r.ExistsAsync(userDto.Id)).ReturnsAsync(false);
+
+        // Act
+        var result = await _service.UpdateAsync(userDto);
+
+        // Assert
+        result.Should().BeFalse();
+    }
+    
+    [Fact]
+    public async Task UpdateAsync_ReturnsFalse_WhenThereIsValidationError()
     {
         // Arrange
         
