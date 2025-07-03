@@ -43,7 +43,7 @@ public class UserService(IUserRepository userRepository,IMapper mapper)
         if (!await userRepository.ValidateForUpdateAsync(user))
             return false;
 
-        userRepository.Update(user);
+        await userRepository.Update(user);
         return true;
     }
 
@@ -52,7 +52,7 @@ public class UserService(IUserRepository userRepository,IMapper mapper)
         var user = await userRepository.GetByIdAsync(id);
         if (user == null) return false;
 
-        userRepository.Delete(user);
+        await userRepository.Delete(user);
         return true;
     }
 }
