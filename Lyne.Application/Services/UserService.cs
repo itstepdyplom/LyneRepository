@@ -25,7 +25,11 @@ public class UserService(IUserRepository userRepository,IMapper mapper)
         user.CreatedAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
 
+        if (!await userRepository.ValidateForCreateAsync(user))
+            return false;
+    
         await userRepository.AddAsync(user);
+        return true;
     }
 
     public async Task<bool> UpdateAsync(UserDto dto)
