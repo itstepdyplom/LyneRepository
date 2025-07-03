@@ -1,35 +1,51 @@
+using Lyne.Application.DTO;
+using Lyne.Application.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lyne.API.Controllers
 {
-    public class UsersController : BaseController
+    public class UsersController(IUserService userService,ILogger<UsersController> logger) : BaseController
     {
-        [HttpGet]
-        public IEnumerable<string> Get()
+        [HttpGet("/users")]
+        public async Task<List<UserDto>> Get()
         {
-            return null;
+            return await userService.GetAllAsync();
         }
 
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("/user/{id}")]
+        public async Task<UserDto?> Get(int id)
         {
-            return null;
+            return await userService.GetByIdAsync(id);
         }
 
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("/user/create")]
+        public void Post([FromBody] UserDto dto)
         {
+            userService.AddAsync(dto);
         }
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("/user/update")]
+        public void Put([FromBody] UserDto dto)
         {
+            userService.UpdateAsync(dto);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("/user/delete/{id}")]
         public void Delete(int id)
         {
+            userService.DeleteAsync(id);
+        }
+
+        [HttpPost("/addUserWithAddress")]
+        public async Task<bool> AddUserWithAddress([FromBody]UserDto dto)
+        {
+            return await userService.AddAsync(dto);
+        }
+        [HttpPost("/updateUserWithAddress")]
+        public async Task<bool> UpdateUserWithAddress(UserDto dto)
+        {
+            return await userService.UpdateAsync(dto);
         }
     }
 }

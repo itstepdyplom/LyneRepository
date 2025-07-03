@@ -1,13 +1,11 @@
-using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Lyne.Application.DTO;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
-using Microsoft.Extensions.Logging;
 
 namespace Lyne.Application.Services;
 
-public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<UserService> logger)
+public class UserService(IUserRepository userRepository,IMapper mapper)
 {
     public async Task<List<UserDto>> GetAllAsync()
     {
@@ -23,37 +21,30 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
 
     public async Task<bool> AddAsync(UserDto dto)
     {
-        var validationContext = new ValidationContext(dto);
-        var validationResults = new List<ValidationResult>();
-        bool isValid = Validator.TryValidateObject(dto, validationContext, validationResults, true);
-
-        if (!isValid)
-        {
-            foreach (var error in validationResults)
-            {
-                logger.LogWarning("Validation failed: {ErrorMessage}", error.ErrorMessage);
-            }
-            return false;
-        }
-
         var user = mapper.Map<User>(dto);
         user.CreatedAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
 
-        var result = await userRepository.AddAsync(user);
-        return result;
+        if (!await userRepository.ValidateForCreateAsync(user))
+            return false;
+    
+        await userRepository.AddAsync(user);
+        return true;
     }
 
     public async Task<bool> UpdateAsync(UserDto dto)
     {
         if (!await userRepository.ExistsAsync(dto.Id))
             return false;
-
+        
         var user = mapper.Map<User>(dto);
         user.UpdatedAt = DateTime.UtcNow;
+        
+        if (!await userRepository.ValidateForUpdateAsync(user))
+            return false;
 
-        var result = userRepository.Update(user);
-        return result.Result;
+        await userRepository.Update(user);
+        return true;
     }
 
     public async Task<bool> DeleteAsync(int id)
@@ -61,7 +52,7 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
         var user = await userRepository.GetByIdAsync(id);
         if (user == null) return false;
 
-        var result = userRepository.Delete(user);
-        return result.Result;
+        await userRepository.Delete(user);
+        return true;
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Lyne.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lyne.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250702194700_AddJwtAuthentication")]
+    partial class AddJwtAuthentication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.6");
@@ -65,78 +68,6 @@ namespace Lyne.Infrastructure.Migrations
                             State = "Київська",
                             Street = "вул. Тараса Шевченка, 115",
                             Zip = "01001"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            City = "Київ",
-                            Country = "Україна",
-                            State = "Київська",
-                            Street = "вул. Хрещатик, 1",
-                            Zip = "01001"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            City = "Одеса",
-                            Country = "Україна",
-                            State = "Одеська",
-                            Street = "вул. Дерибасівська, 10",
-                            Zip = "65000"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            City = "Default City",
-                            Country = "Україна",
-                            State = "Default State",
-                            Street = "Default Address",
-                            Zip = "00000"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            City = "Дніпро",
-                            Country = "Україна",
-                            State = "Дніпропетровська",
-                            Street = "вул. Соборна, 25",
-                            Zip = "49000"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            City = "Харків",
-                            Country = "Україна",
-                            State = "Харківська",
-                            Street = "вул. Сумська, 50",
-                            Zip = "61000"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            City = "Запоріжжя",
-                            Country = "Україна",
-                            State = "Запорізька",
-                            Street = "вул. Героїв Майдану, 33",
-                            Zip = "69000"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            City = "Полтава",
-                            Country = "Україна",
-                            State = "Полтавська",
-                            Street = "вул. Центральна, 15",
-                            Zip = "36000"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            City = "Чернівці",
-                            Country = "Україна",
-                            State = "Чернівецька",
-                            Street = "вул. Миру, 8",
-                            Zip = "58000"
                         });
                 });
 
@@ -373,7 +304,7 @@ namespace Lyne.Infrastructure.Migrations
                         {
                             Id = 2,
                             AddressId = 2,
-                            CreatedAt = new DateTime(2024, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2025, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(2000, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "alekskochmar18@gmail.com",
                             ForName = "Кочмар",
@@ -381,7 +312,7 @@ namespace Lyne.Infrastructure.Migrations
                             Name = "Алекс",
                             PasswordHash = "hashedpassword123",
                             PhoneNumber = "+380986199887",
-                            UpdatedAt = new DateTime(2024, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            UpdatedAt = new DateTime(2025, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
