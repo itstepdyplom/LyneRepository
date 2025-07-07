@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Lyne.Domain.Entities;
 
 namespace Lyne.Domain.IRepositories;
@@ -5,5 +6,5 @@ namespace Lyne.Domain.IRepositories;
 public interface IJwtService
 {
     string GenerateToken(User user);
-    bool ValidateToken(string token);
+    ClaimsPrincipal ValidateToken(string token);
 } 

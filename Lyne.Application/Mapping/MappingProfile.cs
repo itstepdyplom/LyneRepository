@@ -32,5 +32,14 @@ public class MappingProfile : Profile
         // Address ↔ AddressDto
         CreateMap<Address, AddressDto>();
         CreateMap<AddressDto, Address>();
+        
+        // Product ↔ ProductDto
+        CreateMap<Product, ProductDto>();
+        CreateMap<ProductDto, Product>();
+        
+        // Category ↔ CategoryDto
+        CreateMap<Category, CategoryDto>();
+        CreateMap<CategoryDto, Category>();
+
     }
 }

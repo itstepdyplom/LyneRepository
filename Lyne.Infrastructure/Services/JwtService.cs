@@ -48,14 +48,14 @@ public class JwtService : IJwtService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public bool ValidateToken(string token)
+    public ClaimsPrincipal? ValidateToken(string token)
     {
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_secretKey);
-            
-            tokenHandler.ValidateToken(token, new TokenValidationParameters
+
+            var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -67,11 +67,11 @@ public class JwtService : IJwtService
                 ClockSkew = TimeSpan.Zero
             }, out SecurityToken validatedToken);
 
-            return true;
+            return principal;
         }
         catch
         {
-            return false;
+            return null;
         }
     }
 } 

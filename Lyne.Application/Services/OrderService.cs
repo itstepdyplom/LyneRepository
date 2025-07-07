@@ -34,6 +34,8 @@ public class OrderService(IOrderRepository orderRepository,IMapper mapper):IOrde
 
     public async Task<bool> UpdateAsync(OrderDto dto)
     {
+        if(dto==null)
+            return false;
         if (!await orderRepository.ExistsAsync(dto.Id))
             return false;
         

@@ -4,15 +4,14 @@ using Lyne.Application.DTO;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
-using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Lyne.Tests;
+namespace Lyne.Tests.ServiceTests;
 
 public class UserServiceTests
 {
     private readonly Mock<IUserRepository> _userRepoMock;
-    private readonly UserService _service;
+    private readonly IUserService _service;
     private readonly IMapper _mapper;
 
     public UserServiceTests()
@@ -236,7 +235,8 @@ public class UserServiceTests
             PasswordHash = "pass",
             PhoneNumber = "3809877777777",
         };
-        _userRepoMock.Setup(r => r.ExistsAsync(userDto.Id)).ReturnsAsync(false);
+        _userRepoMock.Setup(r => r.ExistsAsync(userDto.Id)).ReturnsAsync(true);
+        _userRepoMock.Setup(r => r.ValidateForCreateAsync(It.IsAny<User>())).ReturnsAsync(false);
 
         // Act
         var result = await _service.UpdateAsync(userDto);

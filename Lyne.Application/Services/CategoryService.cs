@@ -32,6 +32,8 @@ public class CategoryService(ICategoryRepository categoryRepository,IMapper mapp
 
     public async Task<bool> UpdateAsync(CategoryDto dto)
     {
+        if(dto==null)
+            return false;
         if (!await categoryRepository.ExistsAsync(dto.Id))
             return false;
         

@@ -10,7 +10,7 @@ public interface IProductService
 
     public Task<bool> AddAsync(ProductDto dto);
 
-    public Task<bool> UpdateAsync(ProductDto dto);
+    public Task<bool> UpdateAsync(ProductDto? dto);
 
     public Task<bool> DeleteAsync(Guid id);
 }

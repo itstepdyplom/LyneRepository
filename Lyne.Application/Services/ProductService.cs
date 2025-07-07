@@ -32,8 +32,11 @@ public class ProductService(IProductRepository productRepository,IMapper mapper)
         return true;
     }
 
-    public async Task<bool> UpdateAsync(ProductDto dto)
+    public async Task<bool> UpdateAsync(ProductDto? dto)
     {
+        if (dto==null)
+            return false;
+        
         if (!await productRepository.ExistsAsync(dto.Id))
             return false;
         

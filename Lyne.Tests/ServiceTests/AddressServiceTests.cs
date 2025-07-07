@@ -4,15 +4,14 @@ using Lyne.Application.DTO;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
-using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Lyne.Tests;
+namespace Lyne.Tests.ServiceTests;
 
 public class AddressServiceTests
 {
      private readonly Mock<IAddressRepository> _addressRepoMock;
-    private readonly AddressService _service;
+    private readonly IAddressService _service;
     private readonly IMapper _mapper;
 
     public AddressServiceTests()
@@ -27,6 +26,47 @@ public class AddressServiceTests
 
 
         _service = new AddressService(_addressRepoMock.Object, _mapper);
+    }
+    
+    [Fact]
+    public async Task GetAsync_ReturnsAddresses_WhenAddressesExists()
+    {
+        // Arrange
+        var addressId = 1;
+        var user = new User()
+        {
+            Id = addressId,
+            AddressId = 1,
+            Name = "John",
+            ForName = "Doe",
+            Email = "test@gmail.com",
+            PasswordHash = "test"
+        };
+        var expectedAddress = new Address { Id = addressId, City = "Test",Country = "Test",State = "Test",Street = "Test",User = user,Zip = "Test"};
+        _addressRepoMock.Setup(r => r.GetByIdAsync(addressId)).ReturnsAsync(expectedAddress);
+        _addressRepoMock.Setup(r => r.ExistsAsync(user.Id)).ReturnsAsync(true);
+
+        // Act
+        var result = await _service.GetByIdAsync(addressId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(addressId);
+    }
+    
+    [Fact]
+    public async Task GetAsync_ReturnsNull_WhenAddressesNotExists()
+    {
+        // Arrange
+        int addressId = 99;
+       
+        _addressRepoMock.Setup(r => r.GetByIdAsync(addressId)).ReturnsAsync((Address?)null);
+        
+        // Act
+        var result = await _service.GetByIdAsync(addressId);
+
+        // Assert
+        result.Should().BeNull();
     }
     
     [Fact]
