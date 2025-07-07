@@ -54,7 +54,7 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
         }
         else
         {
-            logger.LogInformation("Cannot delete address with id:{Id} deleted", address!.Id);
+            logger.LogInformation("Cannot delete address with id:{Id}", address!.Id);
             return false;
         }
     }
