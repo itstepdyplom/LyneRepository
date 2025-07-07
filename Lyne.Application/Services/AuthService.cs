@@ -4,27 +4,18 @@ using Lyne.Domain.IRepositories;
 
 namespace Lyne.Application.Services;
 
-public class AuthService
+public class AuthService(IAuthRepository authRepository, IJwtService jwtService)
 {
-    private readonly IAuthRepository _authRepository;
-    private readonly IJwtService _jwtService;
-
-    public AuthService(IAuthRepository authRepository, IJwtService jwtService)
-    {
-        _authRepository = authRepository;
-        _jwtService = jwtService;
-    }
-
     public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto loginRequest)
     {
-        var user = await _authRepository.GetUserByEmailAsync(loginRequest.Email);
+        var user = await authRepository.GetUserByEmailAsync(loginRequest.Email);
         
         if (user == null || !VerifyPassword(loginRequest.Password, user.PasswordHash))
         {
             return null;
         }
 
-        var token = _jwtService.GenerateToken(user);
+        var token = jwtService.GenerateToken(user);
         
         return new AuthResponseDto
         {
@@ -38,7 +29,7 @@ public class AuthService
 
     public async Task<AuthResponseDto?> RegisterAsync(RegisterRequestDto registerRequest)
     {
-        if (await _authRepository.UserExistsAsync(registerRequest.Email))
+        if (await authRepository.UserExistsAsync(registerRequest.Email))
         {
             return null;
         }
@@ -54,7 +45,7 @@ public class AuthService
             Country = "Україна"
         };
 
-        var createdAddress = await _authRepository.CreateAddressAsync(address);
+        var createdAddress = await authRepository.CreateAddressAsync(address);
 
         var user = new User
         {
@@ -71,8 +62,8 @@ public class AuthService
             AddressId = createdAddress.Id
         };
 
-        var createdUser = await _authRepository.CreateUserAsync(user);
-        var token = _jwtService.GenerateToken(createdUser);
+        var createdUser = await authRepository.CreateUserAsync(user);
+        var token = jwtService.GenerateToken(createdUser);
 
         return new AuthResponseDto
         {
