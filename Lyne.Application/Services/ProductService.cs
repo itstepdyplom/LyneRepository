@@ -5,7 +5,7 @@ using Lyne.Domain.IRepositories;
 
 namespace Lyne.Application.Services;
 
-public class ProductService(IProductRepository productRepository,IMapper mapper)
+public class ProductService(IProductRepository productRepository,IMapper mapper):IProductService
 {
     public async Task<List<ProductDto>> GetAllAsync()
     {

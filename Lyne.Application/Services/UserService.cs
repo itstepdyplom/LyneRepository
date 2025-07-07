@@ -5,7 +5,7 @@ using Lyne.Domain.IRepositories;
 
 namespace Lyne.Application.Services;
 
-public class UserService(IUserRepository userRepository,IMapper mapper)
+public class UserService(IUserRepository userRepository,IMapper mapper):IUserService
 {
     public async Task<List<UserDto>> GetAllAsync()
     {

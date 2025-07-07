@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lyne.Infrastructure.Repositories;
 
-public class ProductRepository(AppDbContext context, ILogger<AddressRepository> logger): IProductRepository
+public class ProductRepository(AppDbContext context, ILogger<ProductRepository> logger): IProductRepository
 {
     public async Task<List<Product?>> GetAllAsync()
     {
