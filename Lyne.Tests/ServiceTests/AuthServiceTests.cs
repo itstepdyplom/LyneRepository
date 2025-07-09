@@ -28,7 +28,8 @@ public class AuthServiceTests
             Email = "test@example.com",
             PasswordHash = "hashedpassword123",
             Name = "Test",
-            ForName = "User"
+            ForName = "User",
+            Genre = "test"
         };
         _authRepoMock.Setup(r => r.GetUserByEmailAsync("test@example.com")).ReturnsAsync(user);
         _jwtServiceMock.Setup(j => j.GenerateToken(user)).Returns("token123");
@@ -63,7 +64,8 @@ public class AuthServiceTests
             Email = "test@example.com",
             PasswordHash = "hashedpassword123",
             Name = "Test",
-            ForName = "User"
+            ForName = "User",
+            Genre = "test"
         };
         _authRepoMock.Setup(r => r.GetUserByEmailAsync("test@example.com")).ReturnsAsync(user);
 

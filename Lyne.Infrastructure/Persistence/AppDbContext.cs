@@ -14,6 +14,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Address>()
+            .HasOne(a => a.User)
+            .WithMany()
+            .HasForeignKey(a => a.UserId);
+        
         //Seed Address
         modelBuilder.Entity<Address>().HasData(
             new Address
@@ -23,7 +29,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 City = "Львів",
                 State = "Львівська",
                 Zip = "79000",
-                Country = "Україна"
+                Country = "Україна",
+                UserId = 1
             },
             new Address
             {
@@ -32,7 +39,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 City = "Київ",
                 State = "Київська",
                 Zip = "01001",
-                Country = "Україна"
+                Country = "Україна",
+                UserId = 2
             },
             new Address
             {
@@ -41,7 +49,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 City = "Київ",
                 State = "Київська", 
                 Zip = "01001",
-                Country = "Україна"
+                Country = "Україна",
+                UserId = 1
             },
             new Address
             {
@@ -50,7 +59,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 City = "Одеса",
                 State = "Одеська",
                 Zip = "65000",
-                Country = "Україна"
+                Country = "Україна",
+                UserId = 2
             },
             new Address
             {
@@ -59,7 +69,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 City = "Default City",
                 State = "Default State",
                 Zip = "00000",
-                Country = "Україна"
+                Country = "Україна",
+                UserId = 1
             },
             new Address
             {
@@ -68,7 +79,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 City = "Дніпро",
                 State = "Дніпропетровська",
                 Zip = "49000",
-                Country = "Україна"
+                Country = "Україна",
+                UserId = 2
             },
             new Address
             {
@@ -77,7 +89,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 City = "Харків",
                 State = "Харківська",
                 Zip = "61000",
-                Country = "Україна"
+                Country = "Україна",
+                UserId = 1
             },
             new Address
             {
@@ -86,7 +99,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 City = "Запоріжжя",
                 State = "Запорізька",
                 Zip = "69000",
-                Country = "Україна"
+                Country = "Україна",
+                UserId = 2
             },
             new Address
             {
@@ -95,7 +109,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 City = "Полтава",
                 State = "Полтавська",
                 Zip = "36000",
-                Country = "Україна"
+                Country = "Україна",
+                UserId = 1
             },
             new Address
             {
@@ -104,26 +119,26 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 City = "Чернівці",
                 State = "Чернівецька",
                 Zip = "58000",
-                Country = "Україна"
+                Country = "Україна",
+                UserId = 2
             }
         );
-
+        
         //Seed Users with static password hashes (password: password123)
         modelBuilder.Entity<User>().HasData(
-           new User
-           {
-               Id = 1,
-               Name = "Ольга",
-               ForName = "Косач",
-               Genre = "Жіноча",
-               PasswordHash = "hashedpassword123",
-               DateOfBirth = new DateTime(2002, 3, 15),
-               PhoneNumber = "+380501234567",
-               Email = "kosacho@gmail.com",
-               AddressId = 1,
-               CreatedAt = new DateTime(2024, 6, 1),
-               UpdatedAt = new DateTime(2024, 6, 1)
-           },
+            new User
+            {
+                Id = 1,
+                Name = "Ольга",
+                ForName = "Косач",
+                Genre = "Жіноча",
+                PasswordHash = "hashedpassword123",
+                DateOfBirth = new DateTime(2002, 3, 15),
+                PhoneNumber = "+380501234567",
+                Email = "kosacho@gmail.com",
+                CreatedAt = new DateTime(2024, 6, 1),
+                UpdatedAt = new DateTime(2024, 6, 1)
+            },
             new User
             {
                 Id = 2,
@@ -134,11 +149,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 DateOfBirth = new DateTime(2000, 6, 18),
                 PhoneNumber = "+380986199887",
                 Email = "alekskochmar18@gmail.com",
-                AddressId = 2,
                 CreatedAt = new DateTime(2024, 2, 15),
                 UpdatedAt = new DateTime(2024, 2, 15)
             }
         );
+       
 
         //Seed Categories
         var menCategoryId = Guid.Parse("11111111-1111-1111-1111-111111111111");

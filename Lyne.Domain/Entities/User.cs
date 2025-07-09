@@ -6,10 +6,10 @@ namespace Lyne.Domain.Entities;
 public class User
 {
     [Key]
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required string Name { get; set; } = "";
     public required string ForName { get; set; } = "";
-    public string Genre { get; set; }
+    public required string Genre { get; set; }
     public required string PasswordHash { get; set; } = "";
     public DateTime DateOfBirth { get; set; }
 
@@ -18,7 +18,7 @@ public class User
 
     [EmailAddress]
     public required string Email { get; set; } = "";
-    public int AddressId { get; set; }
+    public int? AddressId { get; set; }
 
     [ForeignKey("AddressId")]
     public Address? Address { get; set; }

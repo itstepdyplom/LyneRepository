@@ -39,13 +39,18 @@ namespace Lyne.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Zip")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Address");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Addresses");
 
                     b.HasData(
                         new
@@ -55,6 +60,7 @@ namespace Lyne.Infrastructure.Migrations
                             Country = "Україна",
                             State = "Львівська",
                             Street = "вул. Січових Стрільців, 12",
+                            UserId = 1,
                             Zip = "79000"
                         },
                         new
@@ -64,6 +70,7 @@ namespace Lyne.Infrastructure.Migrations
                             Country = "Україна",
                             State = "Київська",
                             Street = "вул. Тараса Шевченка, 115",
+                            UserId = 2,
                             Zip = "01001"
                         },
                         new
@@ -73,6 +80,7 @@ namespace Lyne.Infrastructure.Migrations
                             Country = "Україна",
                             State = "Київська",
                             Street = "вул. Хрещатик, 1",
+                            UserId = 1,
                             Zip = "01001"
                         },
                         new
@@ -82,6 +90,7 @@ namespace Lyne.Infrastructure.Migrations
                             Country = "Україна",
                             State = "Одеська",
                             Street = "вул. Дерибасівська, 10",
+                            UserId = 2,
                             Zip = "65000"
                         },
                         new
@@ -91,6 +100,7 @@ namespace Lyne.Infrastructure.Migrations
                             Country = "Україна",
                             State = "Default State",
                             Street = "Default Address",
+                            UserId = 1,
                             Zip = "00000"
                         },
                         new
@@ -100,6 +110,7 @@ namespace Lyne.Infrastructure.Migrations
                             Country = "Україна",
                             State = "Дніпропетровська",
                             Street = "вул. Соборна, 25",
+                            UserId = 2,
                             Zip = "49000"
                         },
                         new
@@ -109,6 +120,7 @@ namespace Lyne.Infrastructure.Migrations
                             Country = "Україна",
                             State = "Харківська",
                             Street = "вул. Сумська, 50",
+                            UserId = 1,
                             Zip = "61000"
                         },
                         new
@@ -118,6 +130,7 @@ namespace Lyne.Infrastructure.Migrations
                             Country = "Україна",
                             State = "Запорізька",
                             Street = "вул. Героїв Майдану, 33",
+                            UserId = 2,
                             Zip = "69000"
                         },
                         new
@@ -127,6 +140,7 @@ namespace Lyne.Infrastructure.Migrations
                             Country = "Україна",
                             State = "Полтавська",
                             Street = "вул. Центральна, 15",
+                            UserId = 1,
                             Zip = "36000"
                         },
                         new
@@ -136,6 +150,7 @@ namespace Lyne.Infrastructure.Migrations
                             Country = "Україна",
                             State = "Чернівецька",
                             Street = "вул. Миру, 8",
+                            UserId = 2,
                             Zip = "58000"
                         });
                 });
@@ -312,7 +327,7 @@ namespace Lyne.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedAt")
@@ -349,8 +364,7 @@ namespace Lyne.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId")
-                        .IsUnique();
+                    b.HasIndex("AddressId");
 
                     b.ToTable("Users");
 
@@ -358,7 +372,6 @@ namespace Lyne.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            AddressId = 1,
                             CreatedAt = new DateTime(2024, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(2002, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "kosacho@gmail.com",
@@ -372,7 +385,6 @@ namespace Lyne.Infrastructure.Migrations
                         new
                         {
                             Id = 2,
-                            AddressId = 2,
                             CreatedAt = new DateTime(2024, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(2000, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "alekskochmar18@gmail.com",
@@ -383,6 +395,17 @@ namespace Lyne.Infrastructure.Migrations
                             PhoneNumber = "+380986199887",
                             UpdatedAt = new DateTime(2024, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("Lyne.Domain.Entities.Address", b =>
+                {
+                    b.HasOne("Lyne.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Lyne.Domain.Entities.Order", b =>
@@ -422,17 +445,10 @@ namespace Lyne.Infrastructure.Migrations
             modelBuilder.Entity("Lyne.Domain.Entities.User", b =>
                 {
                     b.HasOne("Lyne.Domain.Entities.Address", "Address")
-                        .WithOne("User")
-                        .HasForeignKey("Lyne.Domain.Entities.User", "AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("AddressId");
 
                     b.Navigation("Address");
-                });
-
-            modelBuilder.Entity("Lyne.Domain.Entities.Address", b =>
-                {
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Lyne.Domain.Entities.Category", b =>

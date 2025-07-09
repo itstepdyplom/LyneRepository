@@ -40,7 +40,8 @@ public class AddressServiceTests
             Name = "John",
             ForName = "Doe",
             Email = "test@gmail.com",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Genre = "test"
         };
         var expectedAddress = new Address { Id = addressId, City = "Test",Country = "Test",State = "Test",Street = "Test",User = user,Zip = "Test"};
         _addressRepoMock.Setup(r => r.GetByIdAsync(addressId)).ReturnsAsync(expectedAddress);
@@ -81,7 +82,8 @@ public class AddressServiceTests
             Name = "John",
             ForName = "Doe",
             Email = "test@gmail.com",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Genre = "test"
         };
         var expectedAddress = new Address { Id = addressId, City = "Test",Country = "Test",State = "Test",Street = "Test",User = user,Zip = "Test"};
         _addressRepoMock.Setup(r => r.GetByIdAsync(addressId)).ReturnsAsync(expectedAddress);
@@ -122,7 +124,8 @@ public class AddressServiceTests
             Name = "John",
             ForName = "Doe",
             Email = "test@gmail.com",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Genre = "test"
         };
         var address = new Address()
         {
@@ -157,7 +160,8 @@ public class AddressServiceTests
             Name = "John",
             ForName = "Doe",
             Email = "test@gmail.com",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Genre = "test"
         };
         var address = new Address()
         {
@@ -192,7 +196,8 @@ public class AddressServiceTests
             Name = "John",
             ForName = "Doe",
             Email = "test@gmail.com",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Genre = "test"
         };
         var address = new Address()
         {
@@ -228,7 +233,8 @@ public class AddressServiceTests
             Name = "John",
             ForName = "Doe",
             Email = "test@gmail.com",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Genre = "test"
         };
         var address = new Address()
         {
@@ -263,7 +269,8 @@ public class AddressServiceTests
             Name = "John",
             ForName = "Doe",
             Email = "test@gmail.com",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Genre = "test"
         };
         var address = new Address()
         {
@@ -298,7 +305,8 @@ public class AddressServiceTests
             Name = "John",
             ForName = "Doe",
             Email = "test@gmail.com",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Genre = "test"
         };
         var address = new Address()
         {
@@ -334,7 +342,8 @@ public class AddressServiceTests
             Name = "John",
             ForName = "Doe",
             Email = "test@gmail.com",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Genre = "test"
             
         };
         var address = new Address()
@@ -370,7 +379,8 @@ public class AddressServiceTests
             Name = "John",
             ForName = "Doe",
             Email = "test@gmail.com",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Genre = "test"
         };
         var address = new Address()
         {

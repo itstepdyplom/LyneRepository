@@ -1,4 +1,6 @@
+using AutoMapper;
 using Lyne.Domain.Entities;
+using Lyne.Domain.Enums;
 using Lyne.Domain.IRepositories;
 using Lyne.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lyne.Infrastructure.Repositories;
 
-public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logger): IOrderRepository
+public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logger, IMapper mapper): IOrderRepository
 {
     public async Task<List<Order>> GetAllAsync()
     {
@@ -16,9 +18,14 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
 
     public async Task<Order?> GetByIdAsync(int id)
     {
-        var address = await context.Orders.FirstOrDefaultAsync(x => x.Id == id);
-        logger.LogInformation("Address id:{Id} users", address!.Id);
-        return await Task.FromResult(address);
+        var order = await context.Orders.FindAsync(id);
+        if (order == null)
+        {
+            logger.LogInformation("Order with id:{Id} not found", id);
+            return null;
+        }
+        logger.LogInformation("Order with id:{Id} found", order.Id);
+        return order;
     }
 
     public async Task<bool> AddAsync(Order? order)
@@ -29,6 +36,7 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
             return false;
         }
         await context.Orders.AddAsync(order);
+        await context.SaveChangesAsync();
         logger.LogInformation("Order with id:{Id} added", order!.Id);
         return await Task.FromResult(true);
     }
@@ -37,32 +45,36 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
     {
         if (order == null)
         {
-            logger.LogInformation("Cannot update order with id:{Id}, some fields are empty", order!.Id);
-            return await Task.FromResult(false);
+            logger.LogInformation("Cannot update order with id:{Id}, some fields are empty", 0);
+            return false;
         }
-        context.Orders.Update(order);
-        logger.LogInformation("Order with id:{Id} updated", order!.Id);
-        return await Task.FromResult(true);
+
+        var existingOrder = await context.Orders.FindAsync(order.Id);
+        if (existingOrder == null)
+            return false;
+        
+        //context.Entry(existingOrder).CurrentValues.SetValues(order);
+        mapper.Map(order, existingOrder);
+
+        if (!await ValidateForUpdateAsync(existingOrder))
+        {
+            logger.LogInformation("Cannot update order with id:{Id}, validation issues", existingOrder!.Id);
+            return false;
+        }
+        await context.SaveChangesAsync();
+        logger.LogInformation("Order with id:{Id} updated", existingOrder.Id);
+        return true;
     }
 
     public async Task<bool> DeleteAsync(Order? order)
     {
-        if (!ValidateForUpdateAsync(order).Result)
-        {
-            logger.LogInformation("Cannot update order with id:{Id}, some fields are empty", order!.Id);
-            return await Task.FromResult(false);
-        }
-        var result = context.Orders.Remove(order);
-        if (result.State == EntityState.Detached)
-        {
-            logger.LogInformation("Order with id:{Id} deleted", order!.Id);
-            return true;
-        }
-        else
-        {
-            logger.LogInformation("Cannot delete order with id:{Id}", order!.Id);
+        var existingOrder = await context.Orders.FindAsync(order.Id);
+        if (existingOrder == null)
             return false;
-        }
+
+        context.Orders.Remove(existingOrder);
+        await context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> ExistsAsync(int id)
@@ -78,7 +90,7 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
             order.OrderStatus != default &&
             !string.IsNullOrEmpty(order.PaymentMethod) &&
             order.ShippingAddressId != default &&
-            !string.IsNullOrEmpty(order.TrackingNumber.ToString()) &&
+            order.TrackingNumber != 0 &&
             order.UserId != default
         );
     }
@@ -89,8 +101,9 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
             return false;
 
         var orderExists = await context.Orders.AnyAsync(u => u.Id == order.Id);
+        logger.LogInformation("Order Exists: {Exists} for Id: {Id}", orderExists, order.Id);
 
-        return order.OrderStatus != default &&
+        return order.OrderStatus != OrderStatus.Unknown &&
                !string.IsNullOrEmpty(order.PaymentMethod) &&
                order.ShippingAddressId != default &&
                !string.IsNullOrEmpty(order.TrackingNumber.ToString()) &&

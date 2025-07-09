@@ -7,7 +7,7 @@ namespace Lyne.Domain.Entities;
 public class Order
 {
     [Key]
-    public required int Id { get; set; }
+    public int Id { get; set; }
 
     public DateTime Date { get; set; }
 

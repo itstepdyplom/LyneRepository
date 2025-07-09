@@ -1,6 +1,5 @@
 using Lyne.Application.Mapping;
 using Lyne.Application.Services;
-using Lyne.Domain.IRepositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lyne.Application.Extensions;

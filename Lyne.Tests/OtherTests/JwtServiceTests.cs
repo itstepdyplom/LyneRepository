@@ -28,7 +28,7 @@ public class JwtServiceTests
     [Fact]
     public void GenerateToken_ReturnsValidToken()
     {
-        var user = new User { Id = 1, Email = "test@example.com", Name = "Test", ForName = "test", PasswordHash = "test" };
+        var user = new User { Id = 1, Email = "test@example.com", Name = "Test", ForName = "test", PasswordHash = "test", Genre = "test"};
         var token = _jwtService.GenerateToken(user);
         token.Should().NotBeNullOrEmpty();
     }
@@ -36,7 +36,7 @@ public class JwtServiceTests
     [Fact]
     public void ValidateToken_ReturnsClaimsPrincipal_WhenTokenIsValid()
     {
-        var user = new User { Id = 1, Email = "test@example.com", Name = "Test", ForName = "test", PasswordHash = "test"};
+        var user = new User { Id = 1, Email = "test@example.com", Name = "Test", ForName = "test", PasswordHash = "test", Genre = "test"};
         var token = _jwtService.GenerateToken(user);
         ClaimsPrincipal? principal = _jwtService.ValidateToken(token);
         principal.Should().NotBeNull();
