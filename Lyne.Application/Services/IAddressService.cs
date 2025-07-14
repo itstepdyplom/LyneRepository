@@ -11,5 +11,5 @@ public interface IAddressService
 
     public Task<bool> UpdateAsync(AddressDto dto);
 
-    public Task<bool> DeleteAsync(AddressDto dto);
+    public Task<bool> DeleteAsync(int id);
 }

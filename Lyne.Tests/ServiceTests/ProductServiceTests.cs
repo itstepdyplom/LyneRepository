@@ -4,6 +4,7 @@ using Lyne.Application.DTO;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Lyne.Tests.ServiceTests;
@@ -13,16 +14,19 @@ public class ProductServiceTests
     private readonly Mock<IProductRepository> _productRepoMock;
     private readonly IProductService _service;
     private readonly IMapper _mapper;
+    private readonly Mock<ILogger<ProductService>> _logger;
+
 
     public ProductServiceTests()
     {
         _productRepoMock = new Mock<IProductRepository>();
+        _logger = new Mock<ILogger<ProductService>>();
 
         var config = new MapperConfiguration(cfg => { cfg.AddProfile<Lyne.Application.Mapping.MappingProfile>(); });
         _mapper = config.CreateMapper();
 
 
-        _service = new ProductService(_productRepoMock.Object, _mapper);
+        _service = new ProductService(_productRepoMock.Object, _mapper, _logger.Object);
     }
 
     [Fact]
@@ -345,7 +349,9 @@ public class ProductServiceTests
         _productRepoMock.Setup(r => r.ExistsAsync(product.Id)).ReturnsAsync(false);
         _productRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Product>())).ReturnsAsync(true);
         _productRepoMock.Setup(r => r.Update(It.IsAny<Product>())).ReturnsAsync(true);
-
+        _productRepoMock.Setup(r => r.Update(It.IsAny<Product>()))
+            .ReturnsAsync((Product p) => _productRepoMock.Object.ExistsAsync(p.Id).Result);
+        
         // Act
         var result = await _service.UpdateAsync(productDto);
 

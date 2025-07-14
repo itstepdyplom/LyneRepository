@@ -1,10 +1,12 @@
 using Lyne.Domain.IRepositories;
+using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
 using Lyne.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Lyne.Infrastructure.Extensions;
 
@@ -19,7 +21,12 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<IJwtService, JwtService>();
-
+        
+        var redisConnectionString = configuration.GetConnectionString("Redis");
+        var connection = ConnectionMultiplexer.Connect(redisConnectionString!);
+        services.AddSingleton<IConnectionMultiplexer>(connection);
+        services.AddSingleton<ICacheService, RedisCacheService>();
+        
         return services;
     }
     //repository service, Redis, RabbitMQ etc.

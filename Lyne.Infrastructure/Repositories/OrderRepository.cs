@@ -35,6 +35,11 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
             logger.LogInformation("Cannot add order with id:{Id}, some fields are empty", order!.Id);
             return false;
         }
+        if (!await ValidateForCreateAsync(order))
+        {
+            logger.LogInformation("Cannot add order with id:{Id}, validation issues", order!.Id);
+            return false;
+        }
         await context.Orders.AddAsync(order);
         await context.SaveChangesAsync();
         logger.LogInformation("Order with id:{Id} added", order!.Id);
@@ -51,7 +56,10 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
 
         var existingOrder = await context.Orders.FindAsync(order.Id);
         if (existingOrder == null)
+        {
+            logger.LogInformation("Order with id:{Id} not found", order.Id);
             return false;
+        }
         
         //context.Entry(existingOrder).CurrentValues.SetValues(order);
         mapper.Map(order, existingOrder);
@@ -70,10 +78,14 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
     {
         var existingOrder = await context.Orders.FindAsync(order.Id);
         if (existingOrder == null)
+        {
+            logger.LogInformation("Order with id:{Id} not found", order!.Id);
             return false;
+        }
 
         context.Orders.Remove(existingOrder);
         await context.SaveChangesAsync();
+        logger.LogInformation("Order with id:{Id} deleted", order!.Id);
         return true;
     }
 
@@ -86,13 +98,15 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
 
     public Task<bool> ValidateForCreateAsync(Order order)
     {
-        return Task.FromResult(
+        bool isValid =
             order.OrderStatus != default &&
             !string.IsNullOrEmpty(order.PaymentMethod) &&
             order.ShippingAddressId != default &&
             order.TrackingNumber != 0 &&
-            order.UserId != default
-        );
+            order.UserId != default;
+
+        logger.LogInformation("ValidateForCreateOrderAsync: Validation {Result}", isValid ? "passed" : "failed");
+        return Task.FromResult(isValid);
     }
 
     public async Task<bool> ValidateForUpdateAsync(Order? order)
@@ -103,11 +117,13 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
         var orderExists = await context.Orders.AnyAsync(u => u.Id == order.Id);
         logger.LogInformation("Order Exists: {Exists} for Id: {Id}", orderExists, order.Id);
 
-        return order.OrderStatus != OrderStatus.Unknown &&
-               !string.IsNullOrEmpty(order.PaymentMethod) &&
-               order.ShippingAddressId != default &&
-               !string.IsNullOrEmpty(order.TrackingNumber.ToString()) &&
-               order.UserId != default &&
-               orderExists;
+        bool isValid = order.OrderStatus != OrderStatus.Unknown &&
+                       !string.IsNullOrEmpty(order.PaymentMethod) &&
+                       order.ShippingAddressId != default &&
+                       !string.IsNullOrEmpty(order.TrackingNumber.ToString()) &&
+                       order.UserId != default &&
+                       orderExists;
+        logger.LogInformation("ValidateForUpdateOrderAsync: Validation {Result}", isValid ? "passed" : "failed");
+        return isValid;
     }
 }
