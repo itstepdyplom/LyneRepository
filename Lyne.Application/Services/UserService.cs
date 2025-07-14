@@ -2,31 +2,36 @@ using AutoMapper;
 using Lyne.Application.DTO;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
+using Microsoft.Extensions.Logging;
 
 namespace Lyne.Application.Services;
 
-public class UserService(IUserRepository userRepository,IMapper mapper):IUserService
+public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<UserService> logger):IUserService
 {
     public async Task<List<UserDto>> GetAllAsync()
     {
+        logger.LogInformation("Getting all users");
         var users = await userRepository.GetAllAsync();
+        if (users.Count == 0)
+        {
+            logger.LogInformation("No users found");
+        }
         return mapper.Map<List<UserDto>>(users);
     }
 
     public async Task<UserDto?> GetByIdAsync(int id)
     {
+        logger.LogInformation("Getting user with id {id}", id);
         var user = await userRepository.GetByIdAsync(id);
         return mapper.Map<UserDto>(user);
     }
 
     public async Task<bool> AddAsync(UserDto dto)
     {
+        logger.LogInformation("Adding user {user}", dto);
         var user = mapper.Map<User>(dto);
         user.CreatedAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
-
-        if (!await userRepository.ValidateForCreateAsync(user))
-            return false;
     
         await userRepository.AddAsync(user);
         return true;
@@ -34,23 +39,19 @@ public class UserService(IUserRepository userRepository,IMapper mapper):IUserSer
 
     public async Task<bool> UpdateAsync(UserDto dto)
     {
-        if (!await userRepository.ExistsAsync(dto.Id))
-            return false;
-        
+        logger.LogInformation("Updating user with id: {id}", dto.Id);
         var user = mapper.Map<User>(dto);
         user.UpdatedAt = DateTime.UtcNow;
         
-        if (!await userRepository.ValidateForUpdateAsync(user))
-            return false;
-
         await userRepository.Update(user);
         return true;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var user = await userRepository.GetByIdAsync(id);
-        if (user == null) return false;
+        logger.LogInformation("Deleting user with id: {id}", id);
+        var userDto = await GetByIdAsync(id);
+        var user = mapper.Map<User>(userDto);
 
         await userRepository.Delete(user);
         return true;

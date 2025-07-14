@@ -4,6 +4,7 @@ using Lyne.Application.DTO;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Lyne.Tests.ServiceTests;
@@ -13,10 +14,12 @@ public class AddressServiceTests
      private readonly Mock<IAddressRepository> _addressRepoMock;
     private readonly IAddressService _service;
     private readonly IMapper _mapper;
+    private readonly Mock<ILogger<AddressService>> _logger;
 
     public AddressServiceTests()
     {
         _addressRepoMock = new Mock<IAddressRepository>();
+        _logger = new Mock<ILogger<AddressService>>();
 
         var config = new MapperConfiguration(cfg =>
         {
@@ -25,7 +28,7 @@ public class AddressServiceTests
         _mapper = config.CreateMapper();
 
 
-        _service = new AddressService(_addressRepoMock.Object, _mapper);
+        _service = new AddressService(_addressRepoMock.Object, _mapper, _logger.Object);
     }
     
     [Fact]
@@ -249,7 +252,8 @@ public class AddressServiceTests
         _addressRepoMock.Setup(r => r.Update(It.IsAny<Address>())).ReturnsAsync(true);
         _addressRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Address>())).ReturnsAsync(false);
         _addressRepoMock.Setup(r => r.ExistsAsync(user.Id)).ReturnsAsync(true);
-
+        _addressRepoMock.Setup(r => r.Update(It.IsAny<Address>()))
+            .ReturnsAsync((Address a) => _addressRepoMock.Object.ValidateForUpdateAsync(a).Result);
         // Act
         var addressDto = _mapper.Map<AddressDto>(address);
         var result = await _service.UpdateAsync(addressDto);
@@ -285,7 +289,8 @@ public class AddressServiceTests
         _addressRepoMock.Setup(r => r.Update(It.IsAny<Address>())).ReturnsAsync(true);
         _addressRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Address>())).ReturnsAsync(true);
         _addressRepoMock.Setup(r => r.ExistsAsync(user.Id)).ReturnsAsync(false);
-
+        _addressRepoMock.Setup(r => r.Update(It.IsAny<Address>()))
+            .ReturnsAsync((Address a) => _addressRepoMock.Object.ExistsAsync(a.Id).Result);
         // Act
         var addressDto = _mapper.Map<AddressDto>(address);
         var result = await _service.UpdateAsync(addressDto);
@@ -324,7 +329,7 @@ public class AddressServiceTests
 
         // Act
         var addressDto = _mapper.Map<AddressDto>(address);
-        var result = await _service.DeleteAsync(addressDto);
+        var result = await _service.DeleteAsync(addressDto.Id);
 
         // Assert
         result.Should().BeTrue();
@@ -362,7 +367,7 @@ public class AddressServiceTests
 
         // Act
         var addressDto = _mapper.Map<AddressDto>(address);
-        var result = await _service.DeleteAsync(addressDto);
+        var result = await _service.DeleteAsync(addressDto.Id);
 
         // Assert
         result.Should().BeFalse();
@@ -398,7 +403,7 @@ public class AddressServiceTests
 
         // Act
         var addressDto = _mapper.Map<AddressDto>(address);
-        var result = await _service.DeleteAsync(addressDto);
+        var result = await _service.DeleteAsync(addressDto.Id);
 
         // Assert
         result.Should().BeFalse();

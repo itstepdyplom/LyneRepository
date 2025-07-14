@@ -4,6 +4,7 @@ using Lyne.Application.DTO;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Lyne.Tests.ServiceTests;
@@ -13,10 +14,12 @@ public class UserServiceTests
     private readonly Mock<IUserRepository> _userRepoMock;
     private readonly IUserService _service;
     private readonly IMapper _mapper;
+    private readonly Mock<ILogger<UserService>> _logger;
 
     public UserServiceTests()
     {
         _userRepoMock = new Mock<IUserRepository>();
+        _logger = new Mock<ILogger<UserService>>();
 
         var config = new MapperConfiguration(cfg =>
         {
@@ -25,7 +28,7 @@ public class UserServiceTests
         _mapper = config.CreateMapper();
 
 
-        _service = new UserService(_userRepoMock.Object, _mapper);
+        _service = new UserService(_userRepoMock.Object, _mapper, _logger.Object);
     }
     [Fact]
     public async Task GetAllAsync_ReturnsListOfUsers_WhenUsersExists()

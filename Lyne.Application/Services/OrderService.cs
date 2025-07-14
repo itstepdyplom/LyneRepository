@@ -2,59 +2,63 @@ using AutoMapper;
 using Lyne.Application.DTO;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
+using Microsoft.Extensions.Logging;
 
 namespace Lyne.Application.Services;
 
-public class OrderService(IOrderRepository orderRepository,IMapper mapper):IOrderService
+public class OrderService(IOrderRepository orderRepository,IMapper mapper,ILogger<OrderService> logger):IOrderService
 {
     public async Task<List<OrderDto>> GetAllAsync()
     {
+        logger.LogInformation("Getting all orders");
         var orders = await orderRepository.GetAllAsync();
+        if (orders.Count == 0)
+        {
+            logger.LogInformation("No orders found");
+        }
         return mapper.Map<List<OrderDto>>(orders);
     }
 
     public async Task<OrderDto?> GetByIdAsync(int id)
     {
+        logger.LogInformation("Getting order by id");
         var order = await orderRepository.GetByIdAsync(id);
         return mapper.Map<OrderDto>(order);
     }
 
     public async Task<bool> AddAsync(OrderDto dto)
     {
-        var order = mapper.Map<Order>(dto);
-        order.CreatedAt = DateTime.UtcNow;
-        order.UpdatedAt = DateTime.UtcNow;
-
-        if (!await orderRepository.ValidateForCreateAsync(order))
+        try
+        {
+            var order = mapper.Map<Order>(dto);
+            if (!await orderRepository.ValidateForCreateAsync(order))
+                return false;
+            return await orderRepository.AddAsync(order);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error adding order");
             return false;
-    
-        await orderRepository.AddAsync(order);
-        return true;
+        }
     }
 
     public async Task<bool> UpdateAsync(OrderDto dto)
     {
-        if(dto==null)
-            return false;
-        if (!await orderRepository.ExistsAsync(dto.Id))
-            return false;
-        
+        logger.LogInformation("Updating order");
+        if(dto==null) return false;
         var order = mapper.Map<Order>(dto);
         order.UpdatedAt = DateTime.UtcNow;
-        
-        if (!await orderRepository.ValidateForUpdateAsync(order))
-            return false;
 
-        await orderRepository.Update(order);
-        return true;
+        return await orderRepository.Update(order);
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var order = await orderRepository.GetByIdAsync(id);
-        if (order == null) return false;
-
-        await orderRepository.DeleteAsync(order);
-        return true;
+        logger.LogInformation("Deleting order");
+        var orderDto = await GetByIdAsync(id);
+        if (orderDto == null)
+            return false;
+        var order = mapper.Map<Order>(orderDto);
+        return await orderRepository.DeleteAsync(order);
     }
 }

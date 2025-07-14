@@ -31,6 +31,13 @@ public class CategoryRepository(AppDbContext context, ILogger<CategoryRepository
             logger.LogInformation("Cannot add category with id:{Id}, some fields are empty", category!.Id);
             return false;
         }
+
+        if (!ValidateForCreateAsync(category).Result)
+        {
+            logger.LogInformation("Validation error for categoryId: {Id}", category!.Id);
+            return false;
+        }
+        
         await context.Categories.AddAsync(category);
         logger.LogInformation("Category with id:{Id} added", category!.Id);
         return await Task.FromResult(true);
@@ -40,10 +47,20 @@ public class CategoryRepository(AppDbContext context, ILogger<CategoryRepository
     {
         var existing = await context.Categories.FindAsync(category.Id);
         if (existing == null)
+        {
+            logger.LogInformation("Category with id:{Id} not found", category!.Id);
             return false;
+        }
+
+        if (!ValidateForUpdateAsync(category).Result)
+        {
+            logger.LogInformation("Validation error for categoryId: {Id}", category!.Id);
+            return false;
+        }
 
         existing.Name = category.Name;
         existing.Description = category.Description;
+        logger.LogInformation("Category with id:{Id} updated", category!.Id);
         await context.SaveChangesAsync();
         return true;
     }
@@ -55,15 +72,16 @@ public class CategoryRepository(AppDbContext context, ILogger<CategoryRepository
             logger.LogInformation("Cannot delete category: category is null");
             return false;
         }
-        if (!ValidateForUpdateAsync(category).Result)
-        {
-            logger.LogInformation("Cannot update category with id:{Id}, some fields are empty", category!.Id);
-            return await Task.FromResult(false);
-        }
+
         var existing = await context.Categories.FindAsync(category.Id);
         if (existing == null)
         {
             logger.LogInformation("Cannot delete category with id:{Id}: not found", category.Id);
+            return false;
+        }
+        if (!await ValidateForUpdateAsync(category))
+        {
+            logger.LogInformation("Cannot delete category with id:{Id}, validation issues", category.Id);
             return false;
         }
         context.Categories.Remove(existing);
@@ -81,10 +99,11 @@ public class CategoryRepository(AppDbContext context, ILogger<CategoryRepository
 
     public Task<bool> ValidateForCreateAsync(Category category)
     {
-        return Task.FromResult(
+        bool isValid =
             !string.IsNullOrWhiteSpace(category.Name) &&
-            !string.IsNullOrWhiteSpace(category.Description)
-        );
+            !string.IsNullOrWhiteSpace(category.Description);
+        logger.LogInformation("ValidateForCreateCategoryAsync: Validation {Result}", isValid ? "passed" : "failed");
+        return Task.FromResult(isValid);
     }
 
     public async Task<bool> ValidateForUpdateAsync(Category? category)
@@ -94,8 +113,10 @@ public class CategoryRepository(AppDbContext context, ILogger<CategoryRepository
 
         var categoryExists = await context.Categories.AnyAsync(u => u.Id == category.Id);
 
-        return !string.IsNullOrWhiteSpace(category.Name) &&
-               !string.IsNullOrWhiteSpace(category.Description) &&
-               categoryExists;
+        bool isValid = !string.IsNullOrWhiteSpace(category.Name) &&
+                       !string.IsNullOrWhiteSpace(category.Description) &&
+                       categoryExists;
+        logger.LogInformation("ValidateForUpdateCategoryAsync: Validation {Result}", isValid ? "passed" : "failed");
+        return isValid;
     }
 }

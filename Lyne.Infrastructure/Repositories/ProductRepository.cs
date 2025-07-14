@@ -26,7 +26,7 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
             return null;
         }
 
-        logger.LogInformation("Product id:{Id}", product.Id);
+        logger.LogInformation("Product id:{Id} was found", product.Id);
         return product;
     }
 
@@ -37,6 +37,12 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
             logger.LogInformation("Cannot add product with id:{Id}, some fields are empty", product!.Id);
             return false;
         }
+        if (!ValidateForCreateAsync(product).Result)
+        {
+            logger.LogInformation("Cannot add product with id:{Id}, validation issues", product!.Id);
+            return false;
+        }
+        
         await context.Products.AddAsync(product);
         logger.LogInformation("Product with id:{Id} added", product!.Id);
         return await Task.FromResult(true);
@@ -44,13 +50,23 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
 
     public async Task<bool> Update(Product? product)
     {
+        if (product is null)
+        {
+            logger.LogWarning("Attempted to add a null product");
+            return false;
+        }
         var existing = await context.Products.FindAsync(product.Id);
         if (existing == null)
         {
             logger.LogWarning("Product with ID {Id} not found", product.Id);
             return false;
         }
-
+        if (!ValidateForUpdateAsync(product).Result)
+        {
+            logger.LogInformation("Cannot update product with id:{Id}, validation issues", product!.Id);
+            return false;
+        }
+        
         context.Products.Update(existing);
         await context.SaveChangesAsync();
         logger.LogInformation("Product with id:{Id} updated", product!.Id);
@@ -59,6 +75,12 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
 
     public async Task<bool> DeleteAsync(Product? product)
     {
+        if (product == null)
+        {
+            logger.LogWarning("Product is null");
+            return false;
+        }
+
         var existing = await context.Products.FindAsync(product.Id);
         if (existing == null)
         {
@@ -66,18 +88,16 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
             return false;
         }
 
-        var result = context.Products.Remove(existing);
-        await context.SaveChangesAsync();
-        if (result.State == EntityState.Detached)
+        if (!await ValidateForUpdateAsync(product))
         {
-            logger.LogInformation("Product with id:{Id} deleted", existing!.Id);
-            return true;
-        }
-        else
-        {
-            logger.LogInformation("Cannot delete product with id:{Id}", existing!.Id);
+            logger.LogInformation("Cannot delete product with id:{Id}, validation issues", product.Id);
             return false;
         }
+
+        context.Products.Remove(existing);
+        await context.SaveChangesAsync();
+        logger.LogInformation("Product with id:{Id} deleted", existing.Id);
+        return true;
     }
 
     public async Task<bool> ExistsAsync(Guid id)
@@ -92,28 +112,34 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
 
     public async Task<bool> ValidateForCreateAsync(Product product)
     {
-        return !string.IsNullOrEmpty(product.Brand) &&
-               !string.IsNullOrEmpty(product.Color) &&
-               !string.IsNullOrEmpty(product.Description) &&
-               !string.IsNullOrEmpty(product.ImageUrl) &&
-               !string.IsNullOrEmpty(product.Name) &&
-               product.IsActive && // замість ToString()
-               product.Price > 0 &&
-               product.StockQuantity >= 0;
+        bool isValid = !string.IsNullOrEmpty(product.Brand) &&
+                       !string.IsNullOrEmpty(product.Color) &&
+                       !string.IsNullOrEmpty(product.Description) &&
+                       !string.IsNullOrEmpty(product.ImageUrl) &&
+                       !string.IsNullOrEmpty(product.Name) &&
+                       product.IsActive &&
+                       product.Price > 0 &&
+                       product.StockQuantity >= 0;
+
+        logger.LogInformation("ValidateForCreateProductAsync: Validation {Result}", isValid ? "passed" : "failed");
+        return isValid;
     }
 
     public async Task<bool> ValidateForUpdateAsync(Product? product)
     {
         var productExists = product != null && await context.Products.AnyAsync(u => u.Id == product.Id);
 
-        return !string.IsNullOrEmpty(product?.Brand) &&
-               !string.IsNullOrEmpty(product.Color) &&
-               !string.IsNullOrEmpty(product.Description) &&
-               !string.IsNullOrEmpty(product.ImageUrl) &&
-               !string.IsNullOrEmpty(product.Name) &&
-               !string.IsNullOrEmpty(product.IsActive.ToString()) &&
-               !string.IsNullOrEmpty(product.Price.ToString(CultureInfo.InvariantCulture)) &&
-               !string.IsNullOrEmpty(product.StockQuantity.ToString()) &&
-               productExists;
+        bool isValid = !string.IsNullOrEmpty(product?.Brand) &&
+                       !string.IsNullOrEmpty(product.Color) &&
+                       !string.IsNullOrEmpty(product.Description) &&
+                       !string.IsNullOrEmpty(product.ImageUrl) &&
+                       !string.IsNullOrEmpty(product.Name) &&
+                       !string.IsNullOrEmpty(product.IsActive.ToString()) &&
+                       !string.IsNullOrEmpty(product.Price.ToString(CultureInfo.InvariantCulture)) &&
+                       !string.IsNullOrEmpty(product.StockQuantity.ToString()) &&
+                       productExists;
+
+        logger.LogInformation("ValidateForUpdateProductAsync: Validation {Result}", isValid ? "passed" : "failed");
+        return isValid;
     }
 }

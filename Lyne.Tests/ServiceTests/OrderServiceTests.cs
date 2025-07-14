@@ -5,6 +5,7 @@ using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.Enums;
 using Lyne.Domain.IRepositories;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Lyne.Tests.ServiceTests;
@@ -14,13 +15,15 @@ public class OrderServiceTests
     private readonly Mock<IOrderRepository> _orderRepoMock;
     private readonly IOrderService _service;
     private readonly IMapper _mapper;
+    private readonly Mock<ILogger<OrderService>> _logger;
 
     public OrderServiceTests()
     {
         _orderRepoMock = new Mock<IOrderRepository>();
         var config = new MapperConfiguration(cfg => { cfg.AddProfile<Lyne.Application.Mapping.MappingProfile>(); });
         _mapper = config.CreateMapper();
-        _service = new OrderService(_orderRepoMock.Object, _mapper);
+        _logger = new Mock<ILogger<OrderService>>();
+        _service = new OrderService(_orderRepoMock.Object, _mapper, _logger.Object);
     }
 
     [Fact]
@@ -231,9 +234,8 @@ public class OrderServiceTests
         // Arrange
         var id = 1;
         var order = new Order { Id = id, Date = new DateTime(2000, 01, 01), OrderStatus = OrderStatus.Pending };
-        _orderRepoMock.Setup(r => r.ExistsAsync(id)).ReturnsAsync(true);
         _orderRepoMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(order);
-        _orderRepoMock.Setup(r => r.DeleteAsync(order)).ReturnsAsync(true);
+        _orderRepoMock.Setup(r => r.DeleteAsync(It.IsAny<Order>())).ReturnsAsync(true);
 
         // Act
         var result = await _service.DeleteAsync(id);

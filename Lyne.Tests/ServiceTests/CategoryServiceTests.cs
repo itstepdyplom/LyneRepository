@@ -4,6 +4,7 @@ using Lyne.Application.DTO;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Lyne.Tests.ServiceTests;
@@ -13,13 +14,15 @@ public class CategoryServiceTests
     private readonly Mock<ICategoryRepository> _categoryRepoMock;
     private readonly ICategoryService _service;
     private readonly IMapper _mapper;
+    private readonly Mock<ILogger<CategoryService>> _logger;
 
     public CategoryServiceTests()
     {
         _categoryRepoMock = new Mock<ICategoryRepository>();
         var config = new MapperConfiguration(cfg => { cfg.AddProfile<Lyne.Application.Mapping.MappingProfile>(); });
         _mapper = config.CreateMapper();
-        _service = new CategoryService(_categoryRepoMock.Object, _mapper);
+        _logger = new Mock<ILogger<CategoryService>>();
+        _service = new CategoryService(_categoryRepoMock.Object, _mapper, _logger.Object);
     }
 
     [Fact]
@@ -228,14 +231,13 @@ public class CategoryServiceTests
     public async Task DeleteAsync_ReturnsTrue_WhenOrderDeleted()
     {
         // Arrange
-        var id = new Guid();
-        var category = new Category { Id = id,Name = "test"};
-        _categoryRepoMock.Setup(r => r.ExistsAsync(category.Id)).ReturnsAsync(true);
-        _categoryRepoMock.Setup(r => r.GetByIdAsync(category.Id)).ReturnsAsync(category);
-        _categoryRepoMock.Setup(r => r.DeleteAsync(category)).ReturnsAsync(true);
+        var id = Guid.NewGuid();
+        var category = new Category { Id = id, Name = "test" };
+        _categoryRepoMock.Setup(r => r.DeleteAsync(It.IsAny<Category>())).ReturnsAsync(true);
+        var categoryDto = _mapper.Map<CategoryDto>(category);
 
         // Act
-        var result = await _service.DeleteAsync(id);
+        var result = await _service.DeleteAsync(categoryDto.Id);
 
         // Assert
         result.Should().BeTrue();
@@ -246,10 +248,12 @@ public class CategoryServiceTests
     {
         // Arrange
         var id = new Guid();
+        var category = new Category { Id = id,Name = "test"};
         _categoryRepoMock.Setup(r => r.ExistsAsync(id)).ReturnsAsync(false);
+        var categoryDto = _mapper.Map<CategoryDto>(category);
 
         // Act
-        var result = await _service.DeleteAsync(id);
+        var result = await _service.DeleteAsync(categoryDto.Id);
 
         // Assert
         result.Should().BeFalse();
@@ -273,10 +277,11 @@ public class CategoryServiceTests
         var category = new Category { Id = id,Name = "test"};
         _categoryRepoMock.Setup(r => r.ExistsAsync(id)).ReturnsAsync(true);
         _categoryRepoMock.Setup(r => r.DeleteAsync(category)).ThrowsAsync(new Exception());
+        var categoryDto = _mapper.Map<CategoryDto>(category);
 
 
         // Act
-        var result = await _service.DeleteAsync(id);
+        var result = await _service.DeleteAsync(categoryDto.Id);
 
         // Assert
         result.Should().BeFalse();

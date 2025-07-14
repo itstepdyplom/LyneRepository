@@ -2,6 +2,7 @@ using Lyne.Application.DTO.Auth;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Lyne.Tests.ServiceTests;
@@ -11,12 +12,14 @@ public class AuthServiceTests
     private readonly Mock<IAuthRepository> _authRepoMock;
     private readonly Mock<IJwtService> _jwtServiceMock;
     private readonly AuthService _authService;
+    private readonly Mock<ILogger<AuthService>> _logger;
 
     public AuthServiceTests()
     {
         _authRepoMock = new Mock<IAuthRepository>();
         _jwtServiceMock = new Mock<IJwtService>();
-        _authService = new AuthService(_authRepoMock.Object, _jwtServiceMock.Object);
+        _logger = new Mock<ILogger<AuthService>>();
+        _authService = new AuthService(_authRepoMock.Object, _jwtServiceMock.Object,_logger.Object);
     }
 
     [Fact]

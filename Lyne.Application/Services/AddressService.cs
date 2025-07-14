@@ -7,46 +7,59 @@ using Microsoft.Extensions.Logging;
 
 namespace Lyne.Application.Services;
 
-public class AddressService(IAddressRepository addressRepository, IMapper mapper):IAddressService
+public class AddressService(IAddressRepository addressRepository, IMapper mapper, ILogger<AddressService> logger):IAddressService
 {
+    public async Task<List<AddressDto>> GetAllAsync()
+    {
+        logger.LogInformation("Getting all addresses");
+        var addresses = await addressRepository.GetAllAsync();
+        if (addresses.Count == 0)
+        {
+            logger.LogInformation("No addresses found");
+        }
+        return mapper.Map<List<AddressDto>>(addresses);
+    }
     public async Task<AddressDto?> GetByIdAsync(int id)
     {
-        var validation = await addressRepository.ExistsAsync(id);
-        if (!validation) return null;
+        logger.LogInformation("Getting address with id: {id}", id);
         var address = await addressRepository.GetByIdAsync(id);
         return mapper.Map<AddressDto>(address);
     }
 
     public async Task<bool> AddAsync(AddressDto dto)
     {
+        logger.LogInformation("Adding address with id: {id}", dto.Id);
         var address = mapper.Map<Address>(dto);
-
-        var validation = await addressRepository.ValidateForCreateAsync(address);
-        if (!validation) return false;
-
+        if (address == null || string.IsNullOrWhiteSpace(address.City) || address.User == null || address.User.Id == 0)
+        {
+            logger.LogInformation("Cannot add address, validation failed");
+            return false;
+        }
         return await addressRepository.AddAsync(address);
     }
 
     public async Task<bool> UpdateAsync(AddressDto dto)
     {
+        logger.LogInformation("Updating address with id: {id}", dto.Id);
         var address = mapper.Map<Address>(dto);
-        
-        if (!await addressRepository.ExistsAsync(address.Id)) return false;
-        
-        var validation = await addressRepository.ValidateForUpdateAsync(address);
-        if (!validation) return false;
-
+        if (address == null)
+        {
+            logger.LogInformation("Cannot update address, address is null");
+            return false;
+        }
         return await addressRepository.Update(address);
     }
 
-    public async Task<bool> DeleteAsync(AddressDto dto)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var address = mapper.Map<Address>(dto);
-
-        if (!await addressRepository.ExistsAsync(address.Id)) return false;
-
-        if (!await addressRepository.ValidateForUpdateAsync(address)) return false;
-
+        logger.LogInformation("Deleting address with id: {id}", id);
+        var addressDto = await GetByIdAsync(id);
+        var address = mapper.Map<Address>(addressDto);
+        if (address == null)
+        {
+            logger.LogInformation("Cannot delete address, address is null");
+            return false;
+        }
         return await addressRepository.DeleteAsync(address);
     }
 }
