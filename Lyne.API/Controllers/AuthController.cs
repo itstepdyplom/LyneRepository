@@ -1,6 +1,8 @@
 using Lyne.Application.DTO.Auth;
 using Lyne.Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace Lyne.API.Controllers;
 
@@ -24,7 +26,7 @@ public class AuthController : ControllerBase
         }
 
         var result = await _authService.LoginAsync(loginRequest);
-        
+
         if (result == null)
         {
             return Unauthorized(new { message = "Invalid email or password" });
@@ -42,7 +44,7 @@ public class AuthController : ControllerBase
         }
 
         var result = await _authService.RegisterAsync(registerRequest);
-        
+
         if (result == null)
         {
             return BadRequest(new { message = "User with this email already exists" });
@@ -50,4 +52,40 @@ public class AuthController : ControllerBase
 
         return Ok(result);
     }
-} 
+
+    [HttpGet("google-login")]
+    public IActionResult GoogleLogin()
+    {
+        var properties = new AuthenticationProperties
+        {
+            RedirectUri = Url.Action("GoogleCallback")!
+        };
+
+        return Challenge(properties, "Google");
+    }
+
+    [HttpGet("google-callback")]
+    public async Task<IActionResult> GoogleCallback()
+    {
+        var result = await HttpContext.AuthenticateAsync("Google");
+
+        if (!result.Succeeded || result.Principal == null)
+        {
+            return Unauthorized("Google login failed");
+        }
+
+        var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+        var name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
+
+        if (email == null)
+        {
+            return BadRequest("Email not found");
+        }
+
+        var authResult = await _authService.LoginWithGoogleAsync(email, name);
+
+        // return Redirect();
+
+        return Ok(authResult);
+    }
+}

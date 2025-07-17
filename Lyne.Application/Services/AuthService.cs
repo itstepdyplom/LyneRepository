@@ -10,7 +10,7 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
     public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto loginRequest)
     {
         var user = await authRepository.GetUserByEmailAsync(loginRequest.Email);
-        logger.LogInformation("Login with email: {email}",loginRequest.Email);
+        logger.LogInformation("Login with email: {email}", loginRequest.Email);
         if (user == null || !VerifyPassword(loginRequest.Password, user.PasswordHash))
         {
             logger.LogWarning("Invalid login attempt");
@@ -43,7 +43,7 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
         {
             Id = 0, // Will be auto-generated
             Street = "Default Street",
-            City = "Default City", 
+            City = "Default City",
             State = "Default State",
             Zip = "00000",
             Country = "Україна"
@@ -92,7 +92,7 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
         {
             return true;
         }
-        
+
         // For new users, use BCrypt verification
         try
         {
@@ -103,4 +103,36 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
             return false;
         }
     }
-} 
+
+    public async Task<AuthResponseDto?> LoginWithGoogleAsync(string email, string? fullName)
+    {
+        var user = await authRepository.GetUserByEmailAsync(email);
+        if (user == null)
+        {
+            user = new User
+            {
+                Email = email,
+                Name = fullName ?? "Google User",
+                ForName = "",
+                PasswordHash = "",
+                Genre = "",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            user = await authRepository.CreateUserAsync(user);
+        }
+
+        var token = jwtService.GenerateToken(user);
+
+        return new AuthResponseDto
+        {
+            Token = token,
+            Email = user.Email,
+            Name = user.Name,
+            ForName = user.ForName,
+            ExpiresAt = DateTime.UtcNow.AddHours(24)
+        };
+    }
+
+}

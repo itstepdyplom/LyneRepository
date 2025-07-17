@@ -32,7 +32,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
+    })
+    .AddGoogle("Google", options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+        options.CallbackPath = "/api/auth/google-callback"; // має відповідати реальному шляху
     });
+
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
