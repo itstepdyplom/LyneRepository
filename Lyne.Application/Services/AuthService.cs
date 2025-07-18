@@ -10,7 +10,7 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
     public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto loginRequest)
     {
         var user = await authRepository.GetUserByEmailAsync(loginRequest.Email);
-        logger.LogInformation("Login with email: {email}",loginRequest.Email);
+        logger.LogInformation("Login with email: {email}", loginRequest.Email);
         if (user == null || !VerifyPassword(loginRequest.Password, user.PasswordHash))
         {
             logger.LogWarning("Invalid login attempt");
@@ -43,7 +43,7 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
         {
             Id = 0, // Will be auto-generated
             Street = "Default Street",
-            City = "Default City", 
+            City = "Default City",
             State = "Default State",
             Zip = "00000",
             Country = "Україна"
@@ -92,7 +92,7 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
         {
             return true;
         }
-        
+
         // For new users, use BCrypt verification
         try
         {
@@ -103,4 +103,46 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
             return false;
         }
     }
-} 
+
+    public async Task<AuthResponseDto?> LoginWithGoogleAsync(string email, string? fullName)
+    {
+        var user = await authRepository.GetUserByEmailAsync(email);
+        if (user == null)
+        {
+            var randomPassword = GenerateRandomPassword();
+
+            user = new User
+            {
+                Email = email,
+                Name = fullName ?? "Google User",
+                ForName = "",
+                PasswordHash = HashPassword(randomPassword),
+                Genre = "",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            user = await authRepository.CreateUserAsync(user);
+            // Потім можна надіслати лист для зміни пароля/надіслати пароль
+        }
+
+        var token = jwtService.GenerateToken(user);
+
+        return new AuthResponseDto
+        {
+            Token = token,
+            Email = user.Email,
+            Name = user.Name,
+            ForName = user.ForName,
+            ExpiresAt = DateTime.UtcNow.AddHours(24)
+        };
+    }
+
+    private string GenerateRandomPassword(int length = 16)
+    {
+        const string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?";
+        var random = new Random();
+        return new string(Enumerable.Range(0, length).Select(_ => validChars[random.Next(validChars.Length)]).ToArray());
+    }
+
+}

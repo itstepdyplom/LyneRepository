@@ -19,7 +19,7 @@ public class AuthServiceTests
         _authRepoMock = new Mock<IAuthRepository>();
         _jwtServiceMock = new Mock<IJwtService>();
         _logger = new Mock<ILogger<AuthService>>();
-        _authService = new AuthService(_authRepoMock.Object, _jwtServiceMock.Object,_logger.Object);
+        _authService = new AuthService(_authRepoMock.Object, _jwtServiceMock.Object, _logger.Object);
     }
 
     [Fact]
@@ -137,4 +137,58 @@ public class AuthServiceTests
 
         Assert.Null(result);
     }
+
+    [Fact]
+    public async Task LoginWithGoogleAsync_ReturnsAuthResponse_WhenUserExists()
+    {
+        var existingUser = new User
+        {
+            Id = 1,
+            Email = "googleuser@example.com",
+            Name = "Existing User",
+            ForName = "Google",
+            Genre = "",
+            PasswordHash = "",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _authRepoMock.Setup(r => r.GetUserByEmailAsync("googleuser@example.com")).ReturnsAsync(existingUser);
+        _jwtServiceMock.Setup(j => j.GenerateToken(existingUser)).Returns("token_google_existing");
+
+        var result = await _authService.LoginWithGoogleAsync("googleuser@example.com", "Existing User");
+
+        Assert.NotNull(result);
+        Assert.Equal("token_google_existing", result!.Token);
+        Assert.Equal("googleuser@example.com", result.Email);
+        Assert.Equal("Existing User", result.Name);
+    }
+
+    [Fact]
+    public async Task LoginWithGoogleAsync_CreatesUserAndReturnsAuthResponse_WhenUserDoesNotExist()
+    {
+        User? createdUser = null;
+
+        _authRepoMock.Setup(r => r.GetUserByEmailAsync("newgoogleuser@example.com")).ReturnsAsync((User?)null);
+        _authRepoMock.Setup(r => r.CreateUserAsync(It.IsAny<User>()))
+            .ReturnsAsync((User u) =>
+            {
+                u.Id = 42;
+                createdUser = u;
+                return u;
+            });
+        _jwtServiceMock.Setup(j => j.GenerateToken(It.IsAny<User>())).Returns("token_google_new");
+
+        var result = await _authService.LoginWithGoogleAsync("newgoogleuser@example.com", "New Google User");
+
+        Assert.NotNull(result);
+        Assert.Equal("token_google_new", result!.Token);
+        Assert.Equal("newgoogleuser@example.com", result.Email);
+        Assert.Equal("New Google User", result.Name);
+
+        Assert.NotNull(createdUser);
+        Assert.Equal("newgoogleuser@example.com", createdUser!.Email);
+        Assert.Equal("New Google User", createdUser.Name);
+    }
+
 }

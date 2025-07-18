@@ -63,7 +63,7 @@ namespace Lyne.API.Controllers
         public async Task<ActionResult> Delete([FromBody] AddressDto dto)
         {
            logger.LogInformation("Запит на видалення адреси з ID = {Id}", dto.Id);
-            var success = await addressService.DeleteAsync(dto);
+            var success = await addressService.DeleteAsync(dto.Id);
             if (!success)
             {
                 logger.LogWarning("Адреса з ID = {Id} не знайдена для видалення", dto.Id);
