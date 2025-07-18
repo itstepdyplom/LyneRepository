@@ -109,18 +109,21 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
         var user = await authRepository.GetUserByEmailAsync(email);
         if (user == null)
         {
+            var randomPassword = GenerateRandomPassword();
+
             user = new User
             {
                 Email = email,
                 Name = fullName ?? "Google User",
                 ForName = "",
-                PasswordHash = "",
+                PasswordHash = HashPassword(randomPassword),
                 Genre = "",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
             user = await authRepository.CreateUserAsync(user);
+            // Потім можна надіслати лист для зміни пароля/надіслати пароль
         }
 
         var token = jwtService.GenerateToken(user);
@@ -133,6 +136,13 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
             ForName = user.ForName,
             ExpiresAt = DateTime.UtcNow.AddHours(24)
         };
+    }
+
+    private string GenerateRandomPassword(int length = 16)
+    {
+        const string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?";
+        var random = new Random();
+        return new string(Enumerable.Range(0, length).Select(_ => validChars[random.Next(validChars.Length)]).ToArray());
     }
 
 }
