@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Lyne.Domain.Entities;
-using Lyne.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
-using System.Security.Claims; // Add this
+using System.Security.Claims;
+using Lyne.Application.Services; // Add this
 
 namespace Lyne.Tests.OtherTests;
 

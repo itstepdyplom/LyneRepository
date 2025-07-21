@@ -11,6 +11,6 @@ public class Address
     public required string State { get; set; }
     public string Zip { get; set; }
     public required string Country { get; set; }
-    public int UserId { get; set; }
-    public User User { get; set; }
+    public int? UserId { get; set; } 
+    public User? User { get; set; }
 }

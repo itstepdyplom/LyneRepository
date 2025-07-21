@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lyne.Application.Services;
 
-public class AuthService(IAuthRepository authRepository, IJwtService jwtService, ILogger<AuthService> logger)
+public class AuthService(IAuthRepository authRepository, IJwtService jwtService, ILogger<AuthService> logger):IAuthService
 {
     public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto loginRequest)
     {

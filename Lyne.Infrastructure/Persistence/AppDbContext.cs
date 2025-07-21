@@ -14,7 +14,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
+        
+        modelBuilder.Entity<Address>().ToTable("Address");
+        
         modelBuilder.Entity<Address>()
             .HasOne(a => a.User)
             .WithMany()

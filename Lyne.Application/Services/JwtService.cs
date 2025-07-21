@@ -6,7 +6,7 @@ using Lyne.Domain.IRepositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Lyne.Infrastructure.Services;
+namespace Lyne.Application.Services;
 
 public class JwtService : IJwtService
 {

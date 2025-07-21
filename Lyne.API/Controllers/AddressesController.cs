@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Lyne.API.Controllers
 {
-    public class AddressesController(IAddressService addressService, ILogger<AddressService> logger) : BaseController
+    public class AddressController(IAddressService addressService, ILogger<AddressController> logger) : BaseController
     {
         [HttpGet("{id}")]
         public async Task<ActionResult<AddressDto>> Get(int id)

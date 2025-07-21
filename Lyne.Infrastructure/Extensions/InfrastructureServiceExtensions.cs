@@ -1,8 +1,8 @@
+using Lyne.Application.Services;
 using Lyne.Domain.IRepositories;
 using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
-using Lyne.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,13 +18,24 @@ public static class InfrastructureServiceExtensions
             options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+
+        // Register repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuthRepository, AuthRepository>();
+        services.AddScoped<IAddressRepository, AddressRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+
         services.AddScoped<IJwtService, JwtService>();
+
         
-        var redisConnectionString = configuration.GetConnectionString("Redis");
-        var connection = ConnectionMultiplexer.Connect(redisConnectionString!);
-        services.AddSingleton<IConnectionMultiplexer>(connection);
+        // C#
+        var redisConfig = configuration.GetConnectionString("Redis");
+        if (string.IsNullOrEmpty(redisConfig))
+            throw new ArgumentNullException(nameof(redisConfig), "Redis connection string is missing.");
+
+        services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConfig));
         services.AddSingleton<ICacheService, RedisCacheService>();
         
         return services;
