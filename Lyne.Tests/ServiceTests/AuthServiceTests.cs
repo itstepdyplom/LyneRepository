@@ -32,7 +32,8 @@ public class AuthServiceTests
             PasswordHash = "hashedpassword123",
             Name = "Test",
             ForName = "User",
-            Genre = "test"
+            Genre = "test",
+            Role = "User"
         };
         _authRepoMock.Setup(r => r.GetUserByEmailAsync("test@example.com")).ReturnsAsync(user);
         _jwtServiceMock.Setup(j => j.GenerateToken(user)).Returns("token123");
@@ -68,7 +69,8 @@ public class AuthServiceTests
             PasswordHash = "hashedpassword123",
             Name = "Test",
             ForName = "User",
-            Genre = "test"
+            Genre = "test",
+            Role = "User"
         };
         _authRepoMock.Setup(r => r.GetUserByEmailAsync("test@example.com")).ReturnsAsync(user);
 
@@ -97,7 +99,8 @@ public class AuthServiceTests
                 PhoneNumber = u.PhoneNumber,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt,
-                AddressId = u.AddressId
+                AddressId = u.AddressId,
+                Role = "User"
             });
         _jwtServiceMock.Setup(j => j.GenerateToken(It.IsAny<User>())).Returns("token456");
 
@@ -150,7 +153,8 @@ public class AuthServiceTests
             Genre = "",
             PasswordHash = "",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Role = "User"
         };
 
         _authRepoMock.Setup(r => r.GetUserByEmailAsync("googleuser@example.com")).ReturnsAsync(existingUser);

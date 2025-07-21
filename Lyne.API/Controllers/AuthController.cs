@@ -3,12 +3,14 @@ using Lyne.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Lyne.API.Controllers;
 
 public class AuthController(AuthService authService) : BaseController
 {
     [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequest)
     {
         if (!ModelState.IsValid)
@@ -27,6 +29,7 @@ public class AuthController(AuthService authService) : BaseController
     }
 
     [HttpPost("register")]
+    [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequest)
     {
         if (!ModelState.IsValid)
@@ -45,6 +48,7 @@ public class AuthController(AuthService authService) : BaseController
     }
 
     [HttpGet("google-login")]
+    [AllowAnonymous]
     public IActionResult GoogleLogin()
     {
         var properties = new AuthenticationProperties

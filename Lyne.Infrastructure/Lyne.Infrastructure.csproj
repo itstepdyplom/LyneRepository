@@ -24,11 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Migrations\20250721095455_InitialCreate.cs" />
     <Compile Remove="Migrations\20250721095455_InitialCreate.Designer.cs" />
   </ItemGroup>

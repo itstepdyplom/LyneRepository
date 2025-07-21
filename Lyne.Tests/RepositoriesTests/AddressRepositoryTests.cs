@@ -41,7 +41,8 @@ public class AddressRepositoryTests : IAsyncLifetime
             Genre = "Test", // ✅ обов'язкове поле
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            DateOfBirth = new DateTime(2000, 1, 1)
+            DateOfBirth = new DateTime(2000, 1, 1),
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -75,7 +76,7 @@ public class AddressRepositoryTests : IAsyncLifetime
     {
         // Arrange
         var user = new User
-            { Name = "User", ForName = "Test", PasswordHash = "hash", Email = "user@test.com", Genre = "test" };
+            { Name = "User", ForName = "Test", PasswordHash = "hash", Email = "user@test.com", Genre = "test", Role = "User" };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -124,7 +125,8 @@ public class AddressRepositoryTests : IAsyncLifetime
             Email = "user@test.com",
             Genre = "test",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -177,7 +179,8 @@ public class AddressRepositoryTests : IAsyncLifetime
             Email = "user@test.com",
             Genre = "test",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -229,7 +232,8 @@ public class AddressRepositoryTests : IAsyncLifetime
             Email = "user@test.com",
             Genre = "test",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -266,7 +270,8 @@ public class AddressRepositoryTests : IAsyncLifetime
             Email = "ghost@test.com",
             Genre = "test",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Role = "User"
         };
 
         var address = new Address
@@ -298,7 +303,8 @@ public class AddressRepositoryTests : IAsyncLifetime
             Email = "user@test.com",
             Genre = "test",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -334,7 +340,8 @@ public class AddressRepositoryTests : IAsyncLifetime
             Email = "user@test.com",
             Genre = "test",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -391,7 +398,8 @@ public class AddressRepositoryTests : IAsyncLifetime
             Email = "user@test.com",
             Genre = "test",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -450,7 +458,8 @@ public class AddressRepositoryTests : IAsyncLifetime
             Email = "user@test.com",
             Genre = "test",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -484,7 +493,8 @@ public class AddressRepositoryTests : IAsyncLifetime
             Email = "user@test.com",
             Genre = "test",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();

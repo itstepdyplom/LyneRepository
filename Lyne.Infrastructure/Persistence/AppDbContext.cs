@@ -139,7 +139,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 PhoneNumber = "+380501234567",
                 Email = "kosacho@gmail.com",
                 CreatedAt = new DateTime(2024, 6, 1),
-                UpdatedAt = new DateTime(2024, 6, 1)
+                UpdatedAt = new DateTime(2024, 6, 1),
+                Role = "User"
             },
             new User
             {
@@ -152,7 +153,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 PhoneNumber = "+380986199887",
                 Email = "alekskochmar18@gmail.com",
                 CreatedAt = new DateTime(2024, 2, 15),
-                UpdatedAt = new DateTime(2024, 2, 15)
+                UpdatedAt = new DateTime(2024, 2, 15),
+                Role = "User"
             }
         );
        

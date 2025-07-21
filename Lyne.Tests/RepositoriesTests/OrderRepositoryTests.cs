@@ -61,7 +61,8 @@ public class OrderRepositoryTests : IAsyncLifetime
             ForName = "test",
             Name = "test",
             PasswordHash = "test",
-            Genre = "test"
+            Genre = "test",
+            Role = "User"
         };
 
         _context.Users.Add(user);
@@ -105,7 +106,7 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task GetAllAsync_ShouldReturnAllOrders()
     {
         // Arrange
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test"};
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User"};
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
         
@@ -167,7 +168,7 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task Update_ShouldReturnTrue_WhenOrderExists()
     {
         // Arrange
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test" };
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User" };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -218,7 +219,7 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task DeleteAsync_ShouldReturnTrue_WhenOrderExists()
     {
         // Arrange: створюємо користувача, адресу та замовлення
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test" };
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User"};
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -307,7 +308,7 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task ValidateForUpdateAsync_ShouldReturnTrue_ForValidOrder()
     {
         // Arrange
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test" };
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User" };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 

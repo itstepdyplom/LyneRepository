@@ -34,9 +34,16 @@ public class JwtService : IJwtService
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Name, user.Name),
             new Claim(ClaimTypes.GivenName, user.ForName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role, user.Role)
         };
-
+        
+        var allowedRoles = new[] { "Admin", "Manager", "User" };
+        if (!allowedRoles.Contains(user.Role))
+        {
+            throw new ArgumentException("Invalid role. Allowed roles: Admin, Manager, User.");
+        }
+        
         var token = new JwtSecurityToken(
             issuer: _issuer,
             audience: _audience,

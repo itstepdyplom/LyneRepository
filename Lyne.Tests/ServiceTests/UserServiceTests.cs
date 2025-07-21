@@ -37,8 +37,8 @@ public class UserServiceTests
         _userRepoMock.Setup(r => r.GetAllAsync())
             .ReturnsAsync(new List<User>
             {
-                new User { Id = 1, Name = "Test", ForName = "User", Email = "test@gmail.com", PasswordHash = "test", Genre = "test"},
-                new User { Id = 2, Name = "Test2", ForName = "User2", Email = "test@gmail.com", PasswordHash = "test", Genre = "test"}
+                new User { Id = 1, Name = "Test", ForName = "User", Email = "test@gmail.com", PasswordHash = "test", Genre = "test", Role = "User"},
+                new User { Id = 2, Name = "Test2", ForName = "User2", Email = "test@gmail.com", PasswordHash = "test", Genre = "test", Role = "User"}
             });
 
         // Act
@@ -66,7 +66,7 @@ public class UserServiceTests
         // Arrange
         var id = new int();
         _userRepoMock.Setup(r => r.GetByIdAsync(id))
-            .ReturnsAsync(new User { Id = 1, Name = "Test", ForName = "User", Email = "test@gmail.com", PasswordHash = "test", Genre = "test"});
+            .ReturnsAsync(new User { Id = 1, Name = "Test", ForName = "User", Email = "test@gmail.com", PasswordHash = "test", Genre = "test", Role = "User"});
 
         // Act
         var result = await _service.GetByIdAsync(id);
@@ -281,7 +281,7 @@ public class UserServiceTests
         };
         var user= await _service.GetByIdAsync(userDto.Id);
         _userRepoMock.Setup(r => r.GetByIdAsync(userDto.Id)).ReturnsAsync(
-            new User { Id = userDto.Id,Name = userDto.Name,ForName = userDto.ForName,Email = userDto.Email,PasswordHash = userDto.PasswordHash, Genre = userDto.Genre});
+            new User { Id = userDto.Id,Name = userDto.Name,ForName = userDto.ForName,Email = userDto.Email,PasswordHash = userDto.PasswordHash, Genre = userDto.Genre, Role = "User"});
         _userRepoMock.Setup(r => r.Delete(It.IsAny<User>())).ReturnsAsync(true);
 
         // Act

@@ -63,7 +63,8 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
             PhoneNumber = registerRequest.PhoneNumber,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            AddressId = createdAddress.Id
+            AddressId = createdAddress.Id,
+            Role = "User"
         };
 
         var createdUser = await authRepository.CreateUserAsync(user);
@@ -119,7 +120,8 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
                 PasswordHash = HashPassword(randomPassword),
                 Genre = "",
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
+                Role = "User"
             };
 
             user = await authRepository.CreateUserAsync(user);

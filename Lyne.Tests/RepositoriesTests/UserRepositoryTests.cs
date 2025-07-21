@@ -62,7 +62,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Test",
             Genre = "M",
             PhoneNumber = "1234567890",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -98,7 +99,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Test2",
             Genre = "F",
             PhoneNumber = "0987654321",
-            PasswordHash = "test2"
+            PasswordHash = "test2",
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -134,7 +136,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "New",
             Genre = "M",
             PhoneNumber = "111222333",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
 
         // Act
@@ -170,7 +173,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Update",
             Genre = "M",
             PhoneNumber = "222333444",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -207,7 +211,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Delete",
             Genre = "F",
             PhoneNumber = "555666777",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -245,7 +250,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Exists",
             Genre = "M",
             PhoneNumber = "000111222",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -261,7 +267,7 @@ public class UserRepositoryTests : IAsyncLifetime
     public async Task ValidateForCreateAsync_ShouldReturnFalse_WhenRequiredFieldsMissing()
     {
         // Arrange
-        var user = new User(){Name = "test", Email = "test", ForName = "test", PasswordHash = "test", Genre = "test"};
+        var user = new User(){Name = "test", Email = "test", ForName = "test", PasswordHash = "test", Genre = "test", Role = "User"};
         
         // Act
         var isValid = await _repository.ValidateForCreateAsync(user);
@@ -281,7 +287,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Valid",
             Genre = "F",
             PhoneNumber = "999888777",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
         
         // Act
@@ -306,7 +313,8 @@ public class UserRepositoryTests : IAsyncLifetime
             AddressId = 1,
             DateOfBirth = DateTime.UtcNow,
             PasswordHash = "test",
-            Orders = new List<Order> { new Order() }
+            Orders = new List<Order> { new Order() },
+            Role = "User"
         };
 
         // Act
@@ -329,7 +337,8 @@ public class UserRepositoryTests : IAsyncLifetime
             PhoneNumber = "333222111",
             DateOfBirth = DateTime.UtcNow,
             PasswordHash = "test",
-            Orders = new List<Order>()
+            Orders = new List<Order>(),
+            Role = "User"
         };
 
         _context.Users.Add(user);
