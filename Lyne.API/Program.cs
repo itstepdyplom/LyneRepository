@@ -41,6 +41,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 context.Response.ContentType = "application/json";
                 var result = System.Text.Json.JsonSerializer.Serialize(new { message = "Unauthorized: Please log in." });
                 return context.Response.WriteAsync(result);
+            },
+            OnForbidden = context =>
+            {
+                context.Response.StatusCode = 403;
+                context.Response.ContentType = "application/json";
+                var result = System.Text.Json.JsonSerializer.Serialize(new { message = "Access denied: insufficient permissions." });
+                return context.Response.WriteAsync(result);
             }
         };
     })
