@@ -43,7 +43,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.File($"{DateTime.UtcNow:dd,MM,yyyy}_log.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 
