@@ -14,14 +14,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.Entity<Address>().ToTable("Address");
-        
-        modelBuilder.Entity<Address>()
+
+        /*modelBuilder.Entity<Address>()
             .HasOne(a => a.User)
             .WithMany()
-            .HasForeignKey(a => a.UserId);
-        
+            .HasForeignKey(a => a.UserId);*/
+
         //Seed Address
         modelBuilder.Entity<Address>().HasData(
             new Address
@@ -32,7 +32,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 State = "Львівська",
                 Zip = "79000",
                 Country = "Україна",
-                UserId = 1
             },
             new Address
             {
@@ -42,17 +41,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 State = "Київська",
                 Zip = "01001",
                 Country = "Україна",
-                UserId = 2
             },
             new Address
             {
                 Id = 3,
                 Street = "вул. Хрещатик, 1",
                 City = "Київ",
-                State = "Київська", 
+                State = "Київська",
                 Zip = "01001",
                 Country = "Україна",
-                UserId = 1
             },
             new Address
             {
@@ -62,7 +59,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 State = "Одеська",
                 Zip = "65000",
                 Country = "Україна",
-                UserId = 2
             },
             new Address
             {
@@ -72,7 +68,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 State = "Default State",
                 Zip = "00000",
                 Country = "Україна",
-                UserId = 1
             },
             new Address
             {
@@ -82,7 +77,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 State = "Дніпропетровська",
                 Zip = "49000",
                 Country = "Україна",
-                UserId = 2
             },
             new Address
             {
@@ -92,7 +86,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 State = "Харківська",
                 Zip = "61000",
                 Country = "Україна",
-                UserId = 1
             },
             new Address
             {
@@ -102,7 +95,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 State = "Запорізька",
                 Zip = "69000",
                 Country = "Україна",
-                UserId = 2
             },
             new Address
             {
@@ -112,7 +104,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 State = "Полтавська",
                 Zip = "36000",
                 Country = "Україна",
-                UserId = 1
             },
             new Address
             {
@@ -122,10 +113,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 State = "Чернівецька",
                 Zip = "58000",
                 Country = "Україна",
-                UserId = 2
             }
         );
-        
+
         //Seed Users with static password hashes (password: password123)
         modelBuilder.Entity<User>().HasData(
             new User
@@ -140,7 +130,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 Email = "kosacho@gmail.com",
                 CreatedAt = new DateTime(2024, 6, 1),
                 UpdatedAt = new DateTime(2024, 6, 1),
-                Role = "User"
+                Role = "User",
+                AddressId = 1
             },
             new User
             {
@@ -154,10 +145,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 Email = "alekskochmar18@gmail.com",
                 CreatedAt = new DateTime(2024, 2, 15),
                 UpdatedAt = new DateTime(2024, 2, 15),
-                Role = "User"
+                Role = "User",
+                AddressId = 2
             }
         );
-       
 
         //Seed Categories
         var menCategoryId = Guid.Parse("11111111-1111-1111-1111-111111111111");

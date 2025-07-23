@@ -56,6 +56,7 @@ public static class InfrastructureServiceExtensions
 
         services.AddScoped<IJwtService, JwtService>();
 
+        services.AddLogging();
         
         // C#
         var redisConfig = configuration.GetConnectionString("Redis");

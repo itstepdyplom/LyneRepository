@@ -116,7 +116,6 @@ namespace Lyne.Tests.RepositoriesTests
                 State = "Test State",
                 Street = "123 Test St",
                 Zip = "12345",
-                UserId = 1 // For the test, just use 1 (no FK check in InMemory)
             };
 
             var createdAddress = await _repository.CreateAddressAsync(address);

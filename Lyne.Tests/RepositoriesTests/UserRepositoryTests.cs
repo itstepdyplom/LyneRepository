@@ -129,6 +129,17 @@ public class UserRepositoryTests : IAsyncLifetime
     public async Task AddAsync_ShouldAddUser_WhenUserIsValid()
     {
         // Arrange
+        var address = new Address
+        {
+            City = "TestCity",
+            Country = "TestCountry",
+            State = "TestState",
+            Street = "TestStreet",
+            Zip = "12345"
+        };
+        _context.Addresses.Add(address);
+        await _context.SaveChangesAsync();
+
         var user = new User
         {
             Name = "New User",
@@ -137,11 +148,16 @@ public class UserRepositoryTests : IAsyncLifetime
             Genre = "M",
             PhoneNumber = "111222333",
             PasswordHash = "test",
-            Role = "User"
+            Role = "User",
+            AddressId = address.Id
         };
 
         // Act
         var result = await _repository.AddAsync(user);
+        await _context.SaveChangesAsync();
+
+        // Now user.Id is set, update address.UserId and save again
+        _context.Addresses.Update(address);
         await _context.SaveChangesAsync();
 
         // Assert
@@ -351,7 +367,6 @@ public class UserRepositoryTests : IAsyncLifetime
             State = "test",
             Street = "test",
             Zip = "12345",
-            UserId = user.Id
         };
 
         _context.Addresses.Add(address);

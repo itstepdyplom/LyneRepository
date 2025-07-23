@@ -47,7 +47,7 @@ public class AddressServiceTests
             Genre = "test",
             Role = "User"
         };
-        var expectedAddress = new Address { Id = addressId, City = "Test",Country = "Test",State = "Test",Street = "Test",User = user,Zip = "Test"};
+        var expectedAddress = new Address { Id = addressId, City = "Test",Country = "Test",State = "Test",Street = "Test",Zip = "Test"};
         _addressRepoMock.Setup(r => r.GetByIdAsync(addressId)).ReturnsAsync(expectedAddress);
         _addressRepoMock.Setup(r => r.ExistsAsync(user.Id)).ReturnsAsync(true);
 
@@ -90,7 +90,7 @@ public class AddressServiceTests
             Genre = "test",
             Role = "User"
         };
-        var expectedAddress = new Address { Id = addressId, City = "Test",Country = "Test",State = "Test",Street = "Test",User = user,Zip = "Test"};
+        var expectedAddress = new Address { Id = addressId, City = "Test",Country = "Test",State = "Test",Street = "Test",Zip = "Test"};
         _addressRepoMock.Setup(r => r.GetByIdAsync(addressId)).ReturnsAsync(expectedAddress);
         _addressRepoMock.Setup(r => r.ExistsAsync(user.Id)).ReturnsAsync(true);
 
@@ -140,7 +140,6 @@ public class AddressServiceTests
             Country = "Test",
             State = "Test",
             Street = "Test",
-            User = user,
             Zip = "Test"
         };
         _addressRepoMock.Setup(r => r.ValidateForCreateAsync(It.IsAny<Address>())).ReturnsAsync(true);
@@ -177,7 +176,6 @@ public class AddressServiceTests
             Country = "Test",
             State = "Test",
             Street = "Test",
-            User = user,
             Zip = "Test"
         };
         _addressRepoMock.Setup(r => r.AddAsync(It.IsAny<Address>())).ReturnsAsync(true);
@@ -214,7 +212,6 @@ public class AddressServiceTests
             Country = "Test",
             State = "Test",
             Street = "Test",
-            User = user,
             Zip = "Test"
         };
         _addressRepoMock.Setup(r => r.Update(It.IsAny<Address>())).ReturnsAsync(true);
@@ -252,7 +249,6 @@ public class AddressServiceTests
             Country = "Test",
             State = "Test",
             Street = "Test",
-            User = user,
             Zip = "Test"
         };
         _addressRepoMock.Setup(r => r.Update(It.IsAny<Address>())).ReturnsAsync(true);
@@ -290,7 +286,6 @@ public class AddressServiceTests
             Country = "Test",
             State = "Test",
             Street = "Test",
-            User = user,
             Zip = "Test"
         };
         _addressRepoMock.Setup(r => r.Update(It.IsAny<Address>())).ReturnsAsync(true);
@@ -310,17 +305,6 @@ public class AddressServiceTests
     {
         // Arrange
         int addressId = 1;
-        var user = new User()
-        {
-            Id = 1,
-            AddressId = addressId,
-            Name = "John",
-            ForName = "Doe",
-            Email = "test@gmail.com",
-            PasswordHash = "test",
-            Genre = "test",
-            Role = "User"
-        };
         var address = new Address()
         {
             Id = addressId,
@@ -328,12 +312,10 @@ public class AddressServiceTests
             Country = "Test",
             State = "Test",
             Street = "Test",
-            User = user,
             Zip = "Test"
         };
-        _addressRepoMock.Setup(r => r.ExistsAsync(user.Id)).ReturnsAsync(true);
-        _addressRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Address>())).ReturnsAsync(true);
-        _addressRepoMock.Setup(r => r.DeleteAsync(It.IsAny<Address>())).ReturnsAsync(true);
+        _addressRepoMock.Setup(r => r.GetByIdAsync(addressId)).ReturnsAsync(address);
+        _addressRepoMock.Setup(r => r.DeleteAsync(It.Is<Address>(a => a.Id == addressId))).ReturnsAsync(true);
 
         // Act
         var addressDto = _mapper.Map<AddressDto>(address);
@@ -367,7 +349,6 @@ public class AddressServiceTests
             Country = "Test",
             State = "Test",
             Street = "Test",
-            User = user,
             Zip = "Test"
         };
         _addressRepoMock.Setup(r => r.DeleteAsync(It.IsAny<Address>())).ReturnsAsync(true);
@@ -404,7 +385,6 @@ public class AddressServiceTests
             Country = "Test",
             State = "Test",
             Street = "Test",
-            User = user,
             Zip = "Test"
         };
         _addressRepoMock.Setup(r => r.DeleteAsync(It.IsAny<Address>())).ReturnsAsync(true);

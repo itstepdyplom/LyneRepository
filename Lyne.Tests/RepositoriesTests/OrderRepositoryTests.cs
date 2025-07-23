@@ -75,7 +75,6 @@ public class OrderRepositoryTests : IAsyncLifetime
             Street = "test",
             State = "test",
             Zip = "12345",
-            UserId = user.Id 
         };
 
         _context.Addresses.Add(address);
@@ -110,7 +109,7 @@ public class OrderRepositoryTests : IAsyncLifetime
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
         
-        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345", UserId = user.Id };
+        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345" };
         _context.Addresses.Add(address);
         await _context.SaveChangesAsync();
         
@@ -172,7 +171,7 @@ public class OrderRepositoryTests : IAsyncLifetime
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345", UserId = user.Id };
+        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345" };
         _context.Addresses.Add(address);
         await _context.SaveChangesAsync();
 
@@ -223,7 +222,7 @@ public class OrderRepositoryTests : IAsyncLifetime
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345", UserId = user.Id };
+        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345" };
         _context.Addresses.Add(address);
         await _context.SaveChangesAsync();
 
@@ -312,7 +311,7 @@ public class OrderRepositoryTests : IAsyncLifetime
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345", UserId = user.Id };
+        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345" };
         _context.Addresses.Add(address);
         await _context.SaveChangesAsync();
 

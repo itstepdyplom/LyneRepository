@@ -30,7 +30,7 @@ public class AddressService(IAddressRepository addressRepository, IMapper mapper
     {
         logger.LogInformation("Adding address with id: {id}", dto.Id);
         var address = mapper.Map<Address>(dto);
-        if (address == null || string.IsNullOrWhiteSpace(address.City) || address.User == null || address.User.Id == 0)
+        if (address == null || string.IsNullOrWhiteSpace(address.City))
         {
             logger.LogInformation("Cannot add address, validation failed");
             return false;

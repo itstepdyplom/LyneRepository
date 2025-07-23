@@ -33,15 +33,16 @@ public class UserRepository(AppDbContext context, ILogger<UserRepository> logger
             logger.LogWarning("Attempted to add a null user");
             return false;
         }
-        if (!ValidateForCreateAsync(user).Result)
+        if (!await ValidateForCreateAsync(user))
         {
             logger.LogInformation("Cannot add user with id:{Id}, validation issues", user.Id);
             return false;
         }
         
-        var result = await context.Users.AddAsync(user);
+        await context.Users.AddAsync(user);
+        await context.SaveChangesAsync();
         logger.LogInformation("User with name {UserName} added", user.Name);
-        return result.State == EntityState.Added;
+        return true;
     }
     
     public async Task<bool> Update(User? user)
@@ -59,16 +60,16 @@ public class UserRepository(AppDbContext context, ILogger<UserRepository> logger
             return false;
         }
 
-        if (!ValidateForUpdateAsync(user).Result)
+        if (!await ValidateForUpdateAsync(user))
         {
             logger.LogInformation("Cannot update user with id:{Id}, validation issues", user.Id);
             return false;
         }
 
-        context.Users.Update(existing);
+        context.Entry(existing).CurrentValues.SetValues(user);
         await context.SaveChangesAsync();
         logger.LogInformation("Product with id:{Id} updated", user!.Id);
-        return await Task.FromResult(true);
+        return true;
     }
 
     public async Task<bool> Delete(User? user)
@@ -83,12 +84,6 @@ public class UserRepository(AppDbContext context, ILogger<UserRepository> logger
         if (existing == null)
         {
             logger.LogWarning("User not found with id {Id}", user.Id);
-            return false;
-        }
-        
-        if (!await ValidateForUpdateAsync(user))
-        {
-            logger.LogInformation("Cannot delete user with id:{Id}, validation issues", user.Id);
             return false;
         }
 
@@ -122,11 +117,8 @@ public class UserRepository(AppDbContext context, ILogger<UserRepository> logger
                        !string.IsNullOrEmpty(user.ForName) &&
                        !string.IsNullOrEmpty(user.Genre) &&
                        !string.IsNullOrEmpty(user.PhoneNumber) &&
-                       user.AddressId > 0 &&
-                       user.DateOfBirth != default &&
-                       user.Orders != null &&
-                       user.Orders.Count > 0 &&
                        userExists;
+
         logger.LogInformation("ValidateForUpdateUserAsync: Validation {Result}", isValid ? "passed" : "failed");
         return isValid;
     }

@@ -26,15 +26,14 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
         return await Task.FromResult(address);
     }
 
-    public async Task<bool> AddAsync(Address address)
+    public async Task<bool> AddAsync(Address? address)
     {
-        if (address == null || address.UserId == 0)
+        if (address == null)
         {
             logger.LogInformation("Cannot add address, UserId is missing or address is null");
             return false;
         }
-        var isValid = await ValidateForCreateAsync(address);
-        if (!isValid)
+        if (!await ValidateForCreateAsync(address))
         {
             logger.LogInformation("Cannot add address with id: {Id}, validation failed", address.Id);
             return false;
@@ -47,7 +46,7 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
 
     public async Task<bool> Update(Address? address)
     {
-        if (address?.User == null)
+        if (address == null)
         {
             logger.LogInformation("Cannot update address with id:{Id}, some fields are empty", address!.Id);
             return false;
@@ -59,8 +58,7 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
             logger.LogInformation("Cannot update address with id: {Id}, not found", address.Id);
             return false;
         }
-        var isValid = await ValidateForUpdateAsync(address);
-        if (!isValid)
+        if (!await ValidateForUpdateAsync(address))
         {
             logger.LogInformation("Cannot update address with id: {Id}, validation failed", address.Id);
             return false;
@@ -79,8 +77,7 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
             return false;
         }
         
-        var isValid = await ValidateForUpdateAsync(address);
-        if (!isValid)
+        if (!await ValidateForUpdateAsync(address))
         {
             logger.LogInformation("Cannot delete address with id: {Id}, validation failed", address.Id);
             return false;
@@ -105,13 +102,6 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
         if (address == null)
             return false;
 
-        if (address.UserId == 0)
-            return false;
-
-        var userExists = await context.Users.AnyAsync(u => u.Id == address.UserId);
-        if (!userExists)
-            return false;
-
         bool isValid = !string.IsNullOrWhiteSpace(address.City) &&
                        !string.IsNullOrWhiteSpace(address.Country) &&
                        !string.IsNullOrWhiteSpace(address.Street) &&
@@ -124,15 +114,11 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
 
     public async Task<bool> ValidateForUpdateAsync(Address address)
     {
-        var userExists = await context.Users.AnyAsync(u => u.Id == address.UserId);
-
-        bool isValid = address.UserId != null &&
-                       !string.IsNullOrWhiteSpace(address.City) &&
+        bool isValid = !string.IsNullOrWhiteSpace(address.City) &&
                        !string.IsNullOrWhiteSpace(address.State) &&
                        !string.IsNullOrWhiteSpace(address.Country) &&
                        !string.IsNullOrWhiteSpace(address.Street) &&
-                       !string.IsNullOrWhiteSpace(address.Zip) &&
-                       userExists;
+                       !string.IsNullOrWhiteSpace(address.Zip);
 
         logger.LogInformation("ValidateForUpdateAddressAsync: Validation {Result}", isValid ? "passed" : "failed");
         return isValid;

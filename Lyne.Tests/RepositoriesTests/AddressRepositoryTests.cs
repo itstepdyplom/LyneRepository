@@ -30,25 +30,10 @@ public class AddressRepositoryTests : IAsyncLifetime
     {
         _context.ChangeTracker.Clear();
         await _context.Database.EnsureDeletedAsync();
-        await _context.Database.EnsureCreatedAsync();
-
-        var user = new User
-        {
-            ForName = "test",
-            PasswordHash = "hashedpassword123",
-            Name = "test",
-            Email = "test",
-            Genre = "Test", // ✅ обов'язкове поле
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            DateOfBirth = new DateTime(2000, 1, 1),
-            Role = "User"
-        };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
+        await _context.Database.EnsureCreatedAsync(); // Recreate schema
+        
         _context.Addresses.Add(new Address
-            { UserId = user.Id, City = "test", State = "test", Country = "test", Street = "test", Zip = "test" });
+            {  City = "test", State = "test", Country = "test", Street = "test", Zip = "test" });
         await _context.SaveChangesAsync();
     }
 
@@ -75,14 +60,8 @@ public class AddressRepositoryTests : IAsyncLifetime
     public async Task GetByIdAsync_ShouldReturnAddress_WhenAddressExists()
     {
         // Arrange
-        var user = new User
-            { Name = "User", ForName = "Test", PasswordHash = "hash", Email = "user@test.com", Genre = "test", Role = "User" };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
         var address = new Address
         {
-            UserId = user.Id,
             City = "City",
             State = "State",
             Country = "Country",
@@ -117,23 +96,8 @@ public class AddressRepositoryTests : IAsyncLifetime
     public async Task Update_ShouldReturnTrue_WhenValid()
     {
         // Arrange
-        var user = new User
-        {
-            Name = "User",
-            ForName = "Test",
-            PasswordHash = "hash",
-            Email = "user@test.com",
-            Genre = "test",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Role = "User"
-        };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
         var address = new Address
         {
-            UserId = user.Id,
             City = "City",
             State = "State",
             Country = "Country",
@@ -171,23 +135,8 @@ public class AddressRepositoryTests : IAsyncLifetime
     public async Task DeleteAsync_ShouldReturnTrue_WhenAddressExists()
     {
         // Arrange
-        var user = new User
-        {
-            Name = "User",
-            ForName = "Test",
-            PasswordHash = "hash",
-            Email = "user@test.com",
-            Genre = "test",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Role = "User"
-        };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
         var address = new Address
         {
-            UserId = user.Id,
             City = "City",
             State = "State",
             Country = "Country",
@@ -206,41 +155,13 @@ public class AddressRepositoryTests : IAsyncLifetime
         var deleted = await _context.Addresses.FindAsync(address.Id);
         Assert.Null(deleted);
     }
-
-    [Fact]
-    public async Task ValidateForUpdateAsync_ShouldReturnFalse_WhenUserIsNull()
-    {
-        // Arrange
-        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345" };
-        
-        // Act
-        var result = await _repository.ValidateForUpdateAsync(address);
-        
-        // Assert
-        Assert.False(result);
-    }
-
+    
     [Fact]
     public async Task ValidateForUpdateAsync_ShouldReturnFalse_WhenFieldsAreMissing()
     {
         // Arrange
-        var user = new User
-        {
-            Name = "User",
-            ForName = "Test",
-            PasswordHash = "hash",
-            Email = "user@test.com",
-            Genre = "test",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Role = "User"
-        };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
         var address = new Address
         {
-            UserId = user.Id,
             City = "", // missing field
             Country = "test",
             Street = "test",
@@ -256,62 +177,13 @@ public class AddressRepositoryTests : IAsyncLifetime
         // Assert
         Assert.False(result);
     }
-
-    [Fact]
-    public async Task ValidateForUpdateAsync_ShouldReturnFalse_WhenUserDoesNotExist()
-    {
-        // Arrange
-        var ghostUser = new User
-        {
-            Id = 999,
-            Name = "Ghost",
-            ForName = "User",
-            PasswordHash = "hash",
-            Email = "ghost@test.com",
-            Genre = "test",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Role = "User"
-        };
-
-        var address = new Address
-        {
-            UserId = ghostUser.Id, // deliberately not saved
-            City = "test",
-            Country = "test",
-            Street = "test",
-            State = "test",
-            Zip = "12345"
-        };
-
-        // Act
-        var result = await _repository.ValidateForUpdateAsync(address);
-        
-        // Assert
-        Assert.False(result);
-    }
-
+    
     [Fact]
     public async Task ValidateForUpdateAsync_ShouldReturnTrue_WhenAllValid()
     {
         // Arrange
-        var user = new User
-        {
-            Name = "User",
-            ForName = "Test",
-            PasswordHash = "hash",
-            Email = "user@test.com",
-            Genre = "test",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Role = "User"
-        };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
         var address = new Address
         {
-            UserId = user.Id,
             City = "test",
             Country = "test",
             Street = "test",
@@ -332,23 +204,8 @@ public class AddressRepositoryTests : IAsyncLifetime
     public async Task AddAsync_ShouldAddAddress_WhenValid()
     {
         // Arrange
-        var user = new User
-        {
-            Name = "User",
-            ForName = "Test",
-            PasswordHash = "hash",
-            Email = "user@test.com",
-            Genre = "test",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Role = "User"
-        };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
         var address = new Address
         {
-            UserId = user.Id,
             City = "City",
             State = "State",
             Country = "Country",
@@ -366,13 +223,12 @@ public class AddressRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddAsync_ShouldReturnFalse_WhenUserIsNull()
+    public async Task AddAsync_ShouldReturnFalse_WhenValidationError()
     {
         // Arrange
         var address = new Address
         {
-            UserId = 0, // або неіснуючий UserId
-            City = "City",
+            City = "", // invalid: required field missing
             State = "State",
             Country = "Country",
             Street = "Street",
@@ -385,27 +241,25 @@ public class AddressRepositoryTests : IAsyncLifetime
         // Assert
         Assert.False(result);
     }
+    
+    [Fact]
+    public async Task AddAsync_ShouldReturnFalse_WhenAddressIsNull()
+    {
+        // Arrange
+
+        // Act
+        var result = await _repository.AddAsync(null);
+
+        // Assert
+        Assert.False(result);
+    }
 
     [Fact]
     public async Task ExistsAsync_ShouldReturnTrue_WhenAddressExists()
     {
         // Arrange
-        var user = new User
-        {
-            Name = "User",
-            ForName = "Test",
-            PasswordHash = "hash",
-            Email = "user@test.com",
-            Genre = "test",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Role = "User"
-        };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
         var address = new Address
-            { UserId = user.Id, City = "City", State = "State", Country = "Country", Street = "Street", Zip = "Zip" };
+            { City = "City", State = "State", Country = "Country", Street = "Street", Zip = "Zip" };
         _context.Addresses.Add(address);
         await _context.SaveChangesAsync();
 
@@ -450,23 +304,8 @@ public class AddressRepositoryTests : IAsyncLifetime
     public async Task ValidateForCreateAsync_ShouldReturnFalse_WhenRequiredFieldsMissing()
     {
         // Arrange
-        var user = new User
-        {
-            Name = "User",
-            ForName = "Test",
-            PasswordHash = "hash",
-            Email = "user@test.com",
-            Genre = "test",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Role = "User"
-        };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
         var address = new Address
         {
-            UserId = user.Id,
             City = "", // missing city
             State = "State",
             Country = "Country",
@@ -485,23 +324,8 @@ public class AddressRepositoryTests : IAsyncLifetime
     public async Task ValidateForCreateAsync_ShouldReturnTrue_WhenValid()
     {
         // Arrange
-        var user = new User
-        {
-            Name = "User",
-            ForName = "Test",
-            PasswordHash = "hash",
-            Email = "user@test.com",
-            Genre = "test",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Role = "User"
-        };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
         var address = new Address
         {
-            UserId = user.Id,
             City = "City",
             State = "State",
             Country = "Country",

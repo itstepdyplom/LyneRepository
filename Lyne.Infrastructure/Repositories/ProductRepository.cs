@@ -37,15 +37,16 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
             logger.LogInformation("Cannot add product with id:{Id}, some fields are empty", product!.Id);
             return false;
         }
-        if (!ValidateForCreateAsync(product).Result)
+        if (!await ValidateForCreateAsync(product))
         {
             logger.LogInformation("Cannot add product with id:{Id}, validation issues", product!.Id);
             return false;
         }
         
         await context.Products.AddAsync(product);
+        await context.SaveChangesAsync();
         logger.LogInformation("Product with id:{Id} added", product!.Id);
-        return await Task.FromResult(true);
+        return true;
     }
 
     public async Task<bool> Update(Product? product)
