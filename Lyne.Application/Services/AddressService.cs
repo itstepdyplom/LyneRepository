@@ -4,7 +4,6 @@ using Lyne.Application.DTO;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
 using Microsoft.Extensions.Logging;
-
 namespace Lyne.Application.Services;
 
 public class AddressService(IAddressRepository addressRepository, IMapper mapper, ILogger<AddressService> logger):IAddressService

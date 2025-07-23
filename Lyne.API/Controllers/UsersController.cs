@@ -37,7 +37,7 @@ namespace Lyne.API.Controllers
         [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Post([FromBody] UserDto dto)
         {
-            logger.LogInformation("Запит на створення користувача");
+            logger.LogInformation("Request for creation user");
 
             try
             {
@@ -49,12 +49,12 @@ namespace Lyne.API.Controllers
                 }
 
                 logger.LogInformation("Користувача з ID = {Id} успішно створено", dto.Id);
-                return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
+                return StatusCode(200,$"user with name: {dto.Name} created");
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Помилка при створенні користувача");
-                return StatusCode(500, "Внутрішня помилка сервера");
+                return StatusCode(500, "Server error");
             }
         }
 

@@ -1,4 +1,5 @@
 using Lyne.Domain.Entities;
+using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ public class ProductRepositoryTests : IAsyncLifetime
     private readonly AppDbContext _context;
     private readonly Mock<ILogger<ProductRepository>> _mockLogger;
     private readonly ProductRepository _repository;
+    private readonly Mock<ICacheService> _mockCache;
 
     public ProductRepositoryTests()
     {
@@ -24,7 +26,8 @@ public class ProductRepositoryTests : IAsyncLifetime
         _context.Database.EnsureCreated();
 
         _mockLogger = new Mock<ILogger<ProductRepository>>();
-        _repository = new ProductRepository(_context, _mockLogger.Object);
+        _mockCache = new Mock<ICacheService>();
+        _repository = new ProductRepository(_context, _mockLogger.Object,_mockCache.Object);
     }
 
     public async Task InitializeAsync()

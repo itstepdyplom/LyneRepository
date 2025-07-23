@@ -43,7 +43,7 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
         var user = mapper.Map<User>(dto);
         user.UpdatedAt = DateTime.UtcNow;
         
-        return await userRepository.Update(user);
+        return await userRepository.UpdateAsync(user);
     }
 
     public async Task<bool> DeleteAsync(int id)
@@ -52,6 +52,6 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
         var userDto = await GetByIdAsync(id);
         var user = mapper.Map<User>(userDto);
 
-        return await userRepository.Delete(user);
+        return await userRepository.DeleteAsync(user);
     }
 }

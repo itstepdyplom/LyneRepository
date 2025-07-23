@@ -1,6 +1,7 @@
 using AutoMapper;
 using Lyne.Domain.Entities;
 using Lyne.Domain.Enums;
+using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +13,10 @@ namespace Lyne.Tests.RepositoriesTests;
 public class OrderRepositoryTests : IAsyncLifetime
 {
     private readonly AppDbContext _context;
-    private readonly Mock<ILogger<OrderRepository>> mockLogger;
+    private readonly Mock<ILogger<OrderRepository>> _mockLogger;
     private readonly OrderRepository _repository;
-    private readonly Mock<IMapper> mockMapper;
+    private readonly Mock<IMapper> _mockMapper;
+    private readonly Mock<ICacheService> _mockCache;
 
     public OrderRepositoryTests()
     {
@@ -25,9 +27,10 @@ public class OrderRepositoryTests : IAsyncLifetime
         _context.Database.OpenConnection();
         _context.Database.EnsureCreated();
 
-        mockLogger = new Mock<ILogger<OrderRepository>>();
-        mockMapper  = new Mock<IMapper>();
-        _repository = new OrderRepository(_context, mockLogger.Object, mockMapper.Object);
+        _mockLogger = new Mock<ILogger<OrderRepository>>();
+        _mockMapper  = new Mock<IMapper>();
+        _mockCache = new Mock<ICacheService>();
+        _repository = new OrderRepository(_context, _mockLogger.Object, _mockMapper.Object,_mockCache.Object);
     }
 
     public async Task InitializeAsync()

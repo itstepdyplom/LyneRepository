@@ -1,4 +1,5 @@
 using Lyne.Domain.Entities;
+using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ public class CategoryRepositoryTests : IAsyncLifetime
     private readonly AppDbContext _context;
     private readonly Mock<ILogger<CategoryRepository>> _mockLogger;
     private readonly CategoryRepository _repository;
+    private readonly Mock<ICacheService> _mockCache;
 
     public CategoryRepositoryTests()
     {
@@ -23,7 +25,8 @@ public class CategoryRepositoryTests : IAsyncLifetime
         _context.Database.EnsureCreated();
 
         _mockLogger = new Mock<ILogger<CategoryRepository>>();
-        _repository = new CategoryRepository(_context, _mockLogger.Object);
+        _mockCache = new Mock<ICacheService>();
+        _repository = new CategoryRepository(_context, _mockLogger.Object,_mockCache.Object);
     }
 
     public async Task InitializeAsync()

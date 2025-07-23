@@ -59,11 +59,25 @@ public static class InfrastructureServiceExtensions
         services.AddLogging();
         
         // C#
-        var redisConfig = configuration.GetConnectionString("Redis");
-        if (string.IsNullOrEmpty(redisConfig))
-            throw new ArgumentNullException(nameof(redisConfig), "Redis connection string is missing.");
+        var redisSection = configuration.GetSection("Redis");
+        var host = redisSection["Host"];
+        var port = int.Parse(redisSection["Port"] ?? "6379");
+        var password = redisSection["Password"];
+        var ssl = bool.Parse(redisSection["Ssl"] ?? "false");
+        var user = redisSection["User"];
 
-        services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConfig));
+        var config = new ConfigurationOptions
+        {
+            EndPoints = { { host, port } },
+            User = user,
+            Password = password,
+            Ssl = ssl,
+            AbortOnConnectFail = false,
+            ConnectTimeout = 10000,
+            SyncTimeout = 10000,
+        };
+
+        services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(config));
         services.AddSingleton<ICacheService, RedisCacheService>();
         
         return services;

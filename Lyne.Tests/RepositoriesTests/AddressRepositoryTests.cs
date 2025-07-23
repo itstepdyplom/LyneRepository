@@ -1,4 +1,5 @@
 using Lyne.Domain.Entities;
+using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ public class AddressRepositoryTests : IAsyncLifetime
     private readonly AppDbContext _context;
     private readonly Mock<ILogger<AddressRepository>> _mockLogger;
     private readonly AddressRepository _repository;
+    private readonly Mock<ICacheService> _mockCache;
 
     public AddressRepositoryTests()
     {
@@ -23,7 +25,8 @@ public class AddressRepositoryTests : IAsyncLifetime
         _context.Database.EnsureCreated();
 
         _mockLogger = new Mock<ILogger<AddressRepository>>();
-        _repository = new AddressRepository(_context, _mockLogger.Object);
+        _mockCache = new Mock<ICacheService>();
+        _repository = new AddressRepository(_context, _mockLogger.Object,_mockCache.Object);
     }
 
     private async Task InitializeAsync()
@@ -284,17 +287,9 @@ public class AddressRepositoryTests : IAsyncLifetime
     public async Task ValidateForCreateAsync_ShouldReturnFalse_WhenUserIsNull()
     {
         // Arrange
-        var address = new Address
-        {
-            City = "City",
-            State = "State",
-            Country = "Country",
-            Street = "Street",
-            Zip = "Zip"
-        };
         
         // Act
-        var result = await _repository.ValidateForCreateAsync(address);
+        var result = await _repository.ValidateForCreateAsync(null);
         
         // Assert
         Assert.False(result);

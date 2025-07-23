@@ -1,5 +1,6 @@
 using Lyne.Domain.Entities;
 using Lyne.Domain.Enums;
+using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ public class UserRepositoryTests : IAsyncLifetime
     private readonly AppDbContext _context;
     private readonly UserRepository _repository;
     private readonly Mock<ILogger<UserRepository>> _mockLogger;
+    private readonly Mock<ICacheService> _mockCache;
 
     public UserRepositoryTests()
     {
@@ -27,7 +29,8 @@ public class UserRepositoryTests : IAsyncLifetime
         _context.Database.EnsureCreated();
 
         _mockLogger = new Mock<ILogger<UserRepository>>();
-        _repository = new UserRepository(_context, _mockLogger.Object);
+        _mockCache = new Mock<ICacheService>();
+        _repository = new UserRepository(_context, _mockLogger.Object,_mockCache.Object);
     }
 
     public async Task InitializeAsync()
@@ -172,7 +175,7 @@ public class UserRepositoryTests : IAsyncLifetime
         // Arrange
 
         // Act
-        var result = await _repository.Update(null);
+        var result = await _repository.UpdateAsync(null);
         
         // Assert
         Assert.False(result);
@@ -198,7 +201,7 @@ public class UserRepositoryTests : IAsyncLifetime
         user.Name = "Updated Name";
         
         // Act
-        var result = await _repository.Update(user);
+        var result = await _repository.UpdateAsync(user);
         
         // Assert
         Assert.True(result);
@@ -210,7 +213,7 @@ public class UserRepositoryTests : IAsyncLifetime
         // Arrange
 
         // Act
-        var result = await _repository.Delete(null);
+        var result = await _repository.DeleteAsync(null);
         
         // Assert
         Assert.False(result);
@@ -234,7 +237,7 @@ public class UserRepositoryTests : IAsyncLifetime
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _repository.Delete(user);
+        var result = await _repository.DeleteAsync(user);
         await _context.SaveChangesAsync();
 
         // Assert
