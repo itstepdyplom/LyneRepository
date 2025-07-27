@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
-import { ThemeProvider } from '../components/providers/ThemeProvider';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
-import CartDrawer from '../components/cart/CartDrawer';
 import "./globals.css";
 
 const inter = Inter({ 
@@ -24,20 +20,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider>
-          <Header />
-          <main style={{ minHeight: 'calc(100vh - 400px)' }}>
-            {children}
-          </main>
-          <Footer />
-          <CartDrawer />
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );

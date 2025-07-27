@@ -28,6 +28,8 @@ import {
 import { useAuthStore } from '../../stores/authStore';
 import { useCartStore } from '../../stores/cartStore';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 
 const Header: React.FC = () => {
   const theme = useTheme();
@@ -37,7 +39,9 @@ const Header: React.FC = () => {
   
   const { isAuthenticated, user, logout } = useAuthStore();
   const { totalItems, openCart } = useCartStore();
-
+  const t = useTranslations('Header');
+  const params = useParams();
+  const locale = params.locale as string;
 
   const handleDrawerToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -84,14 +88,14 @@ const Header: React.FC = () => {
             <>
               <ListItem>
                 <ListItemText
-                  primary={`Welcome, ${user?.name}`}
+                  primary={t('welcome', { name: user?.name || 'User' })}
                   primaryTypographyProps={{ variant: 'body2' }}
                 />
               </ListItem>
               <ListItem disablePadding>
                 <ListItemButton onClick={logout}>
                   <ListItemText
-                    primary="Logout"
+                    primary={t('logout')}
                     primaryTypographyProps={{ variant: 'subtitle2' }}
                   />
                 </ListItemButton>
@@ -100,17 +104,17 @@ const Header: React.FC = () => {
           ) : (
             <>
               <ListItem disablePadding>
-                <ListItemButton component={Link} href="/auth/login">
+                <ListItemButton component={Link} href={`/${locale}/auth/login`}>
                   <ListItemText
-                    primary="Login"
+                    primary={t('login')}
                     primaryTypographyProps={{ variant: 'subtitle2' }}
                   />
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton component={Link} href="/auth/register">
+                <ListItemButton component={Link} href={`/${locale}/auth/register`}>
                   <ListItemText
-                    primary="Register"
+                    primary={t('register')}
                     primaryTypographyProps={{ variant: 'subtitle2' }}
                   />
                 </ListItemButton>
@@ -141,7 +145,7 @@ const Header: React.FC = () => {
             <Typography
               variant="h4"
               component={Link}
-              href="/"
+              href={`/${locale}`}
               sx={{
                 fontWeight: 300,
                 letterSpacing: '0.2em',
@@ -155,46 +159,46 @@ const Header: React.FC = () => {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton onClick={handleSearchToggle}>
-              <SearchIcon />
-            </IconButton>
+            {searchOpen ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <InputBase
+                  placeholder={t('search')}
+                  autoFocus
+                  sx={{
+                    fontSize: '1rem',
+                    backgroundColor: 'white',
+                    borderRadius: 1,
+                    px: 2,
+                    py: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    minWidth: 200,
+                    '& input': {
+                      py: 0.5,
+                    },
+                  }}
+                />
+                <IconButton onClick={handleSearchToggle} size="small">
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+            ) : (
+              <IconButton onClick={handleSearchToggle}>
+                <SearchIcon />
+              </IconButton>
+            )}
             
-            <IconButton component={Link} href="/account">
+            <IconButton component={Link} href={`/${locale}/account`}>
               <PersonIcon />
             </IconButton>
             
-            <IconButton onClick={openCart}>
+            <IconButton component={Link} href={`/${locale}/cart`}>
               <Badge badgeContent={totalItems} color="primary">
                 <ShoppingBag />
               </Badge>
             </IconButton>
           </Box>
         </Toolbar>
-
-        {searchOpen && (
-          <Box
-            sx={{
-              backgroundColor: (theme) => alpha(theme.palette.background.paper, 0.95),
-              borderTop: '1px solid',
-              borderColor: 'divider',
-              p: 2,
-            }}
-          >
-            <InputBase
-              placeholder="Search luxury items..."
-              fullWidth
-              autoFocus
-              sx={{
-                fontSize: '1.1rem',
-                '& input': {
-                  textAlign: 'center',
-                  py: 1,
-                },
-              }}
-            />
-          </Box>
-        )}
-
       </AppBar>
 
       {mobileMenu}
