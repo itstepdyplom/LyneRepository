@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Lyne.Domain.Entities;
 
-namespace Lyne.Domain.IRepositories;
+namespace Lyne.Application.Services;
 
 public interface IJwtService
 {

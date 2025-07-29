@@ -3,6 +3,7 @@ using Lyne.Domain.IRepositories;
 using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
+using Lyne.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,7 +46,16 @@ public static class InfrastructureServiceExtensions
                 }
             });
         });
-
+        
+        // Register services
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<AuthService>();
+        services.AddScoped<IAddressService, AddressService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IJwtService, JwtService>();
         // Register repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuthRepository, AuthRepository>();
@@ -53,9 +63,7 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
-
-        services.AddScoped<IJwtService, JwtService>();
-
+        
         services.AddLogging();
         
         // C#

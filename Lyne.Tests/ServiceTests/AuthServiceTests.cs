@@ -2,6 +2,7 @@ using Lyne.Application.DTO.Auth;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
+using Lyne.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
 

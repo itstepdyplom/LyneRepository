@@ -1,8 +1,8 @@
 using Lyne.Application.DTO.Auth;
-using Lyne.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Lyne.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Lyne.API.Controllers;

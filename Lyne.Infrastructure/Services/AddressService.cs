@@ -1,10 +1,11 @@
-using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Lyne.Application.DTO;
+using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
 using Microsoft.Extensions.Logging;
-namespace Lyne.Application.Services;
+
+namespace Lyne.Infrastructure.Services;
 
 public class AddressService(IAddressRepository addressRepository, IMapper mapper, ILogger<AddressService> logger):IAddressService
 {

@@ -1,10 +1,11 @@
 using AutoMapper;
 using Lyne.Application.DTO;
+using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
 using Microsoft.Extensions.Logging;
 
-namespace Lyne.Application.Services;
+namespace Lyne.Infrastructure.Services;
 
 public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<UserService> logger):IUserService
 {

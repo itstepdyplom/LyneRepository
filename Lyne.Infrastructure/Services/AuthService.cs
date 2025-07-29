@@ -1,9 +1,10 @@
 using Lyne.Application.DTO.Auth;
+using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
 using Microsoft.Extensions.Logging;
 
-namespace Lyne.Application.Services;
+namespace Lyne.Infrastructure.Services;
 
 public class AuthService(IAuthRepository authRepository, IJwtService jwtService, ILogger<AuthService> logger):IAuthService
 {

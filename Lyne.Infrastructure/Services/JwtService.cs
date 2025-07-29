@@ -1,12 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Lyne.Application.Services;
 using Lyne.Domain.Entities;
-using Lyne.Domain.IRepositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Lyne.Application.Services;
+namespace Lyne.Infrastructure.Services;
 
 public class JwtService : IJwtService
 {
