@@ -1,11 +1,12 @@
-using System.Text;
 using Lyne.Application.Extensions;
+using Lyne.Application.Services;
 using Lyne.Infrastructure.Extensions;
 using Lyne.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
+
+builder.Services.AddScoped<IStripeService, StripeService>();
+
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
