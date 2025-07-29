@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Container,
@@ -20,29 +20,59 @@ import {
   Pinterest,
   YouTube,
 } from '@mui/icons-material';
+import { useTranslations } from 'next-intl';
+import { useParams, useRouter } from 'next/navigation';
 
 const Footer: React.FC = () => {
+  const t = useTranslations('Footer');
+  const params = useParams();
+  const router = useRouter();
+  const currentLocale = params.locale as string;
+  
+  const [selectedLanguage, setSelectedLanguage] = useState(() => {
+    if (currentLocale === 'uk') return 'Ukraine - Ukrainian';
+    if (currentLocale === 'en') return 'United Kingdom - English';
+    return 'United Kingdom - English';
+  });
+
+  const handleLanguageChange = (event: any) => {
+    const newValue = event.target.value;
+    setSelectedLanguage(newValue);
+    
+    let newLocale = 'uk';
+    if (newValue === 'United Kingdom - English') {
+      newLocale = 'en';
+    }
+    
+    // Отримуємо поточний шлях без локалі
+    const currentPath = window.location.pathname;
+    const pathWithoutLocale = currentPath.replace(/^\/(uk|en)/, '');
+    
+    // Перенаправляємо на нову мову з тим же шляхом
+    router.push(`/${newLocale}${pathWithoutLocale}`);
+  };
+
   const footerSections = {
-    'THE COMPANY': [
-      'About',
-      'Design and craft',
-      'Press',
+    [t('theCompany')]: [
+      t('about'),
+      t('designAndCraft'),
+      t('press'),
     ],
-    'ASSISTANCE': [
-      'Delivery information',
-      'Payments',
-      'Return & Refunds',
-      'FAQ',
-      'Product care',
-      'Size guide',
-      'Fit guide',
-      'Student discount',
+    [t('assistance')]: [
+      t('deliveryInfo'),
+      t('payments'),
+      t('returns'),
+      t('faq'),
+      t('productCare'),
+      t('sizeGuide'),
+      t('fitGuide'),
+      t('studentDiscount'),
     ],
-    'LEGAL': [
-      'Privacy policy',
-      'Terms & conditions',
-      'Cookie notice',
-      'Accessibility',
+    [t('legal')]: [
+      t('privacyPolicy'),
+      t('termsConditions'),
+      t('cookieNotice'),
+      t('accessibility'),
     ],
   };
 
@@ -192,7 +222,7 @@ const Footer: React.FC = () => {
                 color: 'white',
               }}
             >
-              FOLLOW US
+              {t('followUs')}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {socialLinks.map(({ icon: Icon, label, href }) => (
@@ -261,7 +291,7 @@ const Footer: React.FC = () => {
                 fontSize: '0.875rem',
               }}
             >
-              Change location and language:
+              {t('changeLocation')}:
             </Typography>
             <FormControl
               size="small"
@@ -285,8 +315,9 @@ const Footer: React.FC = () => {
               }}
             >
               <Select
-                value="United Kingdom - English"
+                value={selectedLanguage}
                 displayEmpty
+                onChange={handleLanguageChange}
                 sx={{
                   color: 'white',
                   fontSize: '0.875rem',
@@ -297,9 +328,6 @@ const Footer: React.FC = () => {
                 </MenuItem>
                 <MenuItem value="Ukraine - Ukrainian">
                   Ukraine - Ukrainian
-                </MenuItem>
-                <MenuItem value="United States - English">
-                  United States - English
                 </MenuItem>
               </Select>
             </FormControl>
@@ -327,7 +355,7 @@ const Footer: React.FC = () => {
                 fontWeight: 400,
                 }}
             >
-                © {new Date().getFullYear()} LYNEE All rights reserved
+                {t('copyright', { year: new Date().getFullYear() })}
             </Typography>
         </Box>
     </Box>

@@ -1,0 +1,93 @@
+{
+  "HomePage": {
+    "shopByCategory": "SHOP BY CATEGORY",
+    "categories": {
+      "women": "WOMEN",
+      "men": "MEN",
+      "kids": "KIDS",
+      "accessories": "ACCESSORIES"
+    },
+    "newArrivals": "New arrivals",
+    "viewAll": "View all",
+    "products": {
+      "silkBlouse": {
+        "name": "Luxury Silk Blouse"
+      },
+      "handbag": {
+        "name": "Designer Handbag"
+      },
+      "heels": {
+        "name": "Classic Heels"
+      },
+      "eveningBag": {
+        "name": "Evening Bag"
+      }
+    },
+    "newsletter": {
+      "title": "Stay Updated",
+      "description": "Subscribe to our newsletter for the latest fashion trends and exclusive offers.",
+      "button": "Subscribe Now"
+    }
+  },
+  "Header": {
+    "search": "Search luxury items...",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "welcome": "Welcome, {name}"
+  },
+  "Categories": {
+    "women": "WOMEN",
+    "men": "MEN",
+    "kids": "KIDS",
+    "accessories": "ACCESSORIES",
+    "womenDescription": "This is a mock page for Women's category. Product listings will be implemented later.",
+    "menDescription": "This is a mock page for Men's category. Product listings will be implemented later.",
+    "kidsDescription": "This is a mock page for Kids' category. Product listings will be implemented later.",
+    "accessoriesDescription": "This is a mock page for Accessories category. Product listings will be implemented later."
+  },
+  "Auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Submit",
+    "forgotPassword": "Forgot Password?",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "loginDescription": "This is a mock login page. Authentication functionality will be implemented later.",
+    "registerDescription": "This is a mock register page. Registration functionality will be implemented later."
+  },
+  "Account": {
+    "title": "Account Profile",
+    "description": "This is a mock account page. User profile functionality will be implemented later."
+  },
+  "Cart": {
+    "title": "Shopping Cart",
+    "description": "This is a mock cart page. Shopping cart functionality will be implemented later."
+  },
+  "Footer": {
+    "changeLocation": "Change location and language:",
+    "followUs": "FOLLOW US",
+    "theCompany": "THE COMPANY",
+    "assistance": "ASSISTANCE",
+    "legal": "LEGAL",
+    "about": "About",
+    "designAndCraft": "Design and craft",
+    "press": "Press",
+    "deliveryInfo": "Delivery information",
+    "payments": "Payments",
+    "returns": "Return & Refunds",
+    "faq": "FAQ",
+    "productCare": "Product care",
+    "sizeGuide": "Size guide",
+    "fitGuide": "Fit guide",
+    "studentDiscount": "Student discount",
+    "privacyPolicy": "Privacy policy",
+    "termsConditions": "Terms & conditions",
+    "cookieNotice": "Cookie notice",
+    "accessibility": "Accessibility",
+    "copyright": "© {year} LYNEE All rights reserved"
+  }
+} 
