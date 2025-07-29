@@ -48,6 +48,7 @@ public static class InfrastructureServiceExtensions
         });
         
         // Register services
+        services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<AuthService>();
         services.AddScoped<IAddressService, AddressService>();
@@ -55,7 +56,6 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IJwtService, JwtService>();
         // Register repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuthRepository, AuthRepository>();

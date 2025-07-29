@@ -7,7 +7,9 @@ public static class ApplicationServiceExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        // Register services
         services.AddAutoMapper(typeof(MappingProfile));
+        
         return services;
     }
 }
