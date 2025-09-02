@@ -1,5 +1,7 @@
 using Lyne.Application.DTO;
 using Lyne.Application.Services;
+using Lyne.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lyne.API.Controllers
@@ -7,6 +9,7 @@ namespace Lyne.API.Controllers
     public class OrdersController(IOrderService orderService, ILogger<OrdersController> logger) : BaseController
     {
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<List<OrderDto>>> Get()
         {
             logger.LogInformation("Запит на отримання всіх замовлень");
@@ -15,6 +18,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult<OrderDto>> Get(int id)
         {
             logger.LogInformation("Запит на отримання замовлення з ID = {Id}", id);
@@ -28,6 +32,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> Post([FromBody] OrderDto dto)
         {
             logger.LogInformation("Запит на створення нового замовлення");
@@ -51,6 +56,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Put(int id, [FromBody] OrderDto dto)
         {
             if (id != dto.Id)
@@ -73,6 +79,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult> Delete(int id)
         {
             logger.LogInformation("Запит на видалення замовлення з ID = {Id}", id);

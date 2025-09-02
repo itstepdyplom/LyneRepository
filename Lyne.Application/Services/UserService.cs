@@ -12,9 +12,10 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
     {
         logger.LogInformation("Getting all users");
         var users = await userRepository.GetAllAsync();
-        if (users.Count == 0)
+        if (users==null || users.Count == 0)
         {
             logger.LogInformation("No users found");
+            return new List<UserDto>();
         }
         return mapper.Map<List<UserDto>>(users);
     }
@@ -33,8 +34,7 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
         user.CreatedAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
     
-        await userRepository.AddAsync(user);
-        return true;
+        return await userRepository.AddAsync(user);
     }
 
     public async Task<bool> UpdateAsync(UserDto dto)
@@ -43,8 +43,7 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
         var user = mapper.Map<User>(dto);
         user.UpdatedAt = DateTime.UtcNow;
         
-        await userRepository.Update(user);
-        return true;
+        return await userRepository.UpdateAsync(user);
     }
 
     public async Task<bool> DeleteAsync(int id)
@@ -53,7 +52,6 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
         var userDto = await GetByIdAsync(id);
         var user = mapper.Map<User>(userDto);
 
-        await userRepository.Delete(user);
-        return true;
+        return await userRepository.DeleteAsync(user);
     }
 }

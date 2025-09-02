@@ -1,5 +1,7 @@
 using Lyne.Application.DTO;
 using Lyne.Application.Services;
+using Lyne.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +10,7 @@ namespace Lyne.API.Controllers
     public class CategoriesController(ICategoryService categoryService, ILogger<CategoriesController> logger) : BaseController
     {
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<List<CategoryDto>>> Get()
         {
             logger.LogInformation("Запит на отримання всіх категорій");
@@ -16,6 +19,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<CategoryDto>> Get(Guid id)
         {
             logger.LogInformation("Запит на отримання категорії з ID = {Id}", id);
@@ -30,6 +34,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> Post([FromBody] CategoryDto dto)
         {
             logger.LogInformation("Запит на створення категорії");
@@ -54,6 +59,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Put(Guid id, [FromBody] CategoryDto dto)
         {
             if (id != dto.Id)
@@ -75,6 +81,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Delete(Guid id)
         {
            logger.LogInformation("Запит на видалення категорії з ID = {Id}", id);

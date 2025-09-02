@@ -35,7 +35,8 @@ namespace Lyne.Tests.RepositoriesTests
                 Genre = "M",
                 PhoneNumber = "1234567890",
                 DateOfBirth = System.DateTime.UtcNow,
-                PasswordHash = "hashedpassword"
+                PasswordHash = "hashedpassword",
+                Role = "User"
             };
 
             var createdUser = await _repository.CreateUserAsync(user);
@@ -58,7 +59,8 @@ namespace Lyne.Tests.RepositoriesTests
                 Genre = "F",
                 PhoneNumber = "0987654321",
                 DateOfBirth = System.DateTime.UtcNow,
-                PasswordHash = "hash"
+                PasswordHash = "hash",
+                Role = "User"
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -87,7 +89,8 @@ namespace Lyne.Tests.RepositoriesTests
                 Genre = "M",
                 PhoneNumber = "1111111111",
                 DateOfBirth = System.DateTime.UtcNow,
-                PasswordHash = "hash"
+                PasswordHash = "hash",
+                Role = "User"
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -113,7 +116,6 @@ namespace Lyne.Tests.RepositoriesTests
                 State = "Test State",
                 Street = "123 Test St",
                 Zip = "12345",
-                UserId = 1 // For the test, just use 1 (no FK check in InMemory)
             };
 
             var createdAddress = await _repository.CreateAddressAsync(address);

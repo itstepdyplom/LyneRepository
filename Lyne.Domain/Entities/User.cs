@@ -25,6 +25,7 @@ public class User
 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public required string Role { get; set; }
     
     public ICollection<Order>? Orders { get; set; } = new List<Order>();
 }

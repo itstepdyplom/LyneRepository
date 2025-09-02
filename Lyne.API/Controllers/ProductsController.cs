@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using Lyne.Application.DTO;
 using Lyne.Application.Services;
+using Lyne.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +19,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<ProductDto>> Get(Guid id)
         {
            logger.LogInformation("Запит на отримання продукту з ID = {Id}", id);
@@ -31,6 +34,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> Post([FromBody] ProductDto dto)
         {
             logger.LogInformation("Запит на створення продукту");
@@ -55,6 +59,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = nameof(UserRole.Admin)+ "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Put(Guid id, [FromBody] ProductDto dto)
         {
             if (id != dto.Id)
@@ -76,6 +81,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult> Delete(Guid id)
         {
             logger.LogInformation("Запит на видалення продукту з ID = {Id}", id);

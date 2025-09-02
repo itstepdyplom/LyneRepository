@@ -3,21 +3,14 @@ using Lyne.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Lyne.API.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(AuthService authService) : BaseController
 {
-    private readonly AuthService _authService;
-
-    public AuthController(AuthService authService)
-    {
-        _authService = authService;
-    }
-
     [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequest)
     {
         if (!ModelState.IsValid)
@@ -25,7 +18,7 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var result = await _authService.LoginAsync(loginRequest);
+        var result = await authService.LoginAsync(loginRequest);
 
         if (result == null)
         {
@@ -36,6 +29,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
+    [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequest)
     {
         if (!ModelState.IsValid)
@@ -43,7 +37,7 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var result = await _authService.RegisterAsync(registerRequest);
+        var result = await authService.RegisterAsync(registerRequest);
 
         if (result == null)
         {
@@ -54,6 +48,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("google-login")]
+    [AllowAnonymous]
     public IActionResult GoogleLogin()
     {
         var properties = new AuthenticationProperties
@@ -82,7 +77,7 @@ public class AuthController : ControllerBase
             return BadRequest("Email not found");
         }
 
-        var authResult = await _authService.LoginWithGoogleAsync(email, name);
+        var authResult = await authService.LoginWithGoogleAsync(email, name);
 
         // return Redirect();
 

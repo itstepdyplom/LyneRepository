@@ -36,6 +36,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = context =>
+            {
+                context.HandleResponse();
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "application/json";
+                var result = System.Text.Json.JsonSerializer.Serialize(new { message = "Unauthorized: Please log in." });
+                return context.Response.WriteAsync(result);
+            },
+            OnForbidden = context =>
+            {
+                context.Response.StatusCode = 403;
+                context.Response.ContentType = "application/json";
+                var result = System.Text.Json.JsonSerializer.Serialize(new { message = "Access denied: insufficient permissions." });
+                return context.Response.WriteAsync(result);
+            }
+        };
     })
     .AddGoogle("Google", options =>
     {
@@ -47,7 +65,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.File($"{DateTime.UtcNow:dd,MM,yyyy}_log.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 

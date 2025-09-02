@@ -1,4 +1,5 @@
 using Lyne.Domain.Entities;
+using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ public class ProductRepositoryTests : IAsyncLifetime
     private readonly AppDbContext _context;
     private readonly Mock<ILogger<ProductRepository>> _mockLogger;
     private readonly ProductRepository _repository;
+    private readonly Mock<ICacheService> _mockCache;
 
     public ProductRepositoryTests()
     {
@@ -24,7 +26,8 @@ public class ProductRepositoryTests : IAsyncLifetime
         _context.Database.EnsureCreated();
 
         _mockLogger = new Mock<ILogger<ProductRepository>>();
-        _repository = new ProductRepository(_context, _mockLogger.Object);
+        _mockCache = new Mock<ICacheService>();
+        _repository = new ProductRepository(_context, _mockLogger.Object,_mockCache.Object);
     }
 
     public async Task InitializeAsync()
@@ -40,6 +43,10 @@ public class ProductRepositoryTests : IAsyncLifetime
     public async Task AddAsync_ShouldAddProduct_WhenValid()
     {
         // Arrange
+        var category = new Category { Name = "TestCat", Description = "Desc" };
+        _context.Categories.Add(category);
+        await _context.SaveChangesAsync();
+
         var product = new Product
         {
             Name = "test",
@@ -47,9 +54,13 @@ public class ProductRepositoryTests : IAsyncLifetime
             Price = 99.99m,
             StockQuantity = 10,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            CategoryId = category.Id,
+            Brand = "TestBrand",
+            Color = "Red",
+            ImageUrl = "http://example.com/image.jpg",
+            IsActive = true
         };
-
         // Act
         var result = await _repository.AddAsync(product);
 
@@ -189,7 +200,11 @@ public class ProductRepositoryTests : IAsyncLifetime
             StockQuantity = 5,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            CategoryId = category.Id
+            CategoryId = category.Id,
+            Brand = "TestBrand",
+            Color = "Blue",
+            ImageUrl = "http://example.com/image.jpg",
+            IsActive = true
         };
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
@@ -242,7 +257,11 @@ public class ProductRepositoryTests : IAsyncLifetime
             StockQuantity = 3,
             CategoryId = category.Id,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Brand = "TestBrand",
+            Color = "Red",
+            ImageUrl = "http://example.com/image.jpg",
+            IsActive = true
         };
         _context.Products.Add(product);
         await _context.SaveChangesAsync();

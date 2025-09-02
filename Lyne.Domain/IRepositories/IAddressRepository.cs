@@ -4,7 +4,7 @@ namespace Lyne.Domain.IRepositories;
 
 public interface IAddressRepository
 {
-    Task<List<Address>> GetAllAsync();
+    Task<List<Address?>> GetAllAsync();
     Task<Address?> GetByIdAsync(int id);
     Task<bool> AddAsync(Address address);
     Task<bool> Update(Address? address);

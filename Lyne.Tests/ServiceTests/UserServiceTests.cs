@@ -37,8 +37,8 @@ public class UserServiceTests
         _userRepoMock.Setup(r => r.GetAllAsync())
             .ReturnsAsync(new List<User>
             {
-                new User { Id = 1, Name = "Test", ForName = "User", Email = "test@gmail.com", PasswordHash = "test", Genre = "test"},
-                new User { Id = 2, Name = "Test2", ForName = "User2", Email = "test@gmail.com", PasswordHash = "test", Genre = "test"}
+                new User { Id = 1, Name = "Test", ForName = "User", Email = "test@gmail.com", PasswordHash = "test", Genre = "test", Role = "User"},
+                new User { Id = 2, Name = "Test2", ForName = "User2", Email = "test@gmail.com", PasswordHash = "test", Genre = "test", Role = "User"}
             });
 
         // Act
@@ -66,7 +66,7 @@ public class UserServiceTests
         // Arrange
         var id = new int();
         _userRepoMock.Setup(r => r.GetByIdAsync(id))
-            .ReturnsAsync(new User { Id = 1, Name = "Test", ForName = "User", Email = "test@gmail.com", PasswordHash = "test", Genre = "test"});
+            .ReturnsAsync(new User { Id = 1, Name = "Test", ForName = "User", Email = "test@gmail.com", PasswordHash = "test", Genre = "test", Role = "User"});
 
         // Act
         var result = await _service.GetByIdAsync(id);
@@ -192,7 +192,7 @@ public class UserServiceTests
 
         _userRepoMock.Setup(r => r.ExistsAsync(userDto.Id)).ReturnsAsync(true);
         _userRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<User>())).ReturnsAsync(true);
-        _userRepoMock.Setup(r => r.Update(It.IsAny<User>())).ReturnsAsync(true);
+        _userRepoMock.Setup(r => r.UpdateAsync(It.IsAny<User>())).ReturnsAsync(true);
 
         // Act
         var result = await _service.UpdateAsync(userDto);
@@ -281,8 +281,8 @@ public class UserServiceTests
         };
         var user= await _service.GetByIdAsync(userDto.Id);
         _userRepoMock.Setup(r => r.GetByIdAsync(userDto.Id)).ReturnsAsync(
-            new User { Id = userDto.Id,Name = userDto.Name,ForName = userDto.ForName,Email = userDto.Email,PasswordHash = userDto.PasswordHash, Genre = userDto.Genre});
-        _userRepoMock.Setup(r => r.Delete(It.IsAny<User>())).ReturnsAsync(true);
+            new User { Id = userDto.Id,Name = userDto.Name,ForName = userDto.ForName,Email = userDto.Email,PasswordHash = userDto.PasswordHash, Genre = userDto.Genre, Role = "User"});
+        _userRepoMock.Setup(r => r.DeleteAsync(It.IsAny<User>())).ReturnsAsync(true);
 
         // Act
         var result = await _service.DeleteAsync(userDto.Id);

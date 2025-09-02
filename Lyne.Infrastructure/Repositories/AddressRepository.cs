@@ -1,44 +1,57 @@
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
+using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Lyne.Infrastructure.Repositories;
 
-public class AddressRepository(AppDbContext context, ILogger<AddressRepository> logger): IAddressRepository
+public class AddressRepository(AppDbContext context, ILogger<AddressRepository> logger, ICacheService cacheService): IAddressRepository
 {
-    public async Task<List<Address>> GetAllAsync()
+    public async Task<List<Address?>> GetAllAsync()
     {
+        var cached = await cacheService.GetAllAsync<Address>("address");
+        if (cached is not null && cached.Count > 0)
+            return cached;
         var addresses = await context.Addresses.ToListAsync();
-        return addresses;
+        return addresses!;
     }
     public async Task<Address?> GetByIdAsync(int id)
     {
-        var address = await context.Addresses.FirstOrDefaultAsync(x => x.Id == id);
-        if (address != null)
-            logger.LogInformation("Address with id:{Id} was found", address!.Id);
-        else
+        var cacheKey = $"address:{id}";
+        var address = await cacheService.GetAsync<Address>(cacheKey);
+        if (address is null)
         {
-            logger.LogInformation("Address with id: {id} was not found", id);
-            return null;
+            address = await context.Addresses.FirstOrDefaultAsync(x => x.Id == id);
+            if (address is not null)
+            {
+                logger.LogInformation("Address with id:{Id} was found", address!.Id);
+                await cacheService.SetAsync(cacheKey, address, "address", TimeSpan.FromMinutes(15));
+            }
+            else
+            {
+                logger.LogInformation("Address with id: {id} was not found", id);
+                return null;
+            }
         }
-        return await Task.FromResult(address);
+        return address;
     }
 
-    public async Task<bool> AddAsync(Address address)
+    public async Task<bool> AddAsync(Address? address)
     {
-        if (address == null || address.UserId == 0)
+        if (address is null)
         {
             logger.LogInformation("Cannot add address, UserId is missing or address is null");
             return false;
         }
-        var isValid = await ValidateForCreateAsync(address);
-        if (!isValid)
+        if (!await ValidateForCreateAsync(address))
         {
             logger.LogInformation("Cannot add address with id: {Id}, validation failed", address.Id);
             return false;
         }
+        var cacheKey = $"address:{address.Id}";
+        await cacheService.SetAsync(cacheKey, address, "address", TimeSpan.FromMinutes(15));
         await context.Addresses.AddAsync(address);
         await context.SaveChangesAsync();
         logger.LogInformation("Address with id:{Id} added", address.Id);
@@ -47,48 +60,54 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
 
     public async Task<bool> Update(Address? address)
     {
-        if (address?.User == null)
+        if (address is null)
         {
             logger.LogInformation("Cannot update address with id:{Id}, some fields are empty", address!.Id);
             return false;
         }
 
-        var exist = ExistsAsync(address.Id);
-        if (!exist.Result)
+        if (!await ExistsAsync(address.Id))
         {
             logger.LogInformation("Cannot update address with id: {Id}, not found", address.Id);
             return false;
         }
-        var isValid = await ValidateForUpdateAsync(address);
-        if (!isValid)
+        if (!await ValidateForUpdateAsync(address))
         {
             logger.LogInformation("Cannot update address with id: {Id}, validation failed", address.Id);
             return false;
         }
+        var cacheKey = $"address:{address.Id}";
+        await cacheService.SetAsync(cacheKey, address, "address", TimeSpan.FromMinutes(15));
         context.Addresses.Update(address);
+        await context.SaveChangesAsync();
         logger.LogInformation("Address with id:{Id} updated", address!.Id);
         return true;
     }
 
     public async Task<bool> DeleteAsync(Address address)
     {
-        var exist = await ExistsAsync(address.Id);
-        if (!exist)
+        if (address is null)
+        {
+            logger.LogInformation("Cannot delete address: address is null");
+            return false;
+        }
+        
+        if (!await ExistsAsync(address.Id))
         {
             logger.LogInformation("Cannot delete address with id: {Id}, not found", address.Id);
             return false;
         }
         
-        var isValid = await ValidateForUpdateAsync(address);
-        if (!isValid)
+        if (!await ValidateForUpdateAsync(address))
         {
             logger.LogInformation("Cannot delete address with id: {Id}, validation failed", address.Id);
             return false;
         }
 
+        var cacheKey = $"address:{address.Id}";
+        await cacheService.RemoveAsync(cacheKey,"address"); 
         context.Addresses.Remove(address);
         await context.SaveChangesAsync();
-
         logger.LogInformation("Address with id: {Id} deleted", address.Id);
         return true;
     }
@@ -102,14 +121,7 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
 
     public async Task<bool> ValidateForCreateAsync(Address address)
     {
-        if (address == null)
-            return false;
-
-        if (address.UserId == 0)
-            return false;
-
-        var userExists = await context.Users.AnyAsync(u => u.Id == address.UserId);
-        if (!userExists)
+        if (address is null)
             return false;
 
         bool isValid = !string.IsNullOrWhiteSpace(address.City) &&
@@ -124,15 +136,11 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
 
     public async Task<bool> ValidateForUpdateAsync(Address address)
     {
-        var userExists = await context.Users.AnyAsync(u => u.Id == address.UserId);
-
-        bool isValid = address.UserId != null &&
-                       !string.IsNullOrWhiteSpace(address.City) &&
+        bool isValid = !string.IsNullOrWhiteSpace(address.City) &&
                        !string.IsNullOrWhiteSpace(address.State) &&
                        !string.IsNullOrWhiteSpace(address.Country) &&
                        !string.IsNullOrWhiteSpace(address.Street) &&
-                       !string.IsNullOrWhiteSpace(address.Zip) &&
-                       userExists;
+                       !string.IsNullOrWhiteSpace(address.Zip);
 
         logger.LogInformation("ValidateForUpdateAddressAsync: Validation {Result}", isValid ? "passed" : "failed");
         return isValid;

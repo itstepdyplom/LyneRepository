@@ -1,5 +1,7 @@
 using Lyne.Application.DTO;
 using Lyne.Application.Services;
+using Lyne.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +10,7 @@ namespace Lyne.API.Controllers
     public class UsersController(IUserService userService,ILogger<UsersController> logger) : BaseController
     {
         [HttpGet("/users")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult<List<UserDto>>> Get()
         {
             logger.LogInformation("Отримано запит на отримання всіх користувачів");
@@ -16,6 +19,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpGet("/user/{id}")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult<UserDto?>> Get(int id)
         {
             logger.LogInformation("Отримано запит на отримання користувача з ID = {Id}", id);
@@ -30,9 +34,10 @@ namespace Lyne.API.Controllers
         }
 
         [HttpPost("/user/create")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Post([FromBody] UserDto dto)
         {
-            logger.LogInformation("Запит на створення користувача");
+            logger.LogInformation("Request for creation user");
 
             try
             {
@@ -44,16 +49,17 @@ namespace Lyne.API.Controllers
                 }
 
                 logger.LogInformation("Користувача з ID = {Id} успішно створено", dto.Id);
-                return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
+                return StatusCode(200,$"user with name: {dto.Name} created");
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Помилка при створенні користувача");
-                return StatusCode(500, "Внутрішня помилка сервера");
+                return StatusCode(500, "Server error");
             }
         }
 
         [HttpPut("/user/update")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Put([FromBody] UserDto dto)
         {
             logger.LogInformation("Запит на оновлення користувача з ID = {Id}", dto.Id);
@@ -69,6 +75,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpDelete("/user/delete/{id}")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Delete(int id)
         {
             logger.LogInformation("Запит на видалення користувача з ID = {Id}", id);
@@ -83,7 +90,8 @@ namespace Lyne.API.Controllers
             return NoContent();
         }
 
-        [HttpPost("/addUserWithAddress")]
+        [HttpPost("/createUserWithAddress")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult<bool>> AddUserWithAddress([FromBody] UserDto dto)
         {
             logger.LogInformation("Запит на створення користувача з адресою");
@@ -100,6 +108,7 @@ namespace Lyne.API.Controllers
             }
         }
         [HttpPost("/updateUserWithAddress")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult<bool>> UpdateUserWithAddress(UserDto dto)
         {
             logger.LogInformation("Запит на оновлення користувача з ID = {Id} з адресою", dto.Id);

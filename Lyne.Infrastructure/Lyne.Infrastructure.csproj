@@ -23,6 +23,11 @@
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Migrations\20250721095455_InitialCreate.cs" />
+    <Compile Remove="Migrations\20250721095455_InitialCreate.Designer.cs" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

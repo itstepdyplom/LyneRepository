@@ -1,5 +1,6 @@
 using Lyne.Domain.Entities;
 using Lyne.Domain.Enums;
+using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ public class UserRepositoryTests : IAsyncLifetime
     private readonly AppDbContext _context;
     private readonly UserRepository _repository;
     private readonly Mock<ILogger<UserRepository>> _mockLogger;
+    private readonly Mock<ICacheService> _mockCache;
 
     public UserRepositoryTests()
     {
@@ -27,7 +29,8 @@ public class UserRepositoryTests : IAsyncLifetime
         _context.Database.EnsureCreated();
 
         _mockLogger = new Mock<ILogger<UserRepository>>();
-        _repository = new UserRepository(_context, _mockLogger.Object);
+        _mockCache = new Mock<ICacheService>();
+        _repository = new UserRepository(_context, _mockLogger.Object,_mockCache.Object);
     }
 
     public async Task InitializeAsync()
@@ -62,7 +65,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Test",
             Genre = "M",
             PhoneNumber = "1234567890",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -98,7 +102,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Test2",
             Genre = "F",
             PhoneNumber = "0987654321",
-            PasswordHash = "test2"
+            PasswordHash = "test2",
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -127,6 +132,17 @@ public class UserRepositoryTests : IAsyncLifetime
     public async Task AddAsync_ShouldAddUser_WhenUserIsValid()
     {
         // Arrange
+        var address = new Address
+        {
+            City = "TestCity",
+            Country = "TestCountry",
+            State = "TestState",
+            Street = "TestStreet",
+            Zip = "12345"
+        };
+        _context.Addresses.Add(address);
+        await _context.SaveChangesAsync();
+
         var user = new User
         {
             Name = "New User",
@@ -134,11 +150,17 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "New",
             Genre = "M",
             PhoneNumber = "111222333",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User",
+            AddressId = address.Id
         };
 
         // Act
         var result = await _repository.AddAsync(user);
+        await _context.SaveChangesAsync();
+
+        // Now user.Id is set, update address.UserId and save again
+        _context.Addresses.Update(address);
         await _context.SaveChangesAsync();
 
         // Assert
@@ -153,7 +175,7 @@ public class UserRepositoryTests : IAsyncLifetime
         // Arrange
 
         // Act
-        var result = await _repository.Update(null);
+        var result = await _repository.UpdateAsync(null);
         
         // Assert
         Assert.False(result);
@@ -170,7 +192,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Update",
             Genre = "M",
             PhoneNumber = "222333444",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -178,7 +201,7 @@ public class UserRepositoryTests : IAsyncLifetime
         user.Name = "Updated Name";
         
         // Act
-        var result = await _repository.Update(user);
+        var result = await _repository.UpdateAsync(user);
         
         // Assert
         Assert.True(result);
@@ -190,7 +213,7 @@ public class UserRepositoryTests : IAsyncLifetime
         // Arrange
 
         // Act
-        var result = await _repository.Delete(null);
+        var result = await _repository.DeleteAsync(null);
         
         // Assert
         Assert.False(result);
@@ -207,13 +230,14 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Delete",
             Genre = "F",
             PhoneNumber = "555666777",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _repository.Delete(user);
+        var result = await _repository.DeleteAsync(user);
         await _context.SaveChangesAsync();
 
         // Assert
@@ -245,7 +269,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Exists",
             Genre = "M",
             PhoneNumber = "000111222",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -261,7 +286,7 @@ public class UserRepositoryTests : IAsyncLifetime
     public async Task ValidateForCreateAsync_ShouldReturnFalse_WhenRequiredFieldsMissing()
     {
         // Arrange
-        var user = new User(){Name = "test", Email = "test", ForName = "test", PasswordHash = "test", Genre = "test"};
+        var user = new User(){Name = "test", Email = "test", ForName = "test", PasswordHash = "test", Genre = "test", Role = "User"};
         
         // Act
         var isValid = await _repository.ValidateForCreateAsync(user);
@@ -281,7 +306,8 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "Valid",
             Genre = "F",
             PhoneNumber = "999888777",
-            PasswordHash = "test"
+            PasswordHash = "test",
+            Role = "User"
         };
         
         // Act
@@ -306,7 +332,8 @@ public class UserRepositoryTests : IAsyncLifetime
             AddressId = 1,
             DateOfBirth = DateTime.UtcNow,
             PasswordHash = "test",
-            Orders = new List<Order> { new Order() }
+            Orders = new List<Order> { new Order() },
+            Role = "User"
         };
 
         // Act
@@ -329,7 +356,8 @@ public class UserRepositoryTests : IAsyncLifetime
             PhoneNumber = "333222111",
             DateOfBirth = DateTime.UtcNow,
             PasswordHash = "test",
-            Orders = new List<Order>()
+            Orders = new List<Order>(),
+            Role = "User"
         };
 
         _context.Users.Add(user);
@@ -342,7 +370,6 @@ public class UserRepositoryTests : IAsyncLifetime
             State = "test",
             Street = "test",
             Zip = "12345",
-            UserId = user.Id
         };
 
         _context.Addresses.Add(address);

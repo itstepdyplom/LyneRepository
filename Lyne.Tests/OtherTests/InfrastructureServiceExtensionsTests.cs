@@ -22,14 +22,11 @@ public class InfrastructureServiceExtensionsTests
             }!)
             .Build();
 
-        // Мок для IConnectionMultiplexer
         var mockConnection = new Mock<IConnectionMultiplexer>();
 
-        // Реєструємо мок у сервісах замість реального підключення
         services.AddSingleton<IConnectionMultiplexer>(mockConnection.Object);
         services.AddSingleton<ICacheService, RedisCacheService>();
 
-        // Викликаємо метод реєстрації сервісів (якщо він є)
         services.AddInfrastructureServices(configuration);
 
         var provider = services.BuildServiceProvider();
@@ -37,5 +34,21 @@ public class InfrastructureServiceExtensionsTests
         var cacheService = provider.GetService<ICacheService>();
 
         cacheService.Should().NotBeNull();
+    }
+    
+    [Fact]
+    public void AddInfrastructureServices_RegistersExpectedServices()
+    {
+        var services = new ServiceCollection();
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string>
+            {
+                ["ConnectionStrings:Redis"] = "localhost:6379"
+            }!)
+            .Build();
+
+        services.AddInfrastructureServices(config);
+
+        Assert.Contains(services, s => s.ServiceType == typeof(ICacheService));
     }
 }

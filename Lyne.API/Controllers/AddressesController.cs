@@ -1,12 +1,15 @@
 using Lyne.Application.DTO;
 using Lyne.Application.Services;
+using Lyne.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lyne.API.Controllers
 {
-    public class AddressesController(IAddressService addressService, ILogger<AddressService> logger) : BaseController
+    public class AddressController(IAddressService addressService, ILogger<AddressController> logger) : BaseController
     {
         [HttpGet("{id}")]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult<AddressDto>> Get(int id)
         {
             logger.LogInformation("Запит на отримання адреси з ID = {Id}", id);
@@ -21,6 +24,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Post([FromBody] AddressDto dto)
         {
            logger.LogInformation("Запит на створення адреси");
@@ -45,6 +49,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Put([FromBody] AddressDto dto)
         {
             logger.LogInformation("Запит на оновлення адреси з ID = {Id}", dto.Id);
@@ -60,6 +65,7 @@ namespace Lyne.API.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Delete([FromBody] AddressDto dto)
         {
            logger.LogInformation("Запит на видалення адреси з ID = {Id}", dto.Id);

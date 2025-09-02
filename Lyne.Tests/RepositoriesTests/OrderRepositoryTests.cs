@@ -1,6 +1,7 @@
 using AutoMapper;
 using Lyne.Domain.Entities;
 using Lyne.Domain.Enums;
+using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
 using Lyne.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +13,10 @@ namespace Lyne.Tests.RepositoriesTests;
 public class OrderRepositoryTests : IAsyncLifetime
 {
     private readonly AppDbContext _context;
-    private readonly Mock<ILogger<OrderRepository>> mockLogger;
+    private readonly Mock<ILogger<OrderRepository>> _mockLogger;
     private readonly OrderRepository _repository;
-    private readonly Mock<IMapper> mockMapper;
+    private readonly Mock<IMapper> _mockMapper;
+    private readonly Mock<ICacheService> _mockCache;
 
     public OrderRepositoryTests()
     {
@@ -25,9 +27,10 @@ public class OrderRepositoryTests : IAsyncLifetime
         _context.Database.OpenConnection();
         _context.Database.EnsureCreated();
 
-        mockLogger = new Mock<ILogger<OrderRepository>>();
-        mockMapper  = new Mock<IMapper>();
-        _repository = new OrderRepository(_context, mockLogger.Object, mockMapper.Object);
+        _mockLogger = new Mock<ILogger<OrderRepository>>();
+        _mockMapper  = new Mock<IMapper>();
+        _mockCache = new Mock<ICacheService>();
+        _repository = new OrderRepository(_context, _mockLogger.Object, _mockMapper.Object,_mockCache.Object);
     }
 
     public async Task InitializeAsync()
@@ -61,7 +64,8 @@ public class OrderRepositoryTests : IAsyncLifetime
             ForName = "test",
             Name = "test",
             PasswordHash = "test",
-            Genre = "test"
+            Genre = "test",
+            Role = "User"
         };
 
         _context.Users.Add(user);
@@ -74,7 +78,6 @@ public class OrderRepositoryTests : IAsyncLifetime
             Street = "test",
             State = "test",
             Zip = "12345",
-            UserId = user.Id 
         };
 
         _context.Addresses.Add(address);
@@ -105,11 +108,11 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task GetAllAsync_ShouldReturnAllOrders()
     {
         // Arrange
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test"};
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User"};
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
         
-        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345", UserId = user.Id };
+        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345" };
         _context.Addresses.Add(address);
         await _context.SaveChangesAsync();
         
@@ -167,11 +170,11 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task Update_ShouldReturnTrue_WhenOrderExists()
     {
         // Arrange
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test" };
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User" };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345", UserId = user.Id };
+        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345" };
         _context.Addresses.Add(address);
         await _context.SaveChangesAsync();
 
@@ -218,11 +221,11 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task DeleteAsync_ShouldReturnTrue_WhenOrderExists()
     {
         // Arrange: створюємо користувача, адресу та замовлення
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test" };
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User"};
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345", UserId = user.Id };
+        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345" };
         _context.Addresses.Add(address);
         await _context.SaveChangesAsync();
 
@@ -307,11 +310,11 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task ValidateForUpdateAsync_ShouldReturnTrue_ForValidOrder()
     {
         // Arrange
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test" };
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User" };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345", UserId = user.Id };
+        var address = new Address { City = "test", Country = "test", Street = "test", State = "test", Zip = "12345" };
         _context.Addresses.Add(address);
         await _context.SaveChangesAsync();
 
