@@ -34,7 +34,19 @@
     "login": "Увійти",
     "register": "Зареєструватися",
     "logout": "Вийти",
-    "welcome": "Ласкаво просимо, {name}"
+    "welcome": "Ласкаво просимо, {name}",
+    "wishlist": "Список бажань",
+    "close": "Закрити",
+    "viewAll": "Переглянути все",
+    "new": "Нове",
+    "women": "Жінки",
+    "men": "Чоловіки",
+    "kids": "Діти",
+    "bagsAndWallets": "Сумки та гаманці",
+    "accessories": "Аксесуари",
+    "home": "Дім",
+    "contact": "Контакти",
+    "changeLocationAndLanguage": "Змінити розташування та мову"
   },
   "Categories": {
     "women": "ЖІНКИ",
