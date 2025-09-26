@@ -9,7 +9,7 @@ public class User
     public int Id { get; set; }
     public required string Name { get; set; } = "";
     public required string ForName { get; set; } = "";
-    public required string Genre { get; set; }
+    public required string Gender { get; set; }
     public required string PasswordHash { get; set; } = "";
     public DateTime DateOfBirth { get; set; }
 

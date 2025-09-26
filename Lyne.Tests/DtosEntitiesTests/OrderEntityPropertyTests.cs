@@ -29,7 +29,7 @@ public class OrderEntityPropertyTests
     [Fact]
     public void User_SetAndGet_Works()
     {
-        var user = new User { Id = 1, Name = "Test", ForName = "Test", PasswordHash = "test", Email = "test@example.com", Genre = "test",Role = "User"};
+        var user = new User { Id = 1, Name = "Test", ForName = "Test", PasswordHash = "test", Email = "test@example.com", Gender = "test",Role = "User"};
         var order = new Order(){Id = 1};
         order.User = user;
         order.User.Should().Be(user);

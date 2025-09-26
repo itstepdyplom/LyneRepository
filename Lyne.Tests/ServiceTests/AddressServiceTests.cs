@@ -45,7 +45,7 @@ public class AddressServiceTests
             ForName = "Doe",
             Email = "test@gmail.com",
             PasswordHash = "test",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
         var expectedAddress = new Address { Id = addressId, City = "Test",Country = "Test",State = "Test",Street = "Test",Zip = "Test"};
@@ -88,7 +88,7 @@ public class AddressServiceTests
             ForName = "Doe",
             Email = "test@gmail.com",
             PasswordHash = "test",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
         var expectedAddress = new Address { Id = addressId, City = "Test",Country = "Test",State = "Test",Street = "Test",Zip = "Test"};
@@ -131,7 +131,7 @@ public class AddressServiceTests
             ForName = "Doe",
             Email = "test@gmail.com",
             PasswordHash = "test",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
         var address = new Address()
@@ -167,7 +167,7 @@ public class AddressServiceTests
             ForName = "Doe",
             Email = "test@gmail.com",
             PasswordHash = "test",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
         var address = new Address()
@@ -203,7 +203,7 @@ public class AddressServiceTests
             ForName = "Doe",
             Email = "test@gmail.com",
             PasswordHash = "test",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
         var address = new Address()
@@ -240,7 +240,7 @@ public class AddressServiceTests
             ForName = "Doe",
             Email = "test@gmail.com",
             PasswordHash = "test",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
         var address = new Address()
@@ -277,7 +277,7 @@ public class AddressServiceTests
             ForName = "Doe",
             Email = "test@gmail.com",
             PasswordHash = "test",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
         var address = new Address()
@@ -339,7 +339,7 @@ public class AddressServiceTests
             ForName = "Doe",
             Email = "test@gmail.com",
             PasswordHash = "test",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
             
         };
@@ -376,7 +376,7 @@ public class AddressServiceTests
             ForName = "Doe",
             Email = "test@gmail.com",
             PasswordHash = "test",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
         var address = new Address()

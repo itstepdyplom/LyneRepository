@@ -11,7 +11,7 @@ public class RegisterUserDto
     [Required(ErrorMessage = "ForName is required"), MaxLength(50)]
     public string ForName { get; set; } = "";
 
-    public string Genre { get; set; } = "";
+    public string Gender { get; set; } = "";
 
     public DateTime DateOfBirth { get; set; }
 

@@ -15,7 +15,7 @@ namespace Lyne.Tests.RepositoriesTests
         public AuthRepositoryTests()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlite("DataSource=:memory:")
+                .UseNpgsql("DataSource=:memory:")
                 .Options;
             _context = new AppDbContext(options);
             _context.Database.OpenConnection();
@@ -32,7 +32,7 @@ namespace Lyne.Tests.RepositoriesTests
                 Name = "Test User",
                 Email = "testuser@example.com",
                 ForName = "Tester",
-                Genre = "M",
+                Gender = "M",
                 PhoneNumber = "1234567890",
                 DateOfBirth = System.DateTime.UtcNow,
                 PasswordHash = "hashedpassword",
@@ -56,7 +56,7 @@ namespace Lyne.Tests.RepositoriesTests
                 Name = "Find Me",
                 Email = "findme@example.com",
                 ForName = "Finder",
-                Genre = "F",
+                Gender = "F",
                 PhoneNumber = "0987654321",
                 DateOfBirth = System.DateTime.UtcNow,
                 PasswordHash = "hash",
@@ -86,7 +86,7 @@ namespace Lyne.Tests.RepositoriesTests
                 Name = "Exists",
                 Email = "exists@example.com",
                 ForName = "Existor",
-                Genre = "M",
+                Gender = "M",
                 PhoneNumber = "1111111111",
                 DateOfBirth = System.DateTime.UtcNow,
                 PasswordHash = "hash",

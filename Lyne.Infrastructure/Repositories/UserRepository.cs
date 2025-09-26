@@ -120,7 +120,7 @@ public class UserRepository(AppDbContext context, ILogger<UserRepository> logger
         bool isValid = !string.IsNullOrEmpty(user.Name) &&
                        !string.IsNullOrEmpty(user.Email) &&
                        !string.IsNullOrEmpty(user.ForName) &&
-                       !string.IsNullOrEmpty(user.Genre) &&
+                       !string.IsNullOrEmpty(user.Gender) &&
                        !string.IsNullOrEmpty(user.PhoneNumber);
         logger.LogInformation("ValidateForCreateUserAsync: Validation {Result}", isValid ? "passed" : "failed");
         return isValid;
@@ -133,7 +133,7 @@ public class UserRepository(AppDbContext context, ILogger<UserRepository> logger
         bool isValid = !string.IsNullOrEmpty(user.Name) &&
                        !string.IsNullOrEmpty(user.Email) &&
                        !string.IsNullOrEmpty(user.ForName) &&
-                       !string.IsNullOrEmpty(user.Genre) &&
+                       !string.IsNullOrEmpty(user.Gender) &&
                        !string.IsNullOrEmpty(user.PhoneNumber) &&
                        userExists;
 

@@ -14,8 +14,35 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.HasDefaultSchema("public");
 
-        modelBuilder.Entity<Address>().ToTable("Address");
+        modelBuilder.Entity<Product>().ToTable("Products");
+        modelBuilder.Entity<Category>().ToTable("Categories");
+        modelBuilder.Entity<User>().ToTable("Users");
+        modelBuilder.Entity<Address>().ToTable("Addresses");
+        modelBuilder.Entity<Order>().ToTable("Orders");
+
+        modelBuilder.Entity<Order>()
+            .HasMany(o => o.Products)
+            .WithMany() 
+            .UsingEntity<Dictionary<string, object>>(
+                "Order_products",                                 
+                right => right    
+                    .HasOne<Product>()
+                    .WithMany()
+                    .HasForeignKey("ProductId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                left => left    
+                    .HasOne<Order>()
+                    .WithMany()
+                    .HasForeignKey("OrderId")
+                    .OnDelete(DeleteBehavior.Cascade));
+
+        foreach (var e in modelBuilder.Model.GetEntityTypes())
+        foreach (var p in e.GetProperties())
+            if (p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?))
+                p.SetColumnType("timestamp without time zone");
 
         /*modelBuilder.Entity<Address>()
             .HasOne(a => a.User)
@@ -123,7 +150,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 Id = 1,
                 Name = "Ольга",
                 ForName = "Косач",
-                Genre = "Жіноча",
+                Gender = "Жіноча",
                 PasswordHash = "hashedpassword123",
                 DateOfBirth = new DateTime(2002, 3, 15),
                 PhoneNumber = "+380501234567",
@@ -138,7 +165,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 Id = 2,
                 Name = "Алекс",
                 ForName = "Кочмар",
-                Genre = "Чоловіча",
+                Gender = "Чоловіча",
                 PasswordHash = "hashedpassword123",
                 DateOfBirth = new DateTime(2000, 6, 18),
                 PhoneNumber = "+380986199887",

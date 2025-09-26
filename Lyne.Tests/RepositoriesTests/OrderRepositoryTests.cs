@@ -21,7 +21,7 @@ public class OrderRepositoryTests : IAsyncLifetime
     public OrderRepositoryTests()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite("DataSource=:memory:")
+            .UseNpgsql("DataSource=:memory:")
             .Options;
         _context = new AppDbContext(options);
         _context.Database.OpenConnection();
@@ -64,7 +64,7 @@ public class OrderRepositoryTests : IAsyncLifetime
             ForName = "test",
             Name = "test",
             PasswordHash = "test",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
 
@@ -108,7 +108,7 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task GetAllAsync_ShouldReturnAllOrders()
     {
         // Arrange
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User"};
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Gender = "test", Role = "User"};
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
         
@@ -170,7 +170,7 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task Update_ShouldReturnTrue_WhenOrderExists()
     {
         // Arrange
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User" };
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Gender = "test", Role = "User" };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -221,7 +221,7 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task DeleteAsync_ShouldReturnTrue_WhenOrderExists()
     {
         // Arrange: створюємо користувача, адресу та замовлення
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User"};
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Gender = "test", Role = "User"};
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -310,7 +310,7 @@ public class OrderRepositoryTests : IAsyncLifetime
     public async Task ValidateForUpdateAsync_ShouldReturnTrue_ForValidOrder()
     {
         // Arrange
-        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Genre = "test", Role = "User" };
+        var user = new User { Email = "test", ForName = "test", Name = "test", PasswordHash = "test", Gender = "test", Role = "User" };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 

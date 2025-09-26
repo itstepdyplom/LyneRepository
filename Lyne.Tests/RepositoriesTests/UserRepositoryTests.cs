@@ -20,7 +20,7 @@ public class UserRepositoryTests : IAsyncLifetime
     public UserRepositoryTests()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite("DataSource=:memory:")
+            .UseNpgsql("DataSource=:memory:")
             .Options;
 
         _context = new AppDbContext(options);
@@ -63,7 +63,7 @@ public class UserRepositoryTests : IAsyncLifetime
             Name = "Test User",
             Email = "test@example.com",
             ForName = "Test",
-            Genre = "M",
+            Gender = "M",
             PhoneNumber = "1234567890",
             PasswordHash = "test",
             Role = "User"
@@ -100,7 +100,7 @@ public class UserRepositoryTests : IAsyncLifetime
             Name = "Test User 2",
             Email = "test2@example.com",
             ForName = "Test2",
-            Genre = "F",
+            Gender = "F",
             PhoneNumber = "0987654321",
             PasswordHash = "test2",
             Role = "User"
@@ -148,7 +148,7 @@ public class UserRepositoryTests : IAsyncLifetime
             Name = "New User",
             Email = "newuser@example.com",
             ForName = "New",
-            Genre = "M",
+            Gender = "M",
             PhoneNumber = "111222333",
             PasswordHash = "test",
             Role = "User",
@@ -190,7 +190,7 @@ public class UserRepositoryTests : IAsyncLifetime
             Name = "Update User",
             Email = "update@example.com",
             ForName = "Update",
-            Genre = "M",
+            Gender = "M",
             PhoneNumber = "222333444",
             PasswordHash = "test",
             Role = "User"
@@ -228,7 +228,7 @@ public class UserRepositoryTests : IAsyncLifetime
             Name = "Delete User",
             Email = "delete@example.com",
             ForName = "Delete",
-            Genre = "F",
+            Gender = "F",
             PhoneNumber = "555666777",
             PasswordHash = "test",
             Role = "User"
@@ -267,7 +267,7 @@ public class UserRepositoryTests : IAsyncLifetime
             Name = "Exists User",
             Email = "exists@example.com",
             ForName = "Exists",
-            Genre = "M",
+            Gender = "M",
             PhoneNumber = "000111222",
             PasswordHash = "test",
             Role = "User"
@@ -286,7 +286,7 @@ public class UserRepositoryTests : IAsyncLifetime
     public async Task ValidateForCreateAsync_ShouldReturnFalse_WhenRequiredFieldsMissing()
     {
         // Arrange
-        var user = new User(){Name = "test", Email = "test", ForName = "test", PasswordHash = "test", Genre = "test", Role = "User"};
+        var user = new User(){Name = "test", Email = "test", ForName = "test", PasswordHash = "test", Gender = "test", Role = "User"};
         
         // Act
         var isValid = await _repository.ValidateForCreateAsync(user);
@@ -304,7 +304,7 @@ public class UserRepositoryTests : IAsyncLifetime
             Name = "Valid User",
             Email = "valid@example.com",
             ForName = "Valid",
-            Genre = "F",
+            Gender = "F",
             PhoneNumber = "999888777",
             PasswordHash = "test",
             Role = "User"
@@ -327,7 +327,7 @@ public class UserRepositoryTests : IAsyncLifetime
             Name = "NoUser",
             Email = "no@example.com",
             ForName = "No",
-            Genre = "M",
+            Gender = "M",
             PhoneNumber = "000000000",
             AddressId = 1,
             DateOfBirth = DateTime.UtcNow,
@@ -352,7 +352,7 @@ public class UserRepositoryTests : IAsyncLifetime
             Name = "Update Valid User",
             Email = "updatevalid@example.com",
             ForName = "UpdateValid",
-            Genre = "F",
+            Gender = "F",
             PhoneNumber = "333222111",
             DateOfBirth = DateTime.UtcNow,
             PasswordHash = "test",

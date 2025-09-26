@@ -33,7 +33,7 @@ public class AuthServiceTests
             PasswordHash = "hashedpassword123",
             Name = "Test",
             ForName = "User",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
         _authRepoMock.Setup(r => r.GetUserByEmailAsync("test@example.com")).ReturnsAsync(user);
@@ -70,7 +70,7 @@ public class AuthServiceTests
             PasswordHash = "hashedpassword123",
             Name = "Test",
             ForName = "User",
-            Genre = "test",
+            Gender = "test",
             Role = "User"
         };
         _authRepoMock.Setup(r => r.GetUserByEmailAsync("test@example.com")).ReturnsAsync(user);
@@ -95,7 +95,7 @@ public class AuthServiceTests
                 ForName = u.ForName,
                 Email = u.Email,
                 PasswordHash = u.PasswordHash,
-                Genre = u.Genre,
+                Gender = u.Gender,
                 DateOfBirth = u.DateOfBirth,
                 PhoneNumber = u.PhoneNumber,
                 CreatedAt = u.CreatedAt,
@@ -151,7 +151,7 @@ public class AuthServiceTests
             Email = "googleuser@example.com",
             Name = "Existing User",
             ForName = "Google",
-            Genre = "",
+            Gender = "",
             PasswordHash = "",
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
