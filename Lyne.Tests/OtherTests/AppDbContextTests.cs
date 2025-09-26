@@ -10,7 +10,7 @@ public class AppDbContextTests
     public void Can_Construct_AppDbContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite("TestDb")
+            .UseNpgsql("TestDb")
             .Options;
         var context = new AppDbContext(options);
         context.Should().NotBeNull();
@@ -20,7 +20,7 @@ public class AppDbContextTests
     public void DbSets_Are_Accessible()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite("TestDb2")
+            .UseNpgsql("TestDb2")
             .Options;
         var context = new AppDbContext(options);
         context.Products.Should().NotBeNull();

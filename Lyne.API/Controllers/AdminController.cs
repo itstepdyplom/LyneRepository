@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using Lyne.Application.DTO;
 
 namespace Lyne.API.Controllers
 {
@@ -53,14 +54,6 @@ namespace Lyne.API.Controllers
         public IActionResult UpdateUser(int id, [FromBody] UserDto user)
         {
             return Ok(new { Message = $"Користувача з ID {id} оновлено." });
-        }
-
-
-        public class UserDto
-        {
-            public string Name { get; set; }
-            public string Email { get; set; }
-            public string Role { get; set; }
         }
     }
 }

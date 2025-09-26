@@ -19,7 +19,7 @@ public class ProductRepositoryTests : IAsyncLifetime
     public ProductRepositoryTests()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite("DataSource=:memory:")
+            .UseNpgsql("DataSource=:memory:")
             .Options;
         _context = new AppDbContext(options);
         _context.Database.OpenConnection();
