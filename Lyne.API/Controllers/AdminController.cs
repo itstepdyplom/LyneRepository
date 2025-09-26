@@ -11,7 +11,7 @@ namespace Lyne.API.Controllers
         [HttpGet("dashboard")]
         public IActionResult GetDashboard()
         {
-            
+
             return Ok(new
             {
                 Title = "Admin Panel",
@@ -55,11 +55,12 @@ namespace Lyne.API.Controllers
             return Ok(new { Message = $"Користувача з ID {id} оновлено." });
         }
 
-        
+
         public class UserDto
-    {
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Role { get; set; }
+        {
+            public string Name { get; set; }
+            public string Email { get; set; }
+            public string Role { get; set; }
+        }
     }
 }
