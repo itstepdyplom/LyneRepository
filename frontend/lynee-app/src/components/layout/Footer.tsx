@@ -3,16 +3,13 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Container,
   Typography,
   Link,
-  TextField,
-  Button,
-  IconButton,
   Divider,
   Select,
   MenuItem,
   FormControl,
+  SelectChangeEvent,
 } from '@mui/material';
 import {
   Facebook,
@@ -35,7 +32,7 @@ const Footer: React.FC = () => {
     return 'United Kingdom - English';
   });
 
-  const handleLanguageChange = (event: any) => {
+  const handleLanguageChange = (event: SelectChangeEvent) => {
     const newValue = event.target.value;
     setSelectedLanguage(newValue);
     

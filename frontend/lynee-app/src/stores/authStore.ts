@@ -34,9 +34,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isAuthenticated: true, 
         isLoading: false 
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage = 'Login failed';
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        errorMessage = (error as { message?: string }).message || errorMessage;
+      }
       set({ 
-        error: error.message || 'Login failed', 
+        error: errorMessage, 
         isLoading: false 
       });
       throw error;
@@ -57,9 +61,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isAuthenticated: true, 
         isLoading: false 
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage = 'Registration failed';
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        errorMessage = (error as { message?: string }).message || errorMessage;
+      }
       set({ 
-        error: error.message || 'Registration failed', 
+        error: errorMessage, 
         isLoading: false 
       });
       throw error;
