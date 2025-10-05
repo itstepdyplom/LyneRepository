@@ -101,7 +101,7 @@ const Footer: React.FC = () => {
         sx={{
           mb: 8,
           height: 300,
-          backgroundImage: 'url(https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)',
+          //backgroundImage: 'url(https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           display: 'flex',

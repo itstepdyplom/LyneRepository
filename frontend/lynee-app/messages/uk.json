@@ -1,5 +1,10 @@
 {
   "HomePage": {
+    "hero": {
+      "luxury": "Розкіш",
+      "collection": "Колекція",
+      "subtitle": "Сумка Cookie BB в монограмі"
+    },
     "shopByCategory": "ПОКУПКИ ЗА КАТЕГОРІЯМИ",
     "categories": {
       "women": "ЖІНКИ",
@@ -9,6 +14,14 @@
     },
     "newArrivals": "Нові надходження",
     "viewAll": "Переглянути все",
+    "crystalRose": {
+      "title": "CRYSTAL ROSE",
+      "collection": "Колекція Gepur",
+      "description": "Вишукана, жіночна, ікона. Дослідіть наші нові корсетні сукні, спідниці та деталі.",
+      "button": "ПРОКРУТИТИ ДО ПОКУПКИ"
+    },
+    "exploreCollections": "Дослідіть інші колекції",
+    "summerSale": "Літня розпродаж -25%",
     "products": {
       "silkBlouse": {
         "name": "Розкішна шовкова блузка"
