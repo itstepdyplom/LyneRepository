@@ -6,443 +6,307 @@ import {
   Container,
   Typography,
   Button,
-  Card,
-  CardMedia,
-  CardContent,
-  Chip,
+  Grid,
   Stack,
+  IconButton,
+  Link as MuiLink,
 } from '@mui/material';
-import { ArrowForward } from '@mui/icons-material';
+import {
+  ArrowForward,
+  FavoriteBorder,
+  LocalMallOutlined,
+} from '@mui/icons-material';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
+import BrandCarousel from '../../components/BrandCarousel';
+
+
+// Helper component for Product Card
+const ProductCard = ({ product }: { product: any }) => (
+  <Box sx={{ position: 'relative', backgroundColor: '#F5F5F5', height: '100%' }}>
+    <Box
+      component="img"
+      src={product.image}
+      alt={product.name}
+      sx={{ width: '100%', height: 'auto', display: 'block' }}
+    />
+    <Box sx={{ position: 'absolute', top: 12, left: 12, backgroundColor: 'white', px: 1, py: 0.5 }}>
+      <Typography variant="caption" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+        {product.brand}
+      </Typography>
+    </Box>
+    <Stack direction="row" spacing={1} sx={{ position: 'absolute', top: 8, right: 8 }}>
+      <IconButton size="small" sx={{ backgroundColor: 'white', '&:hover': { backgroundColor: '#e0e0e0' } }}>
+        <LocalMallOutlined fontSize="small" />
+      </IconButton>
+      <IconButton size="small" sx={{ backgroundColor: 'white', '&:hover': { backgroundColor: '#e0e0e0' } }}>
+        <FavoriteBorder fontSize="small" />
+      </IconButton>
+    </Stack>
+    <Box sx={{ p: 2, backgroundColor: 'white' }}>
+      <Typography variant="body2" sx={{ textTransform: 'uppercase' }}>
+        {product.name}
+      </Typography>
+      <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+        {product.price} UAH
+      </Typography>
+    </Box>
+  </Box>
+);
 
 const HomePage: React.FC = () => {
-  const t = useTranslations('HomePage');
+  const t = useTranslations('HomePage'); // Assuming you have translations set up
   const { locale } = useParams();
 
-  // Mock data for featured products
-  const featuredProducts = [
-    {
-      id: '1',
-      name: t('products.silkBlouse.name'),
-      brand: 'Ralph Lauren',
-      price: 2850,
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
-      category: t('categories.women'),
-      isNew: true,
-    },
-    {
-      id: '2',
-      name: t('products.handbag.name'),
-      brand: 'BURBERRY',
-      price: 3200,
-      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
-      category: t('categories.accessories'),
-      isNew: false,
-    },
-    {
-      id: '3',
-      name: t('products.heels.name'),
-      brand: 'JIMMY CHOO',
-      price: 4500,
-      image: 'https://images.unsplash.com/photo-1544441892-794166f1e3be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
-      category: t('categories.women'),
-      isNew: true,
-    },
-    {
-      id: '4',
-      name: t('products.eveningBag.name'),
-      brand: 'JIMMY CHOO',
-      price: 650,
-      image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
-      category: t('categories.accessories'),
-      isNew: false,
-    },
+  const newArrivals = [
+    { id: '1', name: 'Cropped shirt', brand: 'Ralph Lauren', price: 980, image: 'https://i.imgur.com/B70q2hG.png' },
+    { id: '2', name: 'Cotton t-shirt', brand: 'Burberry', price: 12300, image: 'https://i.imgur.com/u7Fp0y5.png' },
+    { id: '3', name: 'Dimond tote s', brand: 'Jimmy Choo', price: 44730, image: 'https://i.imgur.com/XqT7hWw.png' },
+    { id: '4', name: 'Zoey', brand: 'Jimmy Choo', price: 44730, image: 'https://i.imgur.com/8N4D39T.png' },
+  ];
+  
+  const otherCollections = [
+    { id: '5', name: 'White dress', brand: 'ZARA', price: 988, image: 'https://i.imgur.com/hR7n41c.png' },
+    { id: '6', name: 'Red overalls', brand: 'ZARA', price: 1099, image: 'https://i.imgur.com/n6i3t3N.png' },
+    { id: '7', name: 'Bermuda shorts', brand: 'MANGO', price: 2000, image: 'https://i.imgur.com/F0kQv4D.png' },
+    { id: '8', name: 'Draped denim dress', brand: 'Mohito', price: 2099, image: 'https://i.imgur.com/5u9F58v.png' },
+  ];
+
+  const brands = [
+    { id: '1', name: 'Brand 1', image: '/img/brand/1.png' },
+    { id: '2', name: 'Brand 2', image: '/img/brand/2.png' },
+    { id: '3', name: 'Brand 3', image: '/img/brand/3.png' },
+    { id: '4', name: 'Brand 4', image: '/img/brand/4.png' },
+    { id: '5', name: 'Brand 5', image: '/img/brand/5.png' },
+    { id: '6', name: 'Brand 6', image: '/img/brand/6.png' },
+    { id: '7', name: 'Brand 7', image: '/img/brand/7.png' },
   ];
 
   return (
-    <Box>
-      {/* Hero Section with Categories */}
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
-            gap: 3,
-          }}
-        >
-          {/* Left Section - Categories */}
-          <Box sx={{ flex: 1, pr: { md: 4 } }}>
+    <Box sx={{ backgroundColor: '#fff' }}>
+      {/* Hero Section */}
+      <Box
+        sx={{
+          height: { xs: '60vh', md: '90vh' },
+          backgroundImage: 'url(/img/firstRhoteBagound.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#f0f0f0', // fallback color
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          color: 'white',
+          position: 'relative',
+          px: { xs: 2, md: 10 },
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h1"
+            component="h1"
+            sx={{
+              fontWeight: 400,
+              fontSize: { xs: '3rem', md: '6rem' },
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {t('hero.luxury')}
+          </Typography>
+          <Typography
+            variant="h1"
+            component="h1"
+            sx={{
+              fontWeight: 400,
+              fontSize: { xs: '3rem', md: '6rem' },
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {t('hero.collection')}
+          </Typography>
+          <Typography variant="body1" sx={{ mt: 1, letterSpacing: '0.05em' }}>
+            {t('hero.subtitle')}
+          </Typography>
+        </Box>
+        <Stack direction="row" spacing={1} sx={{ position: 'absolute', bottom: 30, right: 30 }}>
+            <Box sx={{ width: 10, height: 10, borderRadius: '50%', border: '1px solid white' }} />
+            <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'white' }} />
+            <Box sx={{ width: 10, height: 10, borderRadius: '50%', border: '1px solid white' }} />
+        </Stack>
+      </Box>
+
+      {/* Shop by Category Section */}
+      <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10, textAlign: 'center', alignItems: 'center', justifyContent: 'center' } }}>
+        <Grid container spacing={{ xs: 4, md: 8 }} alignItems="center">
+          <Grid size={{ xs: 12, md: 5 }} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: { xs: 'auto', md: '600px' } }}>
             <Typography
-              variant="h2"
-              sx={{
-                mb: 6,
-                fontWeight: 300,
-                letterSpacing: '0.1em',
-                fontSize: { xs: '2rem', md: '2.5rem' },
-                lineHeight: 1.2,
-              }}
+              variant="h6"
+              sx={{ mb: 1, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: { xs: '1rem', md: '1.5rem' } }}
             >
               {t('shopByCategory')}
             </Typography>
-            
-            <Stack spacing={3}>
-              <Typography
-                variant="h3"
-                component={Link}
-                href={`/${locale}/categories/women`}
-                sx={{
-                  color: '#9E9E9E',
-                  fontWeight: 300,
-                  fontSize: { xs: '2rem', md: '3rem' },
-                  letterSpacing: '0.1em',
-                  cursor: 'pointer',
-                  transition: 'color 0.3s ease',
-                  textDecoration: 'none',
-                  '&:hover': {
-                    color: 'text.primary',
-                  },
-                }}
-              >
-                {t('categories.women')}
-              </Typography>
-              <Typography
-                variant="h3"
-                component={Link}
-                href={`/${locale}/categories/men`}
-                sx={{
-                  color: '#9E9E9E',
-                  fontWeight: 300,
-                  fontSize: { xs: '2rem', md: '3rem' },
-                  letterSpacing: '0.1em',
-                  cursor: 'pointer',
-                  transition: 'color 0.3s ease',
-                  textDecoration: 'none',
-                  '&:hover': {
-                    color: 'text.primary',
-                  },
-                }}
-              >
-                {t('categories.men')}
-              </Typography>
-              <Typography
-                variant="h3"
-                component={Link}
-                href={`/${locale}/categories/kids`}
-                sx={{
-                  color: '#9E9E9E',
-                  fontWeight: 300,
-                  fontSize: { xs: '2rem', md: '3rem' },
-                  letterSpacing: '0.1em',
-                  cursor: 'pointer',
-                  transition: 'color 0.3s ease',
-                  textDecoration: 'none',
-                  '&:hover': {
-                    color: 'text.primary',
-                  },
-                }}
-              >
-                {t('categories.kids')}
-              </Typography>
-              <Typography
-                variant="h3"
-                component={Link}
-                href={`/${locale}/categories/accessories`}
-                sx={{
-                  color: '#9E9E9E',
-                  fontWeight: 300,
-                  fontSize: { xs: '2rem', md: '3rem' },
-                  letterSpacing: '0.1em',
-                  cursor: 'pointer',
-                  transition: 'color 0.3s ease',
-                  textDecoration: 'none',
-                  '&:hover': {
-                    color: 'text.primary',
-                  },
-                }}
-              >
-                {t('categories.accessories')}
-              </Typography>
+            <Stack spacing={2}>
+              {[t('categories.women'), t('categories.men'), t('categories.kids'), t('categories.accessories')].map((category) => (
+                <Typography
+                  key={category}
+                  variant="h2"
+                  component={Link}
+                  href={`/${locale}/categories/${category.toLowerCase()}`}
+                  sx={{
+                    color: '#9E9E9E',
+                    fontWeight: 300,
+                    fontSize: { xs: '2.5rem', md: '4rem' },
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                    textDecoration: 'none',
+                    transition: 'color 0.3s ease',
+                    '&:hover': { color: 'text.primary' },
+                  }}
+                >
+                  {category}
+                </Typography>
+              ))}
             </Stack>
-          </Box>
-
-          {/* Right Section - Hero Image */}
-          <Box sx={{ flex: 1 }}>
+          </Grid>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Box
               sx={{
                 height: { xs: 400, md: 600 },
-                backgroundImage: 'url(https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80)',
+                backgroundImage: 'url(/img/imgNearCategories.png)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                borderRadius: 0,
+                backgroundRepeat: 'no-repeat',
+                backgroundColor: '#f0f0f0',
               }}
             />
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
+      </Container>
+      
+      {/* Brands Section */}
+      <Container maxWidth="xl" sx={{ py: 6 }}>
+        <BrandCarousel brands={brands} />
       </Container>
 
-      {/* Brands Section */}
-      <Box
-        sx={{
-          py: 6,
-          backgroundColor: '#f8f8f8',
-          borderTop: '1px solid #e0e0e0',
-          borderBottom: '1px solid #e0e0e0',
-        }}
-      >
-        <Container maxWidth="lg">
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: { xs: 4, md: 8 },
-              flexWrap: 'wrap',
-            }}
-          >
-            {['DIOR', 'PRADA', 'HERMÈS', 'GUCCI', 'Cartier'].map((brand) => (
-              <Typography
-                key={brand}
-                variant="h6"
-                sx={{
-                  letterSpacing: '0.2em',
-                  color: 'text.secondary',
-                  fontWeight: 300,
-                  fontSize: { xs: '1rem', md: '1.2rem' },
-                  fontFamily: 'serif',
-                  cursor: 'pointer',
-                  transition: 'color 0.3s ease',
-                  '&:hover': {
-                    color: 'text.primary',
-                  },
-                }}
-              >
-                {brand}
-              </Typography>
-            ))}
-          </Box>
-        </Container>
-      </Box>
-
-      {/* New arrivals Section */}
-      <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 6,
-          }}
-        >
-          <Typography
-            variant="h2"
-            sx={{
-              fontWeight: 300,
-              letterSpacing: '0.1em',
-              fontSize: { xs: '1.8rem', md: '2rem' },
-            }}
-          >
+      {/* New Arrivals Section */}
+      <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10 } }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+          <Typography variant="h4" sx={{ fontWeight: 300 }}>
             {t('newArrivals')}
           </Typography>
           <Button
             variant="text"
-            endIcon={<ArrowForward />}
-            sx={{
-              color: 'text.primary',
-              fontSize: '1rem',
-              textTransform: 'none',
-              '&:hover': {
-                backgroundColor: 'transparent',
-                textDecoration: 'underline',
-              },
-            }}
+            endIcon={<Box sx={{
+                width: 24, height: 24, borderRadius: '50%', border: '1px solid black',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}><ArrowForward sx={{ fontSize: 16 }} /></Box>}
+            sx={{ color: 'text.primary', textTransform: 'none' }}
           >
             {t('viewAll')}
           </Button>
         </Box>
-
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 3,
-            justifyContent: 'center',
-          }}
-        >
-          {featuredProducts.map((product) => (
-            <Box
-              key={product.id}
-              sx={{
-                flex: '1 1 280px',
-                maxWidth: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 12px)' },
-                minWidth: '280px',
-              }}
-            >
-              <Card
-                sx={{
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: 'none',
-                  height: '100%',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                  },
-                }}
-              >
-                <Box sx={{ position: 'relative' }}>
-                  <CardMedia
-                    component="img"
-                    height="300"
-                    image={product.image}
-                    alt={product.name}
-                    sx={{
-                      objectFit: 'cover',
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 12,
-                      right: 12,
-                      display: 'flex',
-                      gap: 1,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        backgroundColor: 'white',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        transition: 'transform 0.2s ease',
-                        '&:hover': {
-                          transform: 'scale(1.1)',
-                        },
-                      }}
-                    >
-                      <Typography sx={{ fontSize: '1.2rem' }}>🛒</Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        backgroundColor: 'white',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        transition: 'transform 0.2s ease',
-                        '&:hover': {
-                          transform: 'scale(1.1)',
-                        },
-                      }}
-                    >
-                      <Typography sx={{ fontSize: '1.2rem' }}>🤍</Typography>
-                    </Box>
-                  </Box>
-                </Box>
-                <CardContent sx={{ p: 2 }}>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: 'text.secondary',
-                      fontSize: '0.75rem',
-                      letterSpacing: '0.1em',
-                      mb: 1,
-                      display: 'block',
-                    }}
-                  >
-                    {product.brand}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 400,
-                      fontSize: '1rem',
-                      lineHeight: 1.3,
-                      mb: 1,
-                    }}
-                  >
-                    {product.name}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 600,
-                      color: 'text.primary',
-                      fontSize: '1rem',
-                    }}
-                  >
-                    ${product.price.toLocaleString()}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Box>
+        <Grid container spacing={2}>
+          {newArrivals.map((product) => (
+            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={product.id}>
+              <ProductCard product={product} />
+            </Grid>
           ))}
-        </Box>
+        </Grid>
       </Container>
-
-      {/* Newsletter Section */}
-      <Box
+      
+      {/* Collection Gepur Section */}
+      <Container maxWidth="xl" disableGutters sx={{ py: { xs: 6, md: 10 } }}>
+        <Grid container>
+            <Grid size={{ xs: 12, md: 6 }}>
+                 <Box sx={{ position: 'relative', height: { xs: 400, md: 600 } }}>
+                    <Box
+                      component="img"
+                      src="/img/CrystalRoseImg.png"
+                      alt="Crystal Rose Collection"
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block'
+                      }}
+                    />
+                 </Box>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', p: { xs: 4, md: 8 } }}>
+                 <Typography variant="h6" sx={{ letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: { xs: '0.8rem', md: '1rem' }, fontWeight: 400 }}>{t('crystalRose.title')}</Typography>
+                 <Typography variant="h2" sx={{ fontWeight: 300, my: 2 }}>{t('crystalRose.collection')}</Typography>
+                 <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mb: 10 }}>
+                     {t('crystalRose.description')}
+                 </Typography>
+                 <Button variant="text" endIcon={<ArrowForward />} sx={{ color: 'text.primary', justifyContent: 'flex-start', p: 0 }}>
+                     {t('crystalRose.button')}
+                 </Button>
+            </Grid>
+        </Grid>
+      </Container>
+      
+      {/* NUDE SUNSET Section */}
+       <Box
         sx={{
-          py: 8,
-          backgroundColor: '#f8f8f8',
+          height: { xs: '50vh', md: '70vh' },
+          backgroundImage: 'url(/img/NudeImg.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: 'white',
           textAlign: 'center',
         }}
       >
-        <Container maxWidth="md">
-          <Typography
-            variant="h3"
-            sx={{
-              mb: 3,
-              fontWeight: 300,
-              letterSpacing: '0.1em',
-              fontSize: { xs: '2rem', md: '2.5rem' },
-            }}
-          >
-            {t('newsletter.title')}
+       </Box>
+
+      {/* Explore other collections */}
+      <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10 }, backgroundColor: '#fff' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+          <Typography variant="h4" sx={{ fontWeight: 300 }}>
+            {t('exploreCollections')}
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              mb: 4,
-              color: 'text.secondary',
-              maxWidth: 400,
-              mx: 'auto',
-              lineHeight: 1.6,
-            }}
+           <Button
+            variant="text"
+            endIcon={<Box sx={{
+                width: 24, height: 24, borderRadius: '50%', border: '1px solid black',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}><ArrowForward sx={{ fontSize: 16 }} /></Box>}
+            sx={{ color: 'text.primary', textTransform: 'none' }}
           >
-            {t('newsletter.description')}
-          </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            sx={{
-              backgroundColor: 'black',
-              color: 'white',
-              px: 4,
-              py: 1.5,
-              fontSize: '1rem',
-              fontWeight: 400,
-              textTransform: 'none',
-              '&:hover': {
-                backgroundColor: '#333',
-              },
-            }}
-          >
-            {t('newsletter.button')}
+            {t('viewAll')}
           </Button>
-        </Container>
-      </Box>
+        </Box>
+        <Grid container spacing={2}>
+          {otherCollections.map((product) => (
+            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={product.id}>
+              <ProductCard product={product} />
+            </Grid>
+          ))}
+        </Grid>
+         <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end', mt: 4 }}>
+            <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#C4C4C4' }} />
+            <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'black' }} />
+            <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#C4C4C4' }} />
+        </Stack>
+      </Container>
+      
+      {/* Summer Sale */}
+      <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10 }, textAlign: 'center', backgroundColor: '#fff' }}>
+          <Typography variant="h1" sx={{ fontWeight: 400, fontSize: { xs: '3rem', md: '5rem' }, pb: 4 }}>{t('summerSale')}</Typography>
+           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+             <Box component="img" src="/img/SalesImg.png" sx={{ maxWidth: '100%', height: 'auto' }} />
+           </Box>
+      </Container>
+      
     </Box>
   );
 };
 
-export default HomePage; 
+export default HomePage;

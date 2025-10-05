@@ -63,7 +63,7 @@ export const theme = createTheme({
     success: colors.success,
   },
   typography: {
-    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Base Neue Trial", "Inter", "Helvetica", "Arial", sans-serif',
     h1: {
       fontSize: '3.5rem',
       fontWeight: 300,

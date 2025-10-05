@@ -1,7 +1,7 @@
 import { SxProps } from "@mui/material";
 
 export const listItemTextSx: SxProps = {
-  fontFamily: "Base Neue Trial",
+  fontFamily: '"Base Neue Trial", "Inter", "Helvetica", "Arial", sans-serif',
   fontWeight: 300,
   fontSize: { xs: "16px", sm: "18px", md: "20px" },
   lineHeight: { xs: "120%", md: "140%" },
