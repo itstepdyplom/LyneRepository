@@ -68,7 +68,7 @@ public static class InfrastructureServiceExtensions
         
         // C#
         var redisSection = configuration.GetSection("Redis");
-        var host = redisSection["Host"];
+        var host = redisSection["Host"];                
         var port = int.Parse(redisSection["Port"] ?? "6379");
         var password = redisSection["Password"];
         var ssl = bool.Parse(redisSection["Ssl"] ?? "false");
@@ -78,11 +78,15 @@ public static class InfrastructureServiceExtensions
         {
             EndPoints = { { host, port } },
             User = user,
+            ConnectRetry = 3,
             Password = password,
             Ssl = ssl,
             AbortOnConnectFail = false,
             ConnectTimeout = 10000,
             SyncTimeout = 10000,
+            ResolveDns = true,
+            ClientName = "Lyne-API"
+
         };
 
         services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(config));
