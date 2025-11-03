@@ -42,11 +42,11 @@ namespace Lyne.API.Controllers
             try
             {
                 var success = await userService.AddAsync(dto);
-                if (!success)
-                {
-                    logger.LogWarning("Не вдалося створити користувача. DTO: {@Dto}", dto);
-                    return BadRequest("Не вдалось створити користувача");
-                }
+                // if (!success)
+                // {
+                //     logger.LogWarning("Не вдалося створити користувача. DTO: {@Dto}", dto);
+                //     return BadRequest("Не вдалось створити користувача");
+                // }
 
                 logger.LogInformation("Користувача з ID = {Id} успішно створено", dto.Id);
                 return StatusCode(200,$"user with name: {dto.Name} created");

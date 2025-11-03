@@ -14,7 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
-
+// options.UseNpgsql(connStr, o => {
+//     // якщо увімкнено:
+//     o.EnableRetryOnFailure(...); // ретраї можуть дублювати INSERT за DB-generated Id
+// });
 builder.Services.AddScoped<IStripeService, StripeService>();
 
 

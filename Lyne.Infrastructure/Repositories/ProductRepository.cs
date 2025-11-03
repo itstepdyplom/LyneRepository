@@ -1,4 +1,6 @@
+using System.Data;
 using System.Globalization;
+using AutoMapper;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
 using Lyne.Infrastructure.Caching;
@@ -6,17 +8,22 @@ using Lyne.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
+using Npgsql;
+using Supabase.Interfaces;
 
 namespace Lyne.Infrastructure.Repositories;
 
-public class ProductRepository(AppDbContext context, ILogger<ProductRepository> logger,ICacheService cacheService): IProductRepository
+public class ProductRepository(AppDbContext context, ILogger<ProductRepository> logger,ICacheService cacheService,IMapper mapper): IProductRepository
 {
+    private const string AllProductsKey = "products:all";
+
     public async Task<List<Product?>> GetAllAsync()
     {
-        var cached = await cacheService.GetAllAsync<Product>("product");
+        var cached = await cacheService.GetAsync<List<Product>>(AllProductsKey);
         if (cached is not null && cached.Count > 0)
             return cached;
         var products = await context.Products.ToListAsync();
+        await cacheService.SetRangeAsync(AllProductsKey, products, "products", TimeSpan.FromMinutes(15));
         return (await Task.FromResult(products))!;
     }
 
@@ -54,23 +61,25 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
             logger.LogInformation("Cannot add product with id:{Id}, validation issues", product!.Id);
             return false;
         }
+
+        // product.Id = Guid.Empty;
         
-        var cacheKey = $"product:{product.Id}";
-        await cacheService.SetAsync(cacheKey, product, "product", TimeSpan.FromMinutes(15));
-        await context.Products.AddAsync(product);
-        await context.SaveChangesAsync();
-        logger.LogInformation("Product with id:{Id} added", product!.Id);
-        return true;
+         var result = await context.Products.AddAsync(product);
+         await context.SaveChangesAsync();
+         
+         return result is not null ? true : false;
     }
 
-    public async Task<bool> Update(Product? product)
+    public async Task<bool> Update(Product? product, CancellationToken ct = default)
     {
         if (product is null)
         {
             logger.LogWarning("Attempted to add a null product");
             return false;
         }
-        if (!await ExistsAsync(product.Id))
+
+        var existing = await context.Products.FindAsync(product.Id);
+        if (existing is null)
         {
             logger.LogWarning("Product with ID {Id} not found", product.Id);
             return false;
@@ -80,40 +89,42 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
             logger.LogInformation("Cannot update product with id:{Id}, validation issues", product!.Id);
             return false;
         }
-        
-        var cacheKey = $"product:{product.Id}";
-        await cacheService.SetAsync(cacheKey, product, "product", TimeSpan.FromMinutes(15));
-        context.Products.Update(product);
+
+        mapper.Map(product, existing);
         await context.SaveChangesAsync();
-        logger.LogInformation("Product with id:{Id} updated", product!.Id);
+
+        await cacheService.RemoveAsync("products:all", "product");
+        await cacheService.SetAsync($"product:{product.Id}", product, "product", TimeSpan.FromMinutes(15));
         return true;
     }
 
-    public async Task<bool> DeleteAsync(Product? product)
+    public async Task<bool> DeleteAsync(Guid id)
     {
-        if (product is null)
-        {
-            logger.LogWarning("Product is null");
-            return false;
-        }
+        // if (product is null)
+        // {
+        //     logger.LogWarning("Product is null");
+        //     return false;
+        // }
 
-        if (!await ExistsAsync(product.Id))
-        {
-            logger.LogWarning("Product not found with id {Id}", product.Id);
-            return false;
-        }
+        // var existing = await context.Products.FindAsync(product.Id);
+        // if (existing is null)
+        // {
+        //     logger.LogWarning("Product not found with id {Id}", product.Id);
+        //     return false;
+        // }
 
-        if (!await ValidateForUpdateAsync(product))
-        {
-            logger.LogInformation("Cannot delete product with id:{Id}, validation issues", product.Id);
-            return false;
-        }
+        // if (!await ValidateForUpdateAsync(product))
+        // {
+        //     logger.LogInformation("Cannot delete product with id:{Id}, validation issues", product.Id);
+        //     return false;
+        // }
 
-        var cacheKey = $"product:{product.Id}";
-        await cacheService.RemoveAsync(cacheKey,"product"); 
-        context.Products.Remove(product);
+        await context.Products.Where(p => p.Id == id).ExecuteDeleteAsync();
         await context.SaveChangesAsync();
-        logger.LogInformation("Product with id:{Id} deleted", product.Id);
+        
+        var cacheKey = $"product:{id}";
+        await cacheService.RemoveAsync(cacheKey,"product"); 
+        logger.LogInformation("Product with id:{Id} deleted", id);
         return true;
     }
 
@@ -144,7 +155,8 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
 
     public async Task<bool> ValidateForUpdateAsync(Product? product)
     {
-        var productExists = product is not null && await context.Products.AnyAsync(u => u.Id == product.Id);
+        Npgsql.NpgsqlConnection.ClearAllPools();
+        var productExists = await context.Products.AnyAsync(u => u.Id == product!.Id);
 
         bool isValid = !string.IsNullOrEmpty(product?.Brand) &&
                        !string.IsNullOrEmpty(product.Color) &&

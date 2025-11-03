@@ -6,12 +6,13 @@ namespace Lyne.Domain.Entities;
 public class User
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]  // важливо
     public int Id { get; set; }
     public required string Name { get; set; } = "";
     public required string ForName { get; set; } = "";
     public required string Gender { get; set; }
     public required string PasswordHash { get; set; } = "";
-    public DateTime DateOfBirth { get; set; }
+    public DateOnly DateOfBirth { get; set; }
 
     [Phone]
     public string? PhoneNumber { get; set; }
@@ -23,8 +24,8 @@ public class User
     [ForeignKey("AddressId")]
     public Address? Address { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
     public required string Role { get; set; }
     
     public ICollection<Order>? Orders { get; set; } = new List<Order>();

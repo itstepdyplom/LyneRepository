@@ -17,7 +17,10 @@ public static class InfrastructureServiceExtensions
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,IConfiguration configuration)
     {
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), o =>
+            {
+                o.EnableRetryOnFailure(2, TimeSpan.FromSeconds(3), null);
+            }));
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {

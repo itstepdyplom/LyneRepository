@@ -41,15 +41,10 @@ namespace Lyne.API.Controllers
 
             try
             {
-                var success = await productService.AddAsync(dto);
-                if (!success)
-                {
-                    logger.LogWarning("Не вдалося створити продукт. DTO: {@Dto}", dto);
-                    return BadRequest("Не вдалося створити продукт.");
-                }
+                var (ok,created) = await productService.AddAsync(dto);
 
-                logger.LogInformation("Продукт успішно створено з ID = {Id}", dto.Id);
-                return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
+                logger.LogInformation("Продукт успішно створено: {name}", dto.Name);
+                return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
             }
             catch (Exception ex)
             {
@@ -62,12 +57,6 @@ namespace Lyne.API.Controllers
         [Authorize(Roles = nameof(UserRole.Admin)+ "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Put(Guid id, [FromBody] ProductDto dto)
         {
-            if (id != dto.Id)
-            {
-                logger.LogWarning("Id у URL ({UrlId}) не збігається з Id у тілі запиту ({BodyId})", id, dto.Id);
-                return BadRequest("Id в маршруті не співпадає з Id у тілі запиту.");
-            }
-
             logger.LogInformation("Запит на оновлення продукту з ID = {Id}", id);
             var success = await productService.UpdateAsync(dto);
             if (!success)

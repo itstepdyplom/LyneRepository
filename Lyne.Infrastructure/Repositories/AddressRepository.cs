@@ -66,20 +66,15 @@ public class AddressRepository(AppDbContext context, ILogger<AddressRepository> 
             return false;
         }
 
-        if (!await ExistsAsync(address.Id))
-        {
-            logger.LogInformation("Cannot update address with id: {Id}, not found", address.Id);
-            return false;
-        }
-        if (!await ValidateForUpdateAsync(address))
-        {
-            logger.LogInformation("Cannot update address with id: {Id}, validation failed", address.Id);
-            return false;
-        }
+        var existing = await context.Addresses.FirstOrDefaultAsync(a => a.Id == address.Id);
+        if (existing is null) return false;
+        
+        context.Entry(existing).CurrentValues.SetValues(address);
+
+        await context.SaveChangesAsync();
+
         var cacheKey = $"address:{address.Id}";
         await cacheService.SetAsync(cacheKey, address, "address", TimeSpan.FromMinutes(15));
-        context.Addresses.Update(address);
-        await context.SaveChangesAsync();
         logger.LogInformation("Address with id:{Id} updated", address!.Id);
         return true;
     }

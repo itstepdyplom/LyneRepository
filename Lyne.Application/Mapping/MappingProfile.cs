@@ -15,17 +15,37 @@ public class MappingProfile : Profile
         CreateMap<UserDto, User>()
             .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
             .ForMember(dest => dest.Orders, opt => opt.Ignore());
-        
+        CreateMap<UserDto, User>();
         // RegisterUserDto → User
         CreateMap<RegisterUserDto, User>()
             .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+        CreateMap<UserDto, User>()
+            .ForMember(d => d.PasswordHash, o => o.Ignore())
+            .ForMember(d => d.Orders,       o => o.Ignore())
+            .ForMember(d => d.Id,           o => o.Ignore())
+            .ForMember(d => d.DateOfBirth,  o => o.MapFrom(s => DateOnly.Parse(s.DateOfBirth)));
 
         // Order → OrderDto
         CreateMap<Order, OrderDto>()
             .ForMember(dest => dest.ProductIds, opt => opt.MapFrom(src => src.Products.Select(p => p.Id)));
+        CreateMap<Order, OrderDto>()
+            .ForMember(d => d.ProductIds, o => o.MapFrom(s => s.Products.Select(p => p.Id)));
+
+        CreateMap<OrderDto, Order>()
+            .ForMember(d => d.CreatedAt, o => o.Ignore())
+            .ForMember(d => d.UpdatedAt, o => o.Ignore())
+            .ForMember(d => d.User, o => o.Ignore())
+            .ForMember(d => d.ShippingAddress, o => o.Ignore())
+            .ForMember(d => d.Products, o => o.Ignore());
+        
         CreateMap<OrderDto, Order>()
             .ForMember(dest => dest.Products, opt => opt.Ignore());
-
+        CreateMap<OrderDto, Order>()
+            .ForMember(d => d.CreatedAt, o => o.Ignore())
+            .ForMember(d => d.UpdatedAt, o => o.Ignore())
+            .ForMember(d => d.User, o => o.Ignore())
+            .ForMember(d => d.ShippingAddress, o => o.Ignore())
+            .ForMember(d => d.Products, o => o.Ignore());
         // Category → CategoryDto
         CreateMap<Category, CategoryDto>();
 
@@ -40,6 +60,9 @@ public class MappingProfile : Profile
         // Category ↔ CategoryDto
         CreateMap<Category, CategoryDto>();
         CreateMap<CategoryDto, Category>();
+        
+        CreateMap<Product, Product>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
     }
 }

@@ -12,11 +12,13 @@ public class UserDto
     [Required(ErrorMessage = "ForName is required!"), MaxLength(50)]
     public string? ForName { get; set; }
     [Required(ErrorMessage = "Genre is required!"), MaxLength(10)]
-    public string? Genre { get; set; }
+    public string? Gender { get; set; }
+    
+    public string? Role { get; set; }
     
     [Required]
     public string? PasswordHash { get; set; }
-    public DateTime? DateOfBirth { get; set; }
+    public string? DateOfBirth { get; set; }
     
     [Required(ErrorMessage = "PhoneNumber is required!"),Phone]
     public string? PhoneNumber { get; set; }
@@ -26,5 +28,5 @@ public class UserDto
     
     public AddressDto? Address { get; set; }
     
-    public ICollection<int> OrderIds { get; set; } = new List<int>();
+    public ICollection<int>? OrderIds { get; set; } = new List<int>();
 }

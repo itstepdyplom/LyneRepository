@@ -42,7 +42,6 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
         // Create a new address for the user
         var address = new Address
         {
-            Id = 0, // Will be auto-generated
             Street = "Default Street",
             City = "Default City",
             State = "Default State",

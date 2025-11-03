@@ -53,6 +53,12 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
             logger.LogInformation("Cannot add order with id:{Id}, validation issues", order!.Id);
             return false;
         }
+        order.CreatedAt = DateTimeOffset.UtcNow;
+        order.UpdatedAt = DateTimeOffset.UtcNow;
+        
+        if (order.Date.Offset != TimeSpan.Zero)
+            order.Date = order.Date.ToUniversalTime();
+        
         var cacheKey = $"order:{order.Id}";
         await cacheService.SetAsync(cacheKey, order, "order", TimeSpan.FromMinutes(15));
         await context.Orders.AddAsync(order);
@@ -69,22 +75,14 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
             return false;
         }
 
-        if (!await ExistsAsync(order.Id))
-        {
-            logger.LogInformation("Order with id:{Id} not found", order.Id);
-            return false;
-        }
+        var existing = await context.Orders.FirstOrDefaultAsync(a => a.Id == order.Id);
+        if (existing is null) return false;
         
-        if (!await ValidateForUpdateAsync(order))
-        {
-            logger.LogInformation("Cannot update order with id:{Id}, validation issues", order!.Id);
-            return false;
-        }
+        context.Entry(existing).CurrentValues.SetValues(order);
+        await context.SaveChangesAsync();
         
         var cacheKey = $"address:{order.Id}";
         await cacheService.SetAsync(cacheKey, order, "order", TimeSpan.FromMinutes(15));
-        context.Orders.Update(order);
-        await context.SaveChangesAsync();
         logger.LogInformation("Order with id:{Id} updated", order.Id);
         return true;
     }
