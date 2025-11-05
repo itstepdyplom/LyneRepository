@@ -18,4 +18,6 @@ public interface IUserService
     //public Task<bool> UpdateWithAddressAsync(UserDto dto);
 
     public Task<bool> DeleteAsync(int id);
+    Task<string> DeleteByIdAsync(int id);
+
 }

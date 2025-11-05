@@ -148,12 +148,6 @@ public class UserRepository(AppDbContext context, ILogger<UserRepository> logger
             return false;
         }
         
-        if (!await ExistsAsync(user.Id))
-        {
-            logger.LogWarning("User not found with id {Id}", user.Id);
-            return false;
-        }
-        
         await cacheService.RemoveAsync(AllUsersKey,"user");
 
         var cacheKey = $"user:{user.Id}";
@@ -162,6 +156,20 @@ public class UserRepository(AppDbContext context, ILogger<UserRepository> logger
         await context.SaveChangesAsync();
         logger.LogInformation("User with id:{Id} deleted", user.Id);
         return true;
+    }
+    public async Task<string> DeleteByIdAsync(int id)
+    { 
+        var rows = await context.Users
+            .Where(u => u.Id == id)
+            .ExecuteDeleteAsync(); 
+
+        if (rows == 0) return $"Error";
+
+        await cacheService.RemoveAsync("all:users", "user");
+        await cacheService.RemoveAsync($"user:{id}", "user");
+
+        logger.LogInformation("User with id:{Id} deleted", id);
+        return id.ToString();
     }
         
 
