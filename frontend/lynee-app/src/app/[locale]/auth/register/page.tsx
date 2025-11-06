@@ -12,11 +12,11 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-screen font-base m-0 p-0">
       {/* Ліва картинка */}
-      <div className="w-1/2 hidden md:flex items-center justify-center bg-[#f9f9f9] h-screen">
+      <div className="w-1/2 hidden md:block h-screen overflow-hidden">
         <Image
           src={bgImage}
           alt="Model wearing white shirt standing on the beach"
-          className="max-w-full max-h-full object-contain"
+          className="w-full h-full object-cover object-center"
           priority
         />
       </div>
@@ -30,12 +30,12 @@ export default function RegisterPage() {
         {/* Tabs */}
         <div className="flex border-b border-black mb-6 text-black text-sm font-normal">
           <button
-            className="pb-1 mr-6"
+            className="pb-1 mr-6 transition-colors duration-200 hover:text-gray-600 border-b-2 border-transparent hover:border-gray-600"
             onClick={() => router.push("/uk/auth/login")}
           >
             You are already a user
           </button>
-          <button className="border-b-2 border-black pb-1">
+          <button className="border-b-2 border-black pb-1 transition-colors duration-200 hover:text-gray-600 hover:border-gray-600">
             Create an account
           </button>
         </div>
@@ -43,7 +43,7 @@ export default function RegisterPage() {
         {/* Google button */}
         <button
           type="button"
-          className="flex items-center gap-2 text-black text-sm font-normal mb-4"
+          className="flex items-center gap-2 text-black text-sm font-normal mb-4 transition-colors duration-200 hover:text-gray-600 w-fit border-b border-transparent hover:border-gray-600 pb-1"
         >
           <Image src={googleLogo} alt="Google G logo icon" width={20} height={20} />
           Log in with Google
