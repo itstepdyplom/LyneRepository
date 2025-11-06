@@ -1,5 +1,10 @@
 {
   "HomePage": {
+     "hero": {
+      "luxury": "Luxury",
+      "collection": "Collection",
+      "subtitle": "Cookie BB Bag in Monogram"
+    },
     "shopByCategory": "SHOP BY CATEGORY",
     "categories": {
       "women": "WOMEN",
@@ -9,6 +14,14 @@
     },
     "newArrivals": "New arrivals",
     "viewAll": "View all",
+    "crystalRose": {
+      "title": "CRYSTAL ROSE",
+      "collection": "Collection Gepur",
+      "description": "Refined, feminine, iconic. Explore our new corset dresses, skirts, and details.",
+      "button": "SCROLL TO SHOP"
+    },
+    "exploreCollections": "Explore other collections",
+    "summerSale": "Summer Sale -25%",
     "products": {
       "silkBlouse": {
         "name": "Luxury Silk Blouse"

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import ThemeProvider from '../../components/providers/ThemeProvider';
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
@@ -8,8 +8,35 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import "../globals.css";
 
-const inter = Inter({ 
-  subsets: ["latin"],
+const baseNeueTrial = localFont({
+ src: [
+    {
+      path: '../../../public/fonts/BaseNeueTrial-ExpandedThin.ttf',
+      weight: '100',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/BaseNeueTrial-ExpandedLight.ttf',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/BaseNeueTrial-Expanded.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/BaseNeueTrial-ExpandedMedium.ttf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/BaseNeueTrial-ExpandedBold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-base-neue',
   display: 'swap',
 });
 
