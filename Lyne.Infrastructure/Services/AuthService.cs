@@ -1,7 +1,10 @@
+using System.Security.Claims;
 using Lyne.Application.DTO.Auth;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
+using Lyne.Domain.Enums;
 using Lyne.Domain.IRepositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Lyne.Infrastructure.Services;
@@ -20,6 +23,7 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
 
         var token = jwtService.GenerateToken(user);
         logger.LogInformation("Login with id: {id} successfully", user.Id);
+        
         return new AuthResponseDto
         {
             Token = token,
@@ -42,7 +46,6 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
         // Create a new address for the user
         var address = new Address
         {
-            Id = 0, // Will be auto-generated
             Street = "Default Street",
             City = "Default City",
             State = "Default State",
@@ -146,6 +149,38 @@ public class AuthService(IAuthRepository authRepository, IJwtService jwtService,
         const string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?";
         var random = new Random();
         return new string(Enumerable.Range(0, length).Select(_ => validChars[random.Next(validChars.Length)]).ToArray());
+    }
+
+    public async Task<User?> GetCurrentUserAsync(HttpContext context)
+    {
+        var principal = context?.User;
+        if (principal is null || principal.Identity is not { IsAuthenticated: true })
+        {
+            logger.LogWarning("GetCurrentUserAsync: user is not authenticated");
+            return null;
+        }
+        long? userId = null;
+        var idClaim = principal.FindFirst(ClaimTypes.NameIdentifier) ?? principal.FindFirst("uid");
+        if (idClaim is not null && long.TryParse(idClaim.Value, out var parsed))
+            userId = parsed;
+
+        if (userId is not null)
+        {
+            var byId = await authRepository.GetUserByIdAsync(userId.Value);
+            if (byId is not null) return byId;
+        }
+
+        // 2) Фолбек за email
+        var email = principal.FindFirst(ClaimTypes.Email)?.Value
+                    ?? principal.FindFirst("email")?.Value;
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            var byEmail = await authRepository.GetUserByEmailAsync(email);
+            if (byEmail is not null) return byEmail;
+        }
+
+        logger.LogWarning("GetCurrentUserAsync: user not found by claims");
+        return null;
     }
 
 }

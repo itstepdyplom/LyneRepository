@@ -5,6 +5,7 @@ namespace Lyne.Domain.IRepositories;
 public interface IAuthRepository
 {
     Task<User?> GetUserByEmailAsync(string email);
+    Task<User?> GetUserByIdAsync(long id);
     Task<User> CreateUserAsync(User user);
     Task<bool> UserExistsAsync(string email);
     Task<Address> CreateAddressAsync(Address address);

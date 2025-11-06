@@ -13,7 +13,7 @@ public class RegisterUserDto
 
     public string Gender { get; set; } = "";
 
-    public DateTime DateOfBirth { get; set; }
+    public DateOnly DateOfBirth { get; set; }
 
     [Required(ErrorMessage = "PhoneNumber is required"),Phone]
     public string? PhoneNumber { get; set; }

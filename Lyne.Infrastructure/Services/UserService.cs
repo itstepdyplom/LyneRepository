@@ -32,9 +32,10 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
     {
         logger.LogInformation("Adding user {user}", dto);
         var user = mapper.Map<User>(dto);
-        user.CreatedAt = DateTime.UtcNow;
-        user.UpdatedAt = DateTime.UtcNow;
-    
+        user.CreatedAt = DateTimeOffset.UtcNow;
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.PasswordHash);
+        
         return await userRepository.AddAsync(user);
     }
 
@@ -42,6 +43,7 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
     {
         logger.LogInformation("Updating user with id: {id}", dto.Id);
         var user = mapper.Map<User>(dto);
+        user.Id = dto.Id;
         user.UpdatedAt = DateTime.UtcNow;
         
         return await userRepository.UpdateAsync(user);
@@ -52,7 +54,13 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
         logger.LogInformation("Deleting user with id: {id}", id);
         var userDto = await GetByIdAsync(id);
         var user = mapper.Map<User>(userDto);
+        if (userDto != null) user.Id = userDto.Id;
 
         return await userRepository.DeleteAsync(user);
+    } 
+    public async Task<string> DeleteByIdAsync(int id)
+    {
+        logger.LogInformation("Deleting user with id: {id}", id);
+        return await userRepository.DeleteByIdAsync(id);
     }
 }

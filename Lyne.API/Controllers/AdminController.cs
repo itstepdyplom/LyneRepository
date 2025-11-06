@@ -1,59 +1,109 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using Lyne.Application.DTO;
+using Lyne.Application.Services;
+using Lyne.Domain.Entities;
+using Lyne.Domain.Enums;
+using Lyne.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Lyne.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AdminController : ControllerBase
+    public class AdminController(IProductService productService,IOrderService orderService,ICategoryService categoryService, IUserService userService) : ControllerBase
     {
         // GET: api/admin/dashboard
-        [HttpGet("dashboard")]
+        [HttpGet("Dashboard")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public IActionResult GetDashboard()
         {
-
-            return Ok(new
-            {
-                Title = "Admin Panel",
-                TotalUsers = 1240,
-                TotalOrders = 438,
-                Revenue = 10543.75
-            });
+            return null;
         }
 
         // GET: api/admin/users
-        [HttpGet("users")]
+        [HttpGet("Users")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public IActionResult GetUsers()
         {
-            // Приклад заглушки користувачів
-            var users = new List<object>
-            {
-                new { Id = 1, Name = "Іван", Email = "ivan@answear.com", Role = "User" },
-                new { Id = 2, Name = "Анна", Email = "anna@answear.com", Role = "Admin" }
-            };
-            return Ok(users);
+            return Redirect("/api/Users");
+        }
+        [HttpGet("User/{id}")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public IActionResult GetUser(int id)
+        {
+            return Redirect($"/api/User/{id}");
         }
 
         // DELETE: api/admin/user/1
-        [HttpDelete("user/{id}")]
-        public IActionResult DeleteUser(int id)
+        [HttpDelete("User/{id}")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            return Ok(new { Message = $"Користувача з ID {id} було видалено." });
+            var removedId = await userService.DeleteByIdAsync(id);
+           
+            return Ok(new
+            {
+                message = $"User with id:{id} deleted successfully"
+            });
         }
 
         // POST: api/admin/user
-        [HttpPost("user")]
-        public IActionResult AddUser([FromBody] UserDto user)
+        [HttpPost("User/Create")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<IActionResult> AddUser([FromBody] UserDto user)
         {
-            return Ok(new { Message = $"Користувача {user.Name} додано." });
+            if (user == null)
+                return BadRequest("User data is required");
+
+            var created = await userService.AddAsync(user);
+            if (!created)
+                return BadRequest("Failed to create user");
+
+            return Ok(new
+            {
+                message = $"User {user.Name} created successfully",
+                user
+            });
         }
 
         // PUT: api/admin/user/1
-        [HttpPut("user/{id}")]
-        public IActionResult UpdateUser(int id, [FromBody] UserDto user)
+        [HttpPut("User/Update")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto user)
         {
-            return Ok(new { Message = $"Користувача з ID {id} оновлено." });
+            if (user == null)
+                return BadRequest("User data is required");
+
+            var updated = await userService.UpdateAsync(user);
+            if (!updated)
+                return BadRequest("Failed to update user");
+
+            return Ok(new
+            {
+                message = $"User {user.Name} updated successfully",
+                user
+            });
+        }
+        [HttpGet("Orders")]
+        public IActionResult GetOrders()
+        {
+            return Redirect($"/api/Orders");
+        }
+        [HttpGet("Items")]
+        public IActionResult GetProducts()
+        {
+            return Redirect($"/api/Products");
+        }
+        [HttpGet("Filters")]
+        public IActionResult GetFilters()
+        {
+            return null;
+        }
+        [HttpGet("Categories")]
+        public IActionResult GetCategories()
+        {
+            return Redirect($"/api/Categories");
         }
     }
 }

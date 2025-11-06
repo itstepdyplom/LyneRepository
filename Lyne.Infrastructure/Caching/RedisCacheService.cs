@@ -20,6 +20,13 @@ public class RedisCacheService : ICacheService
         await _db.StringSetAsync(key, json, expiry);
         await _db.SetAddAsync($"{prefix}_keys", key);
     }
+    public async Task SetRangeAsync<T>(string key, IEnumerable<T> values, string prefix, TimeSpan? expiry = null)
+    {
+        var json = JsonSerializer.Serialize(values);
+        await _db.StringSetAsync(key, json, expiry);
+        await _db.SetAddAsync($"{prefix}_keys", key);
+    }
+    
 
     public async Task RemoveAsync(string key, string prefix)
     {

@@ -32,4 +32,10 @@ public class AuthRepository(AppDbContext context) : IAuthRepository
         await context.SaveChangesAsync();
         return address;
     }
+
+    public async Task<User?> GetUserByIdAsync(long id)
+    {
+        return await context.Users.FirstOrDefaultAsync(u => u.Id == id);
+    }
+
 } 

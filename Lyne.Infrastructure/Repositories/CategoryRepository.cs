@@ -55,6 +55,7 @@ public class CategoryRepository(AppDbContext context, ILogger<CategoryRepository
         var cacheKey = $"category:{category.Id}";
         await cacheService.SetAsync(cacheKey, category, "category", TimeSpan.FromHours(1));
         await context.Categories.AddAsync(category);
+        await context.SaveChangesAsync();
         logger.LogInformation("Category with id:{Id} added", category!.Id);
         return await Task.FromResult(true);
     }
@@ -67,23 +68,15 @@ public class CategoryRepository(AppDbContext context, ILogger<CategoryRepository
             return false;
         }
 
-        if (!await ExistsAsync(category.Id))
-        {
-            logger.LogInformation("Cannot update category with id: {Id}, not found", category.Id);
-            return false;
-        }
-
-        if (!ValidateForUpdateAsync(category).Result)
-        {
-            logger.LogInformation("Validation error for categoryId: {Id}", category!.Id);
-            return false;
-        }
+        var existing = await context.Categories.FirstOrDefaultAsync(a => a.Id == category.Id);
+        if (existing is null) return false;
+        
+        context.Entry(existing).CurrentValues.SetValues(category);
+        await context.SaveChangesAsync();
         
         var cacheKey = $"category:{category.Id}";
         await cacheService.SetAsync(cacheKey, category, "category", TimeSpan.FromHours(1));
-        context.Update(category);
         logger.LogInformation("Category with id:{Id} updated", category!.Id);
-        await context.SaveChangesAsync();
         return true;
     }
 

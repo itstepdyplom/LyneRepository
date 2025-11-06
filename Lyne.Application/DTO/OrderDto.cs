@@ -9,7 +9,7 @@ public class OrderDto
 {
     public int Id { get; set; }
     [Required(ErrorMessage = "Date is required")]
-    public required DateTime Date { get; set; }
+    public required DateTimeOffset Date { get; set; }
     public int UserId { get; set; }
     public int ShippingAddressId { get; set; }
     public string PaymentMethod { get; set; } = "";

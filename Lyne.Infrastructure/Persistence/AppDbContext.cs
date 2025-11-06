@@ -14,14 +14,28 @@
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.HasPostgresExtension("pgcrypto");
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .ValueGeneratedOnAdd();
             
             modelBuilder.HasDefaultSchema("public");
-
+            modelBuilder.Entity<User>()
+                .Property(x => x.Id)
+                .UseIdentityColumn();
+            
             // modelBuilder.Entity<Product>().ToTable("products");
             // modelBuilder.Entity<Category>().ToTable("categories");
             // modelBuilder.Entity<User>().ToTable("users");
             // modelBuilder.Entity<Address>().ToTable("addresses");
             // modelBuilder.Entity<Order>().ToTable("orders");
+            
+            //modelBuilder.Entity<Product>().Ignore(e => e.RequestClientOptions);
+            // modelBuilder.Entity<Product>().Ignore("BaseUrl");
+            // modelBuilder.Entity<Product>().Ignore("PrimaryKey");
+
  modelBuilder.Entity<User>(e =>
     {
         e.ToTable("users");                 // таблиця в нижньому регістрі
@@ -30,13 +44,13 @@
         e.Property(x => x.ForName).HasColumnName("for_name");
         e.Property(x => x.Gender).HasColumnName("gender");
         e.Property(x => x.PasswordHash).HasColumnName("password_hash");
-        e.Property(x => x.DateOfBirth).HasColumnName("date_of_birth");
         e.Property(x => x.PhoneNumber).HasColumnName("phone_number");
         e.Property(x => x.Email).HasColumnName("email");
         e.Property(x => x.AddressId).HasColumnName("address_id");
-        e.Property(x => x.CreatedAt).HasColumnName("created_at");
-        e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
         e.Property(x => x.Role).HasColumnName("role");
+        e.Property(x => x.CreatedAt).HasColumnName("created_at").HasColumnType("timestamptz");
+        e.Property(x => x.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamptz");
+        e.Property(x => x.DateOfBirth).HasColumnName("date_of_birth").HasColumnType("date");
     });
 
     modelBuilder.Entity<Address>(e =>
@@ -49,6 +63,12 @@
         e.Property(x => x.Zip).HasColumnName("zip");
         e.Property(x => x.Country).HasColumnName("country");
     });
+    modelBuilder.Entity<Address>()
+        .HasKey(a => a.Id);
+
+    modelBuilder.Entity<Address>()
+        .Property(a => a.Id)
+        .UseIdentityByDefaultColumn();
 
     modelBuilder.Entity<Category>(e =>
     {
@@ -80,14 +100,18 @@
     {
         e.ToTable("orders");
         e.Property(x => x.Id).HasColumnName("id");
-        e.Property(x => x.Date).HasColumnName("date");
         e.Property(x => x.UserId).HasColumnName("user_id");
         e.Property(x => x.ShippingAddressId).HasColumnName("shipping_address_id");
         e.Property(x => x.PaymentMethod).HasColumnName("payment_method");
         e.Property(x => x.TrackingNumber).HasColumnName("tracking_number");
-        e.Property(x => x.CreatedAt).HasColumnName("created_at");
-        e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
-        e.Property(x => x.OrderStatus).HasColumnName("order_status");
+        
+        e.Property(x => x.OrderStatus)
+            .HasConversion<string>()
+            .HasColumnName("order_status");
+        
+        e.Property(x => x.Date).HasColumnName("date").HasColumnType("timestamptz");
+        e.Property(x => x.CreatedAt).HasColumnName("created_at").HasColumnType("timestamptz");
+        e.Property(x => x.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamptz");
     });
 
     // many-to-many -> таблиця order_products з snake_case
@@ -98,13 +122,6 @@
             "order_products",
             r => r.HasOne<Product>().WithMany().HasForeignKey("product_id").OnDelete(DeleteBehavior.Restrict),
             l => l.HasOne<Order>().WithMany().HasForeignKey("order_id").OnDelete(DeleteBehavior.Cascade));
-
-           
-
-            foreach (var e in modelBuilder.Model.GetEntityTypes())
-            foreach (var p in e.GetProperties())
-                if (p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?))
-                    p.SetColumnType("timestamp without time zone");
 
             /*modelBuilder.Entity<Address>()
                 .HasOne(a => a.User)
@@ -214,7 +231,7 @@
                     ForName = "Косач",
                     Gender = "Жіноча",
                     PasswordHash = "hashedpassword123",
-                    DateOfBirth = new DateTime(2002, 3, 15),
+                    DateOfBirth = new DateOnly(2002, 3, 15),
                     PhoneNumber = "+380501234567",
                     Email = "kosacho@gmail.com",
                     CreatedAt = new DateTime(2024, 6, 1),
@@ -229,7 +246,7 @@
                     ForName = "Кочмар",
                     Gender = "Чоловіча",
                     PasswordHash = "hashedpassword123",
-                    DateOfBirth = new DateTime(2000, 6, 18),
+                    DateOfBirth = new DateOnly(2000, 6, 18),
                     PhoneNumber = "+380986199887",
                     Email = "alekskochmar18@gmail.com",
                     CreatedAt = new DateTime(2024, 2, 15),

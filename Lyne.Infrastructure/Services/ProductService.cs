@@ -28,22 +28,17 @@ public class ProductService(IProductRepository productRepository,IMapper mapper,
         return mapper.Map<ProductDto>(product);
     }
 
-    public async Task<bool> AddAsync(ProductDto dto)
+    public async Task<(bool,Product created)> AddAsync(ProductDto dto)
     {
-        try
-        {
             logger.LogInformation("Adding product");
-            var product = mapper.Map<Product>(dto);
-            product.CreatedAt = DateTime.UtcNow;
-            product.UpdatedAt = DateTime.UtcNow;
+            var p = mapper.Map<Product>(dto);
+            //p.Id= Guid.NewGuid();
+            //p.Id = p.Id == Guid.Empty ? Guid.NewGuid() : p.Id;
+            p.CreatedAt = DateTime.UtcNow;
+            p.UpdatedAt = DateTime.UtcNow;
     
-            return await productRepository.AddAsync(product);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error adding product");
-            return false;
-        }
+            var ok = await productRepository.AddAsync(p);
+            return (ok, p);
     }
 
     public async Task<bool> UpdateAsync(ProductDto? dto)
@@ -71,6 +66,6 @@ public class ProductService(IProductRepository productRepository,IMapper mapper,
         logger.LogInformation("Deleting product with id:{Id}", id);
         var productDto = await GetByIdAsync(id);
         var product = mapper.Map<Product>(productDto);
-        return await productRepository.DeleteAsync(product);
+        return await productRepository.DeleteAsync(id);
     }
 }

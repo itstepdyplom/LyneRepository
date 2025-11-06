@@ -2,6 +2,7 @@ using Lyne.Application.DTO.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Lyne.Domain.Enums;
 using Lyne.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 
@@ -24,8 +25,17 @@ public class AuthController(AuthService authService) : BaseController
         {
             return Unauthorized(new { message = "Invalid email or password" });
         }
-
         return Ok(result);
+    }
+    [HttpPost("user-info")]
+    [Authorize(Roles = nameof(UserRole.Admin)+ "," + nameof(UserRole.Manager))]
+    public async Task<IActionResult> UserInfo()
+    {
+        var user = await authService.GetCurrentUserAsync(HttpContext);
+        if (user is null)
+            return Unauthorized(new { message = "Unauthorized" });
+
+        return Ok(UserProfileDto.From(user));
     }
 
     [HttpPost("register")]
