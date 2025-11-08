@@ -8,18 +8,9 @@ import {
   Box,
   IconButton,
   Badge,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemButton,
   useMediaQuery,
   useTheme,
   InputBase,
-  alpha,
-  Button,
-  Divider,
-  colors,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -30,21 +21,16 @@ import {
   ChevronRight as ChevronRightIcon,
   Height,
 } from "@mui/icons-material";
-import { useAuthStore } from "../../stores/authStore";
 import { useCartStore } from "../../stores/cartStore";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { listItemTextSx, menuButtonSx } from "./Header.styles";
-import { categories } from "../../constants/menu";
+import MobileMenu from "./mobileMenu";
 
 const Header: React.FC = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  const { isAuthenticated, user, logout } = useAuthStore();
   const { totalItems, openCart } = useCartStore();
   const t = useTranslations("Header");
   const params = useParams();
@@ -58,195 +44,7 @@ const Header: React.FC = () => {
     setSearchOpen(!searchOpen);
   };
 
-  const mobileMenu = (
-    <Drawer
-      anchor="left"
-      open={mobileMenuOpen}
-      onClose={handleDrawerToggle}
-      sx={{
-        "& .MuiDrawer-paper": {
-          width: { xs: "100%", sm: 360, md: 477 },
-          backgroundColor: "#FFFFFF",
-          borderRadius: { xs: 0, sm: "15px" },
-          padding: 2,
-          height: "100%",
-          maxHeight: { md: 780 },
-        },
-      }}
-    >
-      {/* Header */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <IconButton onClick={handleDrawerToggle} sx={{ color: "black" }}>
-          <CloseIcon />
-        </IconButton>
-        <Typography
-          sx={{
-            ...listItemTextSx,
-            color: "#000000",
-            width: "59px",
-            ml: 1,
-            fontSize: { xs: "14px", sm: "16px", md: "18px" },
-          }}
-        >
-          {t("close")}
-        </Typography>
-      </Box>
-
-      {/* Categories */}
-      <Box>
-        <List>
-          {categories.map((category) => (
-            <ListItem key={category.key} disablePadding>
-              <ListItemButton
-                component={Link}
-                href={category.href}
-                sx={{ px: 0 }}
-              >
-                <ListItemText
-                  primary={t(category.key)}
-                  primaryTypographyProps={{ sx: listItemTextSx }}
-                />
-                {category.hasSubmenu && <ChevronRightIcon fontSize="medium" />}
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Box>
-
-      <Divider />
-
-      {/* Account / Auth */}
-      <Box>
-        {isAuthenticated ? (
-          <>
-            <ListItem>
-              <ListItemText
-                primary={t("welcome", { name: user?.name || "User" })}
-                primaryTypographyProps={{ variant: "body2" }}
-              />
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton onClick={logout}>
-                <ListItemText
-                  primary={t("logout")}
-                  primaryTypographyProps={{ variant: "subtitle2" }}
-                />
-              </ListItemButton>
-            </ListItem>
-          </>
-        ) : (
-          <>
-            <ListItem disablePadding>
-              <ListItemButton
-                component={Link}
-                href={`/${locale}/auth/login`}
-                sx={{ px: 0, mt: 1, height: { xs: 28, md: 30 } }}
-              >
-                <ListItemText
-                  primary={t("login")}
-                  primaryTypographyProps={{
-                    sx: {
-                      ...listItemTextSx,
-                      fontSize: { xs: "16px", md: "19px" },
-                    },
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-            {/*<ListItem disablePadding>
-                <ListItemButton component={Link} href={`/${locale}/auth/register`}>
-                  <ListItemText
-                    primary={t('register')}
-                    primaryTypographyProps={{ variant: 'subtitle2' }}
-                  />
-                </ListItemButton>
-              </ListItem>*/}
-            <ListItem disablePadding>
-              <ListItemButton
-                component={Link}
-                href={``}
-                sx={{ px: 0, mt: 1, mb: 1, height: { xs: 28, md: 30 } }}
-              >
-                <ListItemText
-                  primary={t("wishlist")}
-                  primaryTypographyProps={{
-                    sx: {
-                      ...listItemTextSx,
-                      fontSize: { xs: "16px", md: "19px" },
-                    },
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          </>
-        )}
-      </Box>
-
-      <Divider />
-
-      {/* Extra */}
-      <List>
-        <ListItemButton sx={{ px: 0, mt: 1, height: { xs: 28, md: 30 } }}>
-          <ListItemText
-            primary={t("contact")}
-            primaryTypographyProps={{
-              sx: { ...listItemTextSx, fontSize: { xs: "16px", md: "19px" } },
-            }}
-          />
-        </ListItemButton>
-        <ListItemButton sx={{ px: 0, mt: 1, height: { xs: 28, md: 30 } }}>
-          <ListItemText
-            primary={t("changeLocationAndLanguage")}
-            primaryTypographyProps={{
-              sx: { ...listItemTextSx, fontSize: { xs: "16px", md: "19px" } },
-            }}
-          />
-        </ListItemButton>
-      </List>
-
-      {/* Bottom Buttons */}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: 16,
-          left: 16,
-          right: 16,
-          display: "flex",
-          borderRadius: "5px",
-          border: "1px solid #969696",
-          height: { xs: 30, md: 34 },
-          backgroundColor: "#969696",
-        }}
-      >
-        <Button
-          sx={{
-            ...menuButtonSx,
-            backgroundColor: "#FFFFFF",
-            fontSize: { xs: "14px", sm: "15px", md: "17px" },
-          }}
-        >
-          Mid - Segment
-        </Button>
-        <Button
-          sx={{
-            ...menuButtonSx,
-            backgroundColor: "#969696",
-            fontSize: { xs: "15px", sm: "17px", md: "19px" },
-            background: "linear-gradient(90deg, #FFBFB0, #D7D3F3, #86B7FF )",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          Premium
-        </Button>
-      </Box>
-    </Drawer>
-  );
+  
 
   return (
     <>
@@ -333,7 +131,7 @@ const Header: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {mobileMenu}
+      <MobileMenu open={mobileMenuOpen} onClose={handleDrawerToggle} />
     </>
   );
 };
