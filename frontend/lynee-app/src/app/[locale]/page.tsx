@@ -245,7 +245,10 @@ const HomePage: React.FC = () => {
         <Grid container spacing={2}>
           {newArrivals.map((product) => (
             <Grid size={{ xs: 12, sm: 6, md: 3 }} key={product.id}>
+              <Link href="/en/product/1">
               <ProductCard product={product} />
+              </Link>
+              
             </Grid>
           ))}
         </Grid>

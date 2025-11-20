@@ -92,6 +92,19 @@
     "title": "Shopping Cart",
     "description": "This is a mock cart page. Shopping cart functionality will be implemented later."
   },
+  "Product":{
+     "selectSize": "Select your size",
+     "selectColor": "Color:",
+     "addToBag" : "ADD TO BAG",
+     "productDetails": "PRODUCT DETAILS",
+     "deliveryAndReturns": "DELIVERY & RETURNS",
+     "deliveryDetails": "Free delivery for orders over 3000 UAH. 14 days return policy.",
+     "paymentOptions": "PAYMENT OPTIONS",
+     "paymentDetails": "Credit card, Apple Pay, Google Pay, or cash on delivery.",
+     "completeLook": "Complete the Look",
+     "recently": "Recently",
+     "viewed": "viewed"
+  },
   "Footer": {
     "changeLocation": "Change location and language:",
     "followUs": "FOLLOW US",
