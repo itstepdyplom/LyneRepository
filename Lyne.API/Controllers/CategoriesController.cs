@@ -38,7 +38,6 @@ namespace Lyne.API.Controllers
         public async Task<ActionResult> Post([FromBody] CategoryDto dto)
         {
             logger.LogInformation("Запит на створення категорії");
-
             try
             {
                 var success = await categoryService.AddAsync(dto);
@@ -48,8 +47,8 @@ namespace Lyne.API.Controllers
                     return BadRequest("Не вдалося створити категорію.");
                 }
 
-                logger.LogInformation("Категорія успішно створена з ID = {Id}", dto.Id);
-                return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
+                logger.LogInformation("Категорія успішно створена з name = {Name}", dto.Name);
+                return CreatedAtAction(nameof(Get), dto);
             }
             catch (Exception ex)
             {
@@ -62,12 +61,6 @@ namespace Lyne.API.Controllers
         [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult> Put(Guid id, [FromBody] CategoryDto dto)
         {
-            if (id != dto.Id)
-            {
-                logger.LogWarning("Id у URL ({UrlId}) не збігається з Id у тілі запиту ({BodyId})", id, dto.Id);
-                return BadRequest("Id в маршруті не співпадає з Id у тілі запиту.");
-            }
-
             logger.LogInformation("Запит на оновлення категорії з ID = {Id}", id);
             var success = await categoryService.UpdateAsync(dto);
             if (!success)
