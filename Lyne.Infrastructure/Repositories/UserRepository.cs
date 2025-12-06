@@ -140,6 +140,15 @@ public class UserRepository(AppDbContext context, ILogger<UserRepository> logger
         return true;
     }
 
+    public async Task<bool> UpdateRoleAsync(int id, string role)
+    {
+        var existing = await context.Users.FirstOrDefaultAsync(a => a.Id == id);
+        existing.Role = role;
+        await context.SaveChangesAsync();
+        return true;
+    }
+
+
     public async Task<bool> DeleteAsync(User? user)
     { 
         if (user is null)

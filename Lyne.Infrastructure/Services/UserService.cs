@@ -1,5 +1,6 @@
 using AutoMapper;
 using Lyne.Application.DTO;
+using Lyne.Application.DTO.Auth;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
@@ -39,16 +40,27 @@ public class UserService(IUserRepository userRepository,IMapper mapper,ILogger<U
         return await userRepository.AddAsync(user);
     }
 
-    public async Task<bool> UpdateAsync(UserDto dto)
+    public async Task<bool> UpdateAsync(int id, UserUpdateDto dto)
     {
-        logger.LogInformation("Updating user with id: {id}", dto.Id);
-        var user = mapper.Map<User>(dto);
-        user.Id = dto.Id;
+        var user = await userRepository.GetByIdAsync(id);
+        if (user == null)
+            return false;
+
+        mapper.Map(dto, user); // <-- це оновить лише потрібні поля
+
         user.UpdatedAt = DateTime.UtcNow;
-        
+
         return await userRepository.UpdateAsync(user);
     }
 
+    public async Task<bool> UpdateRoleAsync(int id, string role)
+    {
+        var user = await userRepository.GetByIdAsync(id);
+        if (user == null)
+            return false;
+        return await userRepository.UpdateRoleAsync(id,role);
+    }
+    
     public async Task<bool> DeleteAsync(int id)
     {
         logger.LogInformation("Deleting user with id: {id}", id);

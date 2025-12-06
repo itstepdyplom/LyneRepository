@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using Lyne.Application.DTO;
+using Lyne.Application.DTO.Auth;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
 using Lyne.Domain.Enums;
@@ -70,12 +71,12 @@ namespace Lyne.API.Controllers
         // PUT: api/admin/user/1
         [HttpPut("User/Update")]
         [Authorize(Roles = nameof(UserRole.Admin))]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto user)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto user)
         {
             if (user == null)
                 return BadRequest("User data is required");
 
-            var updated = await userService.UpdateAsync(user);
+            var updated = await userService.UpdateAsync(id,user);
             if (!updated)
                 return BadRequest("Failed to update user");
 
@@ -83,6 +84,22 @@ namespace Lyne.API.Controllers
             {
                 message = $"User {user.Name} updated successfully",
                 user
+            });
+        }
+        // PUT: api/admin/user/1
+        [HttpPut("User/Role")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<IActionResult> UpdateRole(int id, string role)
+        {
+            
+            var updated = await userService.UpdateRoleAsync(id,role);
+            if (!updated)
+                return BadRequest("Failed to update role");
+
+            return Ok(new
+            {
+                message = $"User role: {id} updated successfully",
+                id
             });
         }
         [HttpGet("Orders")]

@@ -8,6 +8,8 @@ public interface IUserRepository
     Task<List<User>> GetAllAsync();
     Task<bool> AddAsync(User user);
     Task<bool> UpdateAsync(User? user);
+    Task<bool> UpdateRoleAsync(int id, string role);
+    
     Task<bool> DeleteAsync(User? user);
     Task<string> DeleteByIdAsync(int id);
     Task<bool> ExistsAsync(int id);

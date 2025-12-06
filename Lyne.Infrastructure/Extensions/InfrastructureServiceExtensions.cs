@@ -59,6 +59,7 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IEmailSender,EmailSender>();
         // Register repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuthRepository, AuthRepository>();

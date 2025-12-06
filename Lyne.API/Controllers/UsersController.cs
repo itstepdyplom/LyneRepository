@@ -1,4 +1,5 @@
 using Lyne.Application.DTO;
+using Lyne.Application.DTO.Auth;
 using Lyne.Application.Services;
 using Lyne.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -60,17 +61,17 @@ namespace Lyne.API.Controllers
 
         [HttpPut("/api/User/{id}")]
         [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
-        public async Task<ActionResult> Put(int id, [FromBody] UserDto dto)
+        public async Task<ActionResult> Put(int id, [FromBody] UserUpdateDto dto)
         {
-            logger.LogInformation("Запит на оновлення користувача з ID = {Id}", dto.Id);
-            var success = await userService.UpdateAsync(dto);
+            logger.LogInformation("Запит на оновлення користувача  {name} {forname}", dto.Name, dto.ForName);
+            var success = await userService.UpdateAsync(id,dto);
             if (!success)
             {
-                logger.LogWarning("Користувача з ID = {Id} не знайдено для оновлення", dto.Id);
+                logger.LogWarning("Користувача не знайдено для оновлення");
                 return NotFound();
             }
 
-            logger.LogInformation("Користувача з ID = {Id} успішно оновлено", dto.Id);
+            logger.LogInformation("Користувача успішно оновлено");
             return NoContent();
         }
 
@@ -109,13 +110,13 @@ namespace Lyne.API.Controllers
         }
         [HttpPost("/UpdateUserWithAddress")]
         [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
-        public async Task<ActionResult<bool>> UpdateUserWithAddress(UserDto dto)
+        public async Task<ActionResult<bool>> UpdateUserWithAddress(int id,UserUpdateDto dto)
         {
-            logger.LogInformation("Запит на оновлення користувача з ID = {Id} з адресою", dto.Id);
+            logger.LogInformation("Запит на оновлення користувача {name} {forname} з адресою", dto.Name,dto.ForName);
             try
             {
-                var result = await userService.UpdateAsync(dto);
-                logger.LogInformation("Користувача з ID = {Id} успішно оновлено з адресою", dto.Id);
+                var result = await userService.UpdateAsync(id,dto);
+                logger.LogInformation("Користувача успішно оновлено з адресою");
                 return Ok(result);
             }
             catch (Exception ex)
