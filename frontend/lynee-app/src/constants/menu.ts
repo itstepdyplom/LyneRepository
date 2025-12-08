@@ -5,6 +5,21 @@ export interface Category {
   subCategories?: Category[];
 }
 
+export const getCategoryHref = (locale: string, categoryKey: string): string => {
+  const routeMap: Record<string, string> = {
+    'women': `/categories/women`,
+    'men': `/categories/men`,
+    'kids': `/categories/kids`,
+    'accessories': `/categories/accessories`,
+    'bagsAndWallets': `/categories/accessories`,
+    'viewAll': ``,
+    'new': ``,
+    'home': ``,
+  };
+  const route = routeMap[categoryKey] || ``;
+  return route ? `/${locale}${route}` : ``;
+};
+
 export const categories: Category[] = [
   { key: 'viewAll', href: `` },
   { key: 'new', href: `` },

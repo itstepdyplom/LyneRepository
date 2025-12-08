@@ -171,12 +171,17 @@ const HomePage: React.FC = () => {
             </Typography>
             
             <Stack spacing={2}>
-              {[t('categories.women'), t('categories.men'), t('categories.kids'), t('categories.accessories')].map((category) => (
+              {[
+                { key: 'women', label: t('categories.women') },
+                { key: 'men', label: t('categories.men') },
+                { key: 'kids', label: t('categories.kids') },
+                { key: 'accessories', label: t('categories.accessories') }
+              ].map((category) => (
                 <Typography
-                  key={category}
+                  key={category.key}
                   variant="h2"
                   component={Link}
-                  href={`/${locale}/categories/${category.toLowerCase()}`}
+                  href={`/${locale}/categories/${category.key}`}
                   sx={{
                     color: '#9E9E9E',
                     fontWeight: 300,
@@ -188,7 +193,7 @@ const HomePage: React.FC = () => {
                     '&:hover': { color: 'text.primary' },
                   }}
                 >
-                  {category}
+                  {category.label}
                 </Typography>
               ))}
             </Stack>
