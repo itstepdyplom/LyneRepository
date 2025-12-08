@@ -25,7 +25,7 @@ builder.Services.AddScoped<IStripeService, StripeService>();
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new ArgumentNullException("JWT SecretKey is not configured");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+var authBuilder = builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -57,13 +57,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 return context.Response.WriteAsync(result);
             }
         };
-    })
-    .AddGoogle("Google", options =>
-    {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-        options.CallbackPath = "/api/auth/google-callback"; // має відповідати реальному шляху
     });
+
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    authBuilder.AddGoogle("Google", options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
+        options.CallbackPath = "/api/auth/google-callback";
+    });
+}
 
 
 Log.Logger = new LoggerConfiguration()
@@ -74,6 +81,17 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Services.AddAuthorization();
 builder.Host.UseSerilog();
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
 
 var app = builder.Build();
@@ -87,7 +105,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Authentication & Authorization middleware
+app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

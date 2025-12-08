@@ -24,10 +24,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
     
     try {
-      const { user, accessToken, refreshToken } = await authAPI.login(credentials);
+      const response = await authAPI.login(credentials);
       
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('accessToken', response.token);
+      
+      const user: User = {
+        id: '',
+        email: response.email,
+        name: response.name,
+      };
       
       set({ 
         user, 
@@ -51,10 +56,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
     
     try {
-      const { user, accessToken, refreshToken } = await authAPI.register(data);
+      const response = await authAPI.register(data);
       
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('accessToken', response.token);
+      
+      const user: User = {
+        id: '',
+        email: response.email,
+        name: response.name,
+      };
       
       set({ 
         user, 
@@ -83,7 +93,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Logout error:', error);
     } finally {
       localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
       
       set({ 
         user: null, 
@@ -113,7 +122,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
     } catch (error) {
       localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
       
       set({ 
         user: null, 

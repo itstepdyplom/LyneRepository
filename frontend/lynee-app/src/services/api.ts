@@ -27,14 +27,21 @@ export interface LoginCredentials {
 
 export interface RegisterData {
   name: string;
+  forName: string;
   email: string;
   password: string;
+  confirmPassword: string;
+  gender?: string;
+  dateOfBirth?: string;
+  phoneNumber?: string;
 }
 
 export interface AuthResponse {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
+  token: string;
+  email: string;
+  name: string;
+  forName: string;
+  expiresAt: string;
 }
 
 export const authAPI = {
