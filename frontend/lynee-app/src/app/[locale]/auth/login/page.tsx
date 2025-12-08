@@ -1,13 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import bgImage from "./woomanLogin.png";
 import googleLogo from "./devicon_google.svg";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login, isLoading, error, clearError } = useAuthStore();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
   return (
     <div className="flex min-h-screen font-base m-0 p-0">
@@ -53,7 +59,23 @@ export default function LoginPage() {
         <p className="text-xs text-black mb-4">or</p>
 
         {/* Login form */}
-        <form className="space-y-4 text-xs text-gray-400 font-normal">
+        <form 
+          className="space-y-4 text-xs text-gray-400 font-normal"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            clearError();
+            try {
+              await login(formData);
+              router.push("/uk");
+            } catch (err) {
+              console.error("Login error:", err);
+            }
+          }}
+        >
+          {error && (
+            <div className="text-red-500 text-xs mb-2">{error}</div>
+          )}
+          
           <div>
             <label htmlFor="email" className="block mb-1">
               Email
@@ -61,6 +83,9 @@ export default function LoginPage() {
             <input
               id="email"
               type="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full bg-gray-50 border border-gray-100 rounded-sm px-3 py-2 text-black text-xs"
             />
           </div>
@@ -72,6 +97,9 @@ export default function LoginPage() {
             <input
               id="password"
               type="password"
+              required
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               className="w-full bg-gray-50 border border-gray-100 rounded-sm px-3 py-2 text-black text-xs"
             />
           </div>
@@ -87,9 +115,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full bg-black text-white text-xs py-2 rounded-sm font-normal"
+            disabled={isLoading}
+            className="w-full bg-black text-white text-xs py-2 rounded-sm font-normal disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Log in
+            {isLoading ? "Logging in..." : "Log in"}
           </button>
         </form>
       </div>

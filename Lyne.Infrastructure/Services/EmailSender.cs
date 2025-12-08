@@ -60,13 +60,26 @@ public class EmailSender(IConfiguration configuration):IEmailSender
         var section = configuration.GetSection("EmailSender");
         var email = section["Email"];
         var password = section["Password"];
-        using var client = new SmtpClient();
-        await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-        await client.AuthenticateAsync(email,password);
 
-        await client.SendAsync(message);
-        await client.DisconnectAsync(true);
-        return true;
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var client = new SmtpClient();
+            await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+            await client.AuthenticateAsync(email, password);
+
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public Task UpdatesNotification(LoginUserDto userDto)
