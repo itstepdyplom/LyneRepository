@@ -77,7 +77,7 @@ const Header: React.FC = () => {
               component={Link}
               href={`/${locale}`}
               sx={{
-                fontWeight: 300,
+                fontWeight: 400,
                 letterSpacing: "0.2em",
                 textDecoration: "none",
                 color: "inherit",
