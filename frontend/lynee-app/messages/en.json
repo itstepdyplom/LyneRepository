@@ -90,7 +90,18 @@
   },
   "Cart": {
     "title": "Shopping Cart",
-    "description": "This is a mock cart page. Shopping cart functionality will be implemented later."
+    "description": "This is a mock cart page. Shopping cart functionality will be implemented later.",
+    "emptyTitle": "Your cart is empty",
+    "emptyDescription": "Add some luxury items to get started",
+    "continueShopping": "Continue Shopping",
+    "size": "Size",
+    "color": "Color",
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "calculatedAtCheckout": "Calculated at checkout",
+    "total": "Total",
+    "checkout": "Checkout"
   },
   "Footer": {
     "changeLocation": "Change location and language:",
