@@ -22,7 +22,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { listItemTextSx, menuButtonSx } from "./Header.styles";
-import { categories } from "../../constants/menu";
+import { categories, getCategoryHref } from "../../constants/menu";
 
 interface MobileMenuProps {
   open: boolean;
@@ -95,7 +95,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ open, onClose }) => {
             <ListItem key={category.key} disablePadding>
               <ListItemButton
                 component={Link}
-                href={category.href}
+                href={getCategoryHref(locale, category.key)}
                 sx={{ px: 0 }}
               >
                 <ListItemText
