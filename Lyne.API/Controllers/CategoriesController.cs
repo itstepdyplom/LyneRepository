@@ -32,6 +32,20 @@ namespace Lyne.API.Controllers
 
             return Ok(category);
         }
+        [HttpGet("GetByType")]
+        [Authorize]
+        public async Task<ActionResult<CategoryDto>> Get([FromQuery]string type)
+        {
+            logger.LogInformation("Запит на отримання категорії {type}", type);
+            var category = await categoryService.GetByType(type);
+            if (category == null)
+            {
+                logger.LogWarning("Категорія {type} не знайдена", type);
+                return NotFound();
+            }
+
+            return Ok(category);
+        }
 
         [HttpPost]
         [Authorize]
