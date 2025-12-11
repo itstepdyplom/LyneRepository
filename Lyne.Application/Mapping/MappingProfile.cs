@@ -47,8 +47,12 @@ public class MappingProfile : Profile
             .ForMember(d => d.ShippingAddress, o => o.Ignore())
             .ForMember(d => d.Products, o => o.Ignore());
         // Category → CategoryDto
-        CreateMap<Category, CategoryDto>();
-
+        CreateMap<Category, CategoryDto>()
+            .ForMember(d => d.ProductIds,
+                o => o.MapFrom(s => s.Products.Select(p => p.Id)));
+        CreateMap<CategoryDto, Category>()
+            .ForMember(d => d.Products, o => o.Ignore()); 
+        
         // Address ↔ AddressDto
         CreateMap<Address, AddressDto>();
         CreateMap<AddressDto, Address>();
@@ -56,10 +60,6 @@ public class MappingProfile : Profile
         // Product ↔ ProductDto
         CreateMap<Product, ProductDto>();
         CreateMap<ProductDto, Product>();
-        
-        // Category ↔ CategoryDto
-        CreateMap<Category, CategoryDto>();
-        CreateMap<CategoryDto, Category>();
         
         CreateMap<Product, Product>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));

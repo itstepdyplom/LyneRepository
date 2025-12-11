@@ -27,6 +27,16 @@ public class CategoryService(ICategoryRepository categoryRepository,IMapper mapp
         return mapper.Map<CategoryDto>(category);
     }
 
+    public async Task<CategoryDto?> GetByType(string type)
+    {
+        var category = await categoryRepository.GetAllWithProductsAsync(type);
+
+        if (category is null)
+            return null;
+
+        return mapper.Map<CategoryDto>(category);
+    }
+
     public async Task<bool> AddAsync(CategoryDto dto)
     {
         try

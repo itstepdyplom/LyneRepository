@@ -5,6 +5,7 @@ namespace Lyne.Domain.IRepositories;
 public interface ICategoryRepository
 {
     Task<List<Category>> GetAllAsync();
+    Task<Category?> GetAllWithProductsAsync(string type);
     Task<Category?> GetByIdAsync(Guid id);
     Task<bool> AddAsync(Category? category);
     Task<bool> Update(Category? category);

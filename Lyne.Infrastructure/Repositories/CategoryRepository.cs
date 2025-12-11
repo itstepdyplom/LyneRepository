@@ -17,6 +17,12 @@ public class CategoryRepository(AppDbContext context, ILogger<CategoryRepository
         var categories = await context.Categories.ToListAsync();
         return categories;
     }
+    public async Task<Category?> GetAllWithProductsAsync(string type)
+    {
+        return await context.Categories
+            .Include(c => c.Products)
+            .FirstOrDefaultAsync(c => c.Name == type);
+    }
 
     public async Task<Category?> GetByIdAsync(Guid id)
     {

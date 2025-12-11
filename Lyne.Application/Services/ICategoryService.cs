@@ -7,6 +7,7 @@ public interface ICategoryService
     public Task<List<CategoryDto>> GetAllAsync();
 
     public Task<CategoryDto?> GetByIdAsync(Guid id);
+    public Task<CategoryDto?> GetByType(string type);
 
     public Task<bool> AddAsync(CategoryDto dto);
 
