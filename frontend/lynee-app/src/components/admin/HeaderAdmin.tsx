@@ -1,0 +1,48 @@
+"use client";
+
+import { Box, Typography } from "@mui/material";
+import {
+  AccountCircleOutlined,
+  NotificationsNoneOutlined,
+} from "@mui/icons-material";
+
+export default function HeaderAdmin() {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        backgroundColor: "#fff",
+      }}
+    >
+      <Box
+        sx={{
+          width: 50,
+          height: 50,
+          borderRadius: "50%",
+          background: "black",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mt: 5,
+          ml: 2,
+        }}
+      >
+        <AccountCircleOutlined sx={{ color: "#c4c4c4", fontSize: 30 }} />
+      </Box>
+
+      <Box>
+        <Typography
+          sx={{ fontSize: 16, fontWeight: 400, color: "black", mt: 3 }}
+        >
+          Maria Shatanska
+        </Typography>
+        <Typography sx={{ fontSize: 14, fontWeight: 400, color: "black" }}>admin</Typography>
+      </Box>
+      <Box sx={{ ml: "auto", mr: 5  }}>
+        <NotificationsNoneOutlined sx={{ color: "black", fontSize: 28 }} />
+      </Box>
+    </Box>
+  );
+}
