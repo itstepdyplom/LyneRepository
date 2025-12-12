@@ -1,0 +1,7 @@
+2025-11-20 21:25:36.374 +02:00 [INF] User profile is available. Using 'C:\Users\bojko\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-11-20 21:25:36.500 +02:00 [INF] Creating key {8af322ae-32b4-4d27-8f64-fe5620da9b71} with creation date 2025-11-20 19:25:36Z, activation date 2025-11-20 19:25:36Z, and expiration date 2026-02-18 19:25:36Z.
+2025-11-20 21:25:36.513 +02:00 [INF] Writing data to file 'C:\Users\bojko\AppData\Local\ASP.NET\DataProtection-Keys\key-8af322ae-32b4-4d27-8f64-fe5620da9b71.xml'.
+2025-11-20 21:25:36.634 +02:00 [INF] Now listening on: http://localhost:5000
+2025-11-20 21:25:36.639 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-11-20 21:25:36.642 +02:00 [INF] Hosting environment: Development
+2025-11-20 21:25:36.644 +02:00 [INF] Content root path: C:\Users\bojko\OneDrive\Робочий стіл\LyneRepository\Lyne.API
