@@ -11,10 +11,10 @@ export const getCategoryHref = (locale: string, categoryKey: string): string => 
     'men': `/categories/men`,
     'kids': `/categories/kids`,
     'accessories': `/categories/accessories`,
-    'bagsAndWallets': `/categories/accessories`,
+    'bagsAndWallets': `/categories/bags`,
     'viewAll': ``,
     'new': ``,
-    'home': ``,
+    'home': `/categories/home`,
   };
   const route = routeMap[categoryKey] || ``;
   return route ? `/${locale}${route}` : ``;
