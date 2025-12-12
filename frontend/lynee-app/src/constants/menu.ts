@@ -15,6 +15,7 @@ export const getCategoryHref = (locale: string, categoryKey: string): string => 
     'viewAll': ``,
     'new': ``,
     'home': `/categories/home`,
+    'account' : '/frontend/lynee-app/src/app/[locale]/account'
   };
   const route = routeMap[categoryKey] || ``;
   return route ? `/${locale}${route}` : ``;
