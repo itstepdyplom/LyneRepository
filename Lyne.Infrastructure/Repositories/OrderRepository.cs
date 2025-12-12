@@ -41,6 +41,13 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
         return order;
     }
 
+    public async Task<List<Product>> GetProductsByIdsAsync(List<Guid> ids)
+    {
+        return await context.Products
+            .Where(p => ids.Contains(p.Id))
+            .ToListAsync();
+    }
+
     public async Task<bool> AddAsync(Order? order)
     {
         if (order is null)
@@ -81,7 +88,7 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
         context.Entry(existing).CurrentValues.SetValues(order);
         await context.SaveChangesAsync();
         
-        var cacheKey = $"address:{order.Id}";
+        var cacheKey = $"order:{order.Id}";
         await cacheService.SetAsync(cacheKey, order, "order", TimeSpan.FromMinutes(15));
         logger.LogInformation("Order with id:{Id} updated", order.Id);
         return true;
@@ -145,5 +152,16 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
                        orderExists;
         logger.LogInformation("ValidateForUpdateOrderAsync: Validation {Result}", isValid ? "passed" : "failed");
         return isValid;
+    }
+
+    public async Task<List<Order>> GetMyOrdersAsync(long userId, CancellationToken ct)
+    {
+        return await context.Orders
+            .AsNoTracking()
+            .Include(o => o.ShippingAddress)
+            .Include(o => o.OrderProducts)
+            .Where(o => o.UserId == userId)
+            .OrderByDescending(o => o.CreatedAt)
+            .ToListAsync(ct);
     }
 }

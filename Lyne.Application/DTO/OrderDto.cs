@@ -12,9 +12,10 @@ public class OrderDto
     public required DateTimeOffset Date { get; set; }
     public int UserId { get; set; }
     public int ShippingAddressId { get; set; }
+    public AddressDto? ShippingAddress { get; set; } // 👈
     public string PaymentMethod { get; set; } = "";
     public int TrackingNumber { get; set; }
     [Required(ErrorMessage = "OrderStatus is required")]
     public required OrderStatus OrderStatus { get; set; }
-    public List<int> ProductIds { get; set; } = new();
+    public List<Guid> ProductIds { get; set; } = new();
 }

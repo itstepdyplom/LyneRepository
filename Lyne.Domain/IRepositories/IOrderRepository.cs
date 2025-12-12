@@ -6,10 +6,12 @@ public interface IOrderRepository
 {
     Task<List<Order>> GetAllAsync();
     Task<Order?> GetByIdAsync(int id);
+    Task<List<Product>> GetProductsByIdsAsync(List<Guid> ids);
     Task<bool> AddAsync(Order? order);
     Task<bool> Update(Order? order);
     Task<bool> DeleteAsync(Order? order);
     Task<bool> ExistsAsync(int id);
     Task<bool> ValidateForCreateAsync(Order order);
     Task<bool> ValidateForUpdateAsync(Order? order);
+    Task<List<Order>> GetMyOrdersAsync(long userId, CancellationToken ct);
 }

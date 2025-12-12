@@ -26,26 +26,27 @@ public class MappingProfile : Profile
             .ForMember(d => d.DateOfBirth,  o => o.MapFrom(s => DateOnly.Parse(s.DateOfBirth)));
 
         // Order → OrderDto
+        // CreateMap<Order, OrderDto>()
+        //     .ForMember(dest => dest.ProductIds, opt => opt.MapFrom(src => src.OrderProducts.Select(p => p.OrderId)));
         CreateMap<Order, OrderDto>()
-            .ForMember(dest => dest.ProductIds, opt => opt.MapFrom(src => src.Products.Select(p => p.Id)));
-        CreateMap<Order, OrderDto>()
-            .ForMember(d => d.ProductIds, o => o.MapFrom(s => s.Products.Select(p => p.Id)));
-
-        CreateMap<OrderDto, Order>()
-            .ForMember(d => d.CreatedAt, o => o.Ignore())
-            .ForMember(d => d.UpdatedAt, o => o.Ignore())
-            .ForMember(d => d.User, o => o.Ignore())
-            .ForMember(d => d.ShippingAddress, o => o.Ignore())
-            .ForMember(d => d.Products, o => o.Ignore());
+            .ForMember(d => d.ProductIds, o => o.MapFrom(s => s.OrderProducts.Select(op => op.ProductId)))
+            .ForMember(d => d.ShippingAddress, o => o.MapFrom(s => s.ShippingAddress));
         
         CreateMap<OrderDto, Order>()
-            .ForMember(dest => dest.Products, opt => opt.Ignore());
+            .ForMember(d => d.CreatedAt, o => o.Ignore())
+            .ForMember(d => d.UpdatedAt, o => o.Ignore())
+            .ForMember(d => d.User, o => o.Ignore())
+            .ForMember(d => d.ShippingAddress, o => o.Ignore())
+            .ForMember(d => d.OrderProducts, o => o.Ignore());
+        
+        CreateMap<OrderDto, Order>()
+            .ForMember(dest => dest.OrderProducts, opt => opt.Ignore());
         CreateMap<OrderDto, Order>()
             .ForMember(d => d.CreatedAt, o => o.Ignore())
             .ForMember(d => d.UpdatedAt, o => o.Ignore())
             .ForMember(d => d.User, o => o.Ignore())
             .ForMember(d => d.ShippingAddress, o => o.Ignore())
-            .ForMember(d => d.Products, o => o.Ignore());
+            .ForMember(d => d.OrderProducts, o => o.Ignore());
         // Category → CategoryDto
         CreateMap<Category, CategoryDto>()
             .ForMember(d => d.ProductIds,

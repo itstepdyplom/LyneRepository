@@ -108,3 +108,22 @@ export const ROUTES = {
   ORDERS: '/orders',
   ORDER_DETAIL: (id: string) => `/orders/${id}`,
 } as const; 
+
+export type OrderStatus =
+  | "Unknown"
+  | "Pending"
+  | "Paid"
+  | "Shipped"
+  | "Delivered"
+  | "Cancelled";
+
+export type OrderDto = {
+  id: number;
+  date: string;
+  userId: number;
+  shippingAddressId: number;
+  paymentMethod: string;
+  trackingNumber: number;
+  orderStatus: OrderStatus | number;
+  productIds: number[];
+};

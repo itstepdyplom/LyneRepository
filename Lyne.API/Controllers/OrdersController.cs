@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Lyne.Application.DTO;
 using Lyne.Application.Services;
 using Lyne.Domain.Enums;
@@ -93,6 +94,22 @@ namespace Lyne.API.Controllers
 
             logger.LogInformation("Замовлення з ID = {Id} успішно видалено", id);
             return Ok();
+        }
+        
+        [Authorize]
+        [HttpGet("my")]
+        public async Task<IActionResult> MyOrders(CancellationToken ct)
+        {
+            var userIdStr =
+                User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                User.FindFirstValue("uid") ??
+                User.FindFirstValue("sub");
+
+            if (!long.TryParse(userIdStr, out var userId))
+                return Unauthorized(new { message = "Unauthorized" });
+
+            var orders = await orderService.GetMyOrdersAsync(userId, ct);
+            return Ok(orders);
         }
     }
 }

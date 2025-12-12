@@ -14,4 +14,6 @@ public interface IOrderService
     public Task<bool> UpdateAsync(OrderDto dto);
 
     public Task<bool> DeleteAsync(int id);
+    Task<List<OrderDto>> GetMyOrdersAsync(long userId, CancellationToken ct);
+
 }

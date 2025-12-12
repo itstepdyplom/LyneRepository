@@ -27,8 +27,8 @@ public class AuthController(AuthService authService) : BaseController
         }
         return Ok(result);
     }
-    [HttpPost("user-info")]
-    [Authorize(Roles = nameof(UserRole.Admin)+ "," + nameof(UserRole.Manager))]
+    [HttpGet("user-info")]
+    [Authorize]
     public async Task<IActionResult> UserInfo()
     {
         var user = await authService.GetCurrentUserAsync(HttpContext);

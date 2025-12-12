@@ -1,94 +1,123 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+  InternalAxiosRequestConfig,
+} from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://localhost:5050/api";
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 60000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
-    
+
     return config;
   },
   (error: AxiosError) => {
-    console.error('❌ Request Error:', error);
+    console.error("❌ Request Error:", error);
+    return Promise.reject(error);
+  }
+);
+
+apiClient.interceptors.response.use(
+  (r) => r,
+  (error) => {
+    if (axios.isAxiosError(error)) {
+      console.error("AXIOS ERROR", {
+        code: error.code,           
+        message: error.message,       
+        url: error.config?.url,
+        method: error.config?.method,
+        hasResponse: !!error.response,
+        status: error.response?.status,
+      });
+    } else {
+      console.error("NON-AXIOS ERROR", error);
+    }
     return Promise.reject(error);
   }
 );
 
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('✅ Response:', {
+    if (process.env.NODE_ENV === "development") {
+      console.log("✅ Response:", {
         status: response.status,
         data: response.data,
       });
     }
-    
+
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
-    
+    const originalRequest = error.config as AxiosRequestConfig & {
+      _retry?: boolean;
+    };
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = localStorage.getItem("refreshToken");
         if (refreshToken) {
           const response = await axios.post(`${BASE_URL}/auth/refresh`, {
             refreshToken,
           });
-          
+
           const { accessToken } = response.data;
-          localStorage.setItem('accessToken', accessToken);
-          
+          localStorage.setItem("accessToken", accessToken);
+
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           }
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/auth/login';
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/uk/auth/login";
         return Promise.reject(refreshError);
       }
     }
-    
-    let errorMessage = 'An unexpected error occurred';
-    
+
+    let errorMessage = "An unexpected error occurred";
+
     if (error.response) {
-      errorMessage = (error.response.data as { message?: string })?.message || `Server Error: ${error.response.status}`;
+      errorMessage =
+        (error.response.data as { message?: string })?.message ||
+        `Server Error: ${error.response.status}`;
     } else if (error.request) {
-      errorMessage = 'Network error - please check your connection';
+      errorMessage = "Network error - please check your connection";
     } else {
-      errorMessage = error.message || 'Request setup error';
+      errorMessage = error.message || "Request setup error";
     }
-    
-    console.error('❌ Response Error:', {
+
+    console.error("❌ Response Error:", {
       message: errorMessage,
       status: error.response?.status,
       data: error.response?.data,
     });
-    
+
     const enhancedError = {
       ...error,
       message: errorMessage,
     };
-    
+
     return Promise.reject(enhancedError);
   }
 );
 
-export default apiClient; 
+export default apiClient;

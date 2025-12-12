@@ -26,5 +26,5 @@ public class Order
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     public OrderStatus OrderStatus { get; set; }
-    public ICollection<Product> Products { get; set; } = new List<Product>();
+    public ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
 }

@@ -1,3 +1,4 @@
+import { OrderDto } from '@/utils/constants';
 import apiClient from '../lib/axios';
 
 export interface User {
@@ -5,6 +6,16 @@ export interface User {
   email: string;
   name: string;
   avatar?: string;
+  addressId?: number;
+  address?: Address;
+}
+export interface Address {
+  id: number;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
 }
 
 export interface Product {
@@ -60,7 +71,7 @@ export const authAPI = {
   },
 
   me: async (): Promise<User> => {
-    const response = await apiClient.get('/auth/me');
+    const response = await apiClient.get('/auth/user-info');
     return response.data;
   },
 };
@@ -111,10 +122,10 @@ export const ordersAPI = {
     return response.data;
   },
 
-  getMyOrders: async () => {
-    const response = await apiClient.get('/orders/my');
-    return response.data;
-  },
+  getMyOrders: async (): Promise<OrderDto[]> => {
+  const response = await apiClient.get('/orders/my');
+  return response.data;
+},
 
   getById: async (id: string) => {
     const response = await apiClient.get(`/orders/${id}`);

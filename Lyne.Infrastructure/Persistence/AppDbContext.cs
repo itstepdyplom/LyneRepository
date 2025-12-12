@@ -10,6 +10,7 @@
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<User> Users => Set<User>();
         public DbSet<Address> Addresses => Set<Address>();
+        public DbSet<OrderProduct> OrderProducts => Set<OrderProduct>(); 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +26,43 @@
             modelBuilder.Entity<User>()
                 .Property(x => x.Id)
                 .UseIdentityColumn();
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Address)
+                .WithMany()
+                .HasForeignKey(u => u.AddressId);
+            
+            modelBuilder.Entity<OrderProduct>(e =>
+            {
+                e.ToTable("order_products");
+
+                e.HasKey(x => new { x.OrderId, x.ProductId });
+
+                e.Property(x => x.OrderId).HasColumnName("order_id");
+                e.Property(x => x.ProductId).HasColumnName("product_id");
+                e.Property(x => x.Quantity).HasColumnName("quantity");
+                e.Property(x => x.UnitPrice).HasColumnName("unit_price");
+
+                e.HasOne(x => x.Order)
+                    .WithMany(o => o.OrderProducts)
+                    .HasForeignKey(x => x.OrderId);
+
+                e.HasOne(x => x.Product)
+                    .WithMany()
+                    .HasForeignKey(x => x.ProductId);
+            });
+            
+            // modelBuilder.Entity<OrderProduct>()
+            //     .HasKey(x => new { x.OrderId, x.ProductId });
+            //
+            // modelBuilder.Entity<OrderProduct>()
+            //     .HasOne(x => x.Order)
+            //     .WithMany(o => o.OrderProducts)
+            //     .HasForeignKey(x => x.OrderId);
+            //
+            // modelBuilder.Entity<OrderProduct>()
+            //     .HasOne(x => x.Product)
+            //     .WithMany() // або .WithMany(p => p.OrderProducts)
+            //     .HasForeignKey(x => x.ProductId);
             
             // modelBuilder.Entity<Product>().ToTable("products");
             // modelBuilder.Entity<Category>().ToTable("categories");
@@ -115,18 +153,18 @@
     });
 
     // many-to-many -> таблиця order_products з snake_case
-    modelBuilder.Entity<Order>()
-        .HasMany(o => o.Products)
-        .WithMany()
-        .UsingEntity<Dictionary<string, object>>(
-            "order_products",
-            r => r.HasOne<Product>().WithMany().HasForeignKey("product_id").OnDelete(DeleteBehavior.Restrict),
-            l => l.HasOne<Order>().WithMany().HasForeignKey("order_id").OnDelete(DeleteBehavior.Cascade));
+    // modelBuilder.Entity<Order>()
+    //     .HasMany(o => o.Products)
+    //     .WithMany()
+    //     .UsingEntity<Dictionary<string, object>>(
+    //         "order_products",
+    //         r => r.HasOne<Product>().WithMany().HasForeignKey("product_id").OnDelete(DeleteBehavior.Restrict),
+    //         l => l.HasOne<Order>().WithMany().HasForeignKey("order_id").OnDelete(DeleteBehavior.Cascade));
 
-            /*modelBuilder.Entity<Address>()
-                .HasOne(a => a.User)
-                .WithMany()
-                .HasForeignKey(a => a.UserId);*/
+            // modelBuilder.Entity<Address>()
+            //     .HasOne(a => a.User)
+            //     .WithMany()
+            //     .HasForeignKey(a => a.UserId);
 
             //Seed Address
             modelBuilder.Entity<Address>().HasData(

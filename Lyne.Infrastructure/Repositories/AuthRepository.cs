@@ -35,7 +35,9 @@ public class AuthRepository(AppDbContext context) : IAuthRepository
 
     public async Task<User?> GetUserByIdAsync(long id)
     {
-        return await context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        return await context.Users.AsNoTracking()
+            .Include(u => u.Address)
+            .FirstOrDefaultAsync(u => u.Id == id);
     }
 
 } 

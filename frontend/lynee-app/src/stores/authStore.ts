@@ -14,7 +14,7 @@ interface AuthState {
   clearError: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set, ) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
@@ -122,6 +122,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
     } catch (error) {
       localStorage.removeItem('accessToken');
+      console.log(error);
       
       set({ 
         user: null, 

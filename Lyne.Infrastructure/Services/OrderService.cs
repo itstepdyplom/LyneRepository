@@ -32,8 +32,18 @@ public class OrderService(IOrderRepository orderRepository,IMapper mapper,ILogge
         try
         {
             var order = mapper.Map<Order>(dto);
+            var products = await orderRepository.GetProductsByIdsAsync(dto.ProductIds);
+
+            order.OrderProducts = products.Select(p => new OrderProduct
+            {
+                ProductId = p.Id,
+                Quantity = 1,
+                UnitPrice = p.Price 
+            }).ToList();
+
             if (!await orderRepository.ValidateForCreateAsync(order))
                 return false;
+
             return await orderRepository.AddAsync(order);
         }
         catch (Exception ex)
@@ -61,5 +71,11 @@ public class OrderService(IOrderRepository orderRepository,IMapper mapper,ILogge
             return false;
         var order = mapper.Map<Order>(orderDto);
         return await orderRepository.DeleteAsync(order);
+    }
+    public async Task<List<OrderDto>> GetMyOrdersAsync(long userId, CancellationToken ct)
+    {
+        logger.LogInformation("Getting orders for user {userId}",userId);
+        var orders = await orderRepository.GetMyOrdersAsync(userId, ct);
+        return mapper.Map<List<OrderDto>>(orders);
     }
 }

@@ -44,7 +44,7 @@ src/
 2. **Set up environment variables**
    Create a `.env.local` file in the root directory:
    ```env
-   NEXT_PUBLIC_API_URL=http://localhost:3001/api
+   NEXT_PUBLIC_API_URL=https://localhost:5050/api
    NEXT_PUBLIC_APP_URL=http://localhost:3000
    NEXT_PUBLIC_APP_NAME=LYNEE
    ```

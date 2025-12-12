@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import cherryBag from "./image.png";
 import modelImage from "./imageMyOrders.png";
@@ -8,12 +8,63 @@ import redDress from "./reddressjpg.jpg";
 import shorts from "./shorts.png";
 import blueDress from "./dress.png";
 import Contact from "./contactimg.jpg";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "next/navigation";
+import { ordersAPI } from "@/services/api"; // <-- перевір шлях
+import { OrderDto } from "@/utils/constants";
+
+
 
 export default function AccountOrdersContactPage() {
-  const [activePage, setActivePage] = useState("account");
+  const [activePage, setActivePage] = useState<"account" | "orders" | "contact">("account");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // ===== LOGOUT MODAL =====
+  const { user, isAuthenticated, isLoading, checkAuth, logout } = useAuthStore();
+  const router = useRouter();
+
+  // orders state
+  const [orders, setOrders] = useState<OrderDto[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
+
+  const ran = useRef(false);
+
+  useEffect(() => {
+    if (ran.current) return;
+    ran.current = true;
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/uk/auth/login");
+    }
+  }, [isLoading, isAuthenticated, router]);
+
+  // fetch orders only when user opens "orders" tab and user is authenticated
+  useEffect(() => {
+    const load = async () => {
+      if (activePage !== "orders") return;
+      if (!isAuthenticated) return;
+
+      setOrdersLoading(true);
+      setOrdersError(null);
+
+      try {
+        const data = await ordersAPI.getMyOrders();
+        setOrders(Array.isArray(data) ? data : []);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        setOrders([]);
+        setOrdersError(e?.message ?? "Failed to load orders");
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+
+    load();
+  }, [activePage, isAuthenticated]);
+
   const LogoutModal = () => (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
       <div className="bg-[#2E2E2E] p-8 rounded-md w-[90%] max-w-[420px] text-center">
@@ -21,9 +72,9 @@ export default function AccountOrdersContactPage() {
 
         <button
           className="w-full bg-white text-black py-2 mb-4"
-          onClick={() => {
-            console.log("Logged out");
-            // Тут можеш зробити redirect або clear auth
+          onClick={async () => {
+            await logout();
+            router.push("/uk/auth/login");
           }}
         >
           Log out
@@ -39,12 +90,11 @@ export default function AccountOrdersContactPage() {
     </div>
   );
 
-  // ===== ACCOUNT PAGE =====
   const renderAccount = () => (
     <div className="flex min-h-screen font-base m-0 p-0">
       <div className="w-full md:w-1/2 p-8 md:p-16 bg-white/60 backdrop-blur-sm">
         <h1 className="text-black font-base font-normal text-[32px] leading-[100%] mb-6">
-          Hello, Maria Shatanska!
+          Hello, {user?.name ?? "User"}!
         </h1>
 
         <div className="flex gap-6 text-black text-sm font-normal mb-8">
@@ -78,11 +128,16 @@ export default function AccountOrdersContactPage() {
         <div className="flex flex-col gap-4 w-full md:w-[85%] text-xs text-gray-400">
           <div>
             <label className="block mb-1">Email</label>
-            <input type="email" value="mariashatanska@gmail.com" className="w-full bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" />
+            <input
+              type="email"
+              className="w-full bg-white border border-gray-200 rounded-sm px-3 py-2 text-black"
+              value={user?.email ?? ""}
+              readOnly
+            />
           </div>
           <div>
             <label className="block mb-1">Password</label>
-            <input type="password" value="************" className="w-full bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" />
+            <input type="password" className="w-full bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" />
           </div>
         </div>
 
@@ -92,11 +147,11 @@ export default function AccountOrdersContactPage() {
         </h2>
 
         <div className="flex flex-col gap-4 w-full md:w-[85%] text-xs">
-          <div><label className="block mb-1 text-black/70">Country</label><input className="bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" /></div>
-          <div><label className="block mb-1 text-black/70">City</label><input className="bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" /></div>
-          <div><label className="block mb-1 text-black/70">Postal code</label><input className="bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" /></div>
-          <div><label className="block mb-1 text-black/70">Street</label><input className="bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" /></div>
-          <div><label className="block mb-1 text-black/70">House</label><input className="bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" /></div>
+          <div><label className="block mb-1 text-black/70">Country</label><input readOnly value={user?.address?.country ?? ""}  className="bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" /></div>
+          <div><label className="block mb-1 text-black/70">City</label><input readOnly value={user?.address?.city ?? ""}  className="bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" /></div>
+          <div><label className="block mb-1 text-black/70">Postal code</label><input readOnly value={user?.address?.zip ?? ""} className="bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" /></div>
+          <div><label className="block mb-1 text-black/70">Street</label><input readOnly value={user?.address?.street ?? ""}  className="bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" /></div>
+          <div><label className="block mb-1 text-black/70">House</label><input readOnly value={user?.address?.zip ?? ""}  className="bg-white border border-gray-200 rounded-sm px-3 py-2 text-black" /></div>
         </div>
       </div>
 
@@ -115,23 +170,71 @@ export default function AccountOrdersContactPage() {
     </div>
   );
 
-  // ===== ORDERS PAGE =====
   const renderOrders = () => (
     <div className="flex min-h-screen font-base m-0 p-0 bg-white">
       <div className="w-full md:w-1/2 p-8 md:p-16">
-        <h1 className="text-black font-normal text-[28px] leading-[100%] mb-6">Hello, Maria Shatanska!</h1>
+        <h1 className="text-black font-normal text-[28px] leading-[100%] mb-6">
+          Hello, {user?.name ?? "User"}!
+        </h1>
 
         <div className="flex gap-8 text-black text-sm font-normal mb-10">
           <button className="hover:border-b hover:border-black pb-1 transition" onClick={() => setActivePage("account")}>My account</button>
-          <button className="hover:border-b hover:border-black pb-1 transition" onClick={() => setActivePage("orders")}>My orders</button>
+          <button className="border-b border-black pb-1 transition" onClick={() => setActivePage("orders")}>My orders</button>
           <button className="hover:border-b hover:border-black pb-1 transition" onClick={() => setActivePage("contact")}>Contact us</button>
           <button className="hover:border-b hover:border-black pb-1 transition" onClick={() => setShowLogoutModal(true)}>Log out</button>
         </div>
 
-        <div className="flex items-center gap-4 mb-10">
-          <p className="text-black text-sm">OOPS, you don’t have any orders for now</p>
-          <button className="bg-black text-white text-sm px-4 py-2 transition hover:opacity-80">Start now</button>
-        </div>
+        {/* Orders states */}
+        {ordersLoading && (
+          <p className="text-black text-sm mb-6">Loading orders...</p>
+        )}
+
+        {!ordersLoading && ordersError && (
+          <div className="mb-6">
+            <p className="text-red-600 text-sm">Failed to load orders: {ordersError}</p>
+            <button
+              className="mt-3 bg-black text-white text-sm px-4 py-2 transition hover:opacity-80"
+              onClick={() => {
+                // trigger reload
+                setActivePage("account");
+                setTimeout(() => setActivePage("orders"), 0);
+              }}
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {!ordersLoading && !ordersError && orders.length === 0 && (
+          <div className="flex items-center gap-4 mb-10">
+            <p className="text-black text-sm">OOPS, you don’t have any orders for now</p>
+            <button className="bg-black text-white text-sm px-4 py-2 transition hover:opacity-80">
+              Start now
+            </button>
+          </div>
+        )}
+
+        {!ordersLoading && !ordersError && orders.length > 0 && (
+          <div className="space-y-4 mb-10">
+            {orders.map((o) => (
+              <div key={o.id} className="border border-gray-200 rounded-sm p-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-black text-sm font-medium">Order #{o.id}</p>
+                  <p className="text-black text-xs">
+                    {new Date(o.date).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div className="mt-2 text-xs text-gray-600 space-y-1">
+                  <p><span className="text-black/70">Status:</span> {String(o.orderStatus)}</p>
+                  <p><span className="text-black/70">Payment:</span> {o.paymentMethod || "-"}</p>
+                  <p><span className="text-black/70">Tracking:</span> {o.trackingNumber || "-"}</p>
+                  <p><span className="text-black/70">Items:</span> {o.productIds?.length ?? 0}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="border-b border-gray-300 w-full mb-8"></div>
 
@@ -168,27 +271,26 @@ export default function AccountOrdersContactPage() {
     </div>
   );
 
-  // ===== CONTACT PAGE =====
   const renderContact = () => (
     <div className="flex min-h-screen font-base m-0 p-0">
       <div className="w-full md:w-1/2 p-8 md:p-16 bg-white/60 backdrop-blur-sm">
         <h1 className="text-black font-base font-normal text-[32px] leading-[100%] mb-6">
-          Hello, Maria Shatanska!
+          Hello, {user?.name ?? "User"}!
         </h1>
 
         <div className="flex gap-6 text-black text-sm font-normal mb-8">
           <button className="hover:border-b hover:border-black pb-[2px]" onClick={() => setActivePage("account")}>My account</button>
           <button className="hover:border-b hover:border-black pb-[2px]" onClick={() => setActivePage("orders")}>My orders</button>
-          <button className="hover:border-b hover:border-black pb-[2px]" onClick={() => setActivePage("contact")}>Contact us</button>
+          <button className={`pb-[2px] ${activePage === "contact" ? "border-b border-black" : "hover:border-b hover:border-black"}`} onClick={() => setActivePage("contact")}>Contact us</button>
           <button className="hover:border-b hover:border-black pb-[2px]" onClick={() => setShowLogoutModal(true)}>Log out</button>
         </div>
 
         <p className="text-black text-sm mb-6">You have any questions? Contact us</p>
 
         <div className="flex flex-col gap-4 w-full md:w-[85%] text-xs">
-          <input type="email" placeholder="Email*" className="w-full bg-gray-100 border border-gray-200 rounded-sm px-3 py-2 text-black" value="mariashatanska@gmail.com" />
-          <input type="text" placeholder="Your name*" className="w-full bg-gray-100 border border-gray-200 rounded-sm px-3 py-2 text-black" value="Marii Shatanska" />
-          <input type="tel" placeholder="Telephone number*" className="w-full bg-gray-100 border border-gray-200 rounded-sm px-3 py-2 text-black" value="+380936250027" />
+          <input type="email" placeholder="Email*" className="w-full bg-gray-100 border border-gray-200 rounded-sm px-3 py-2 text-black" value={user?.email ?? ""} readOnly />
+          <input type="text" placeholder="Your name*" className="w-full bg-gray-100 border border-gray-200 rounded-sm px-3 py-2 text-black" value={user?.name ?? ""} readOnly />
+          <input type="tel" placeholder="Telephone number*" className="w-full bg-gray-100 border border-gray-200 rounded-sm px-3 py-2 text-black" />
           <select className="w-full bg-gray-100 border border-gray-200 rounded-sm px-3 py-2 text-black">
             <option>Choose the topic</option>
           </select>
@@ -213,21 +315,21 @@ export default function AccountOrdersContactPage() {
     </div>
   );
 
-  // ===== BACKGROUND IMAGE HANDLING =====
   const getBackgroundImage = () => {
     if (activePage === "account") return cherryBag;
     if (activePage === "contact") return Contact;
     return null;
   };
 
+  const backgroundImage = getBackgroundImage();
+
   return (
     <div className="relative min-h-screen">
-
       {showLogoutModal && <LogoutModal />}
 
-      {getBackgroundImage() && (
+      {backgroundImage && (
         <div className="absolute inset-0 -z-10">
-          <Image src={getBackgroundImage()} alt="Background" fill className="object-cover" />
+          <Image src={backgroundImage} alt="Background" fill className="object-cover" />
         </div>
       )}
 
