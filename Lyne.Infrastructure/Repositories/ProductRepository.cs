@@ -1,6 +1,7 @@
 using System.Data;
 using System.Globalization;
 using AutoMapper;
+using Lyne.Application.DTO;
 using Lyne.Domain.Entities;
 using Lyne.Domain.IRepositories;
 using Lyne.Infrastructure.Caching;
@@ -47,6 +48,31 @@ public class ProductRepository(AppDbContext context, ILogger<ProductRepository> 
         }
 
         return product;
+    }
+
+    public async Task<(List<Product> items, int total)> GetPagedAsync(int page, int limit, string? categoryName)
+    {
+        var query = context.Products
+            .Include(p => p.Category)  
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(categoryName))
+        {
+            var name = categoryName.Trim().ToLower();
+            query = query.Where(p =>
+                p.Category != null && p.Category.Name.ToLower() == name);
+        }
+
+        var total = await query.CountAsync();
+
+        var items = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .Skip((page - 1) * limit)
+            .Take(limit)
+            .ToListAsync();
+
+        return (items, total);
     }
 
     public async Task<bool> AddAsync(Product? product)

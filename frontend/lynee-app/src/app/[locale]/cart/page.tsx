@@ -30,13 +30,19 @@ export default function CartPage() {
   const params = useParams();
   const locale = params.locale as string;
   
-  const {
-    items,
-    removeItem,
-    updateQuantity,
-    totalItems,
-    totalPrice,
-  } = useCartStore();
+const items = useCartStore(s => s.items);
+const removeItem = useCartStore(s => s.removeItem);
+const updateQuantity = useCartStore(s => s.updateQuantity);
+
+const totalItems = React.useMemo(
+  () => items.reduce((sum, i) => sum + i.quantity, 0),
+  [items]
+);
+
+const totalPrice = React.useMemo(
+  () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+  [items]
+);
 
   const handleQuantityChange = (id: string, newQuantity: number) => {
     if (newQuantity <= 0) {

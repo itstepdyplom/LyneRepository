@@ -21,14 +21,20 @@ export interface Address {
 export interface Product {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   price: number;
-  images: string[];
-  category: string;
   brand: string;
-  sizes: string[];
-  colors: string[];
-  inStock: boolean;
+  categoryId: string;
+  imageUrl: string;
+  size?: string;
+  color?: string;
+  isActive: boolean;
+}
+export interface PagedResult<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
 
 export interface LoginCredentials {
@@ -75,20 +81,28 @@ export const authAPI = {
     return response.data;
   },
 };
-
+export interface PagedProductsResponse {
+  products: Product[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
 export const productsAPI = {
-  getAll: async (params?: {
-    category?: string;
+  getAll: async (
+  params?: {
+    categoryName?: string;
+    page?: number;
+    limit?: number;
     brand?: string;
     minPrice?: number;
     maxPrice?: number;
     search?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{ products: Product[]; total: number; page: number; totalPages: number }> => {
-    const response = await apiClient.get('/products', { params });
-    return response.data;
   },
+  signal?: AbortSignal
+): Promise<PagedResult<Product>> => {
+  const response = await apiClient.get("/products", { params, signal });
+  return response.data;
+},
 
   getById: async (id: string): Promise<Product> => {
     const response = await apiClient.get(`/products/${id}`);
@@ -96,7 +110,7 @@ export const productsAPI = {
   },
 
   getCategories: async (): Promise<string[]> => {
-    const response = await apiClient.get('/products/categories');
+    const response = await apiClient.get('/categories');
     return response.data;
   },
 
@@ -106,20 +120,16 @@ export const productsAPI = {
   },
 };
 
+export type CreateOrderDto = {
+  shippingAddressId: number;
+  paymentMethod: string;
+  items: { productId: string; quantity: number; unitPrice: number }[];
+};
+
 export const ordersAPI = {
-  create: async (orderData: {
-    items: { productId: string; quantity: number; size: string; color: string }[];
-    shippingAddress: {
-      street: string;
-      city: string;
-      state: string;
-      zipCode: string;
-      country: string;
-    };
-    paymentMethod: string;
-  }) => {
-    const response = await apiClient.post('/orders', orderData);
-    return response.data;
+  create: async (dto: CreateOrderDto) => {
+    await apiClient.post("/orders", dto);
+    return true;
   },
 
   getMyOrders: async (): Promise<OrderDto[]> => {

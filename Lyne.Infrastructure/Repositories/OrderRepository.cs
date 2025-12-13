@@ -125,14 +125,11 @@ public class OrderRepository(AppDbContext context, ILogger<OrderRepository> logg
 
     public Task<bool> ValidateForCreateAsync(Order order)
     {
-        bool isValid =
-            order.OrderStatus != default &&
-            !string.IsNullOrEmpty(order.PaymentMethod) &&
-            order.ShippingAddressId != default &&
-            order.TrackingNumber != 0 &&
-            order.UserId != default;
+        var isValid =
+            order.UserId != default &&
+            order.OrderStatus != OrderStatus.Unknown &&
+            order.OrderProducts.Any();
 
-        logger.LogInformation("ValidateForCreateOrderAsync: Validation {Result}", isValid ? "passed" : "failed");
         return Task.FromResult(isValid);
     }
 

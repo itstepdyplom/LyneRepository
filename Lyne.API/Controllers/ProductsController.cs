@@ -11,15 +11,23 @@ namespace Lyne.API.Controllers
     public class ProductsController(IProductService productService, ILogger<ProductsController> logger) : BaseController
     {
         [HttpGet]
-        public async Task<ActionResult<List<ProductDto>>> Get()
+        public async Task<ActionResult<PagedResult<ProductDto>>> Get(
+            [FromQuery] int page = 1,
+            [FromQuery] int limit = 10,
+            [FromQuery] string? categoryName = null)
         {
-            logger.LogInformation("Запит на отримання всіх продуктів");
-            var products = await productService.GetAllAsync();
-            return Ok(products);
+            var (items, total) = await productService.GetPagedAsync(page, limit, categoryName);
+
+            return Ok(new PagedResult<ProductDto>
+            {
+                Items = items,
+                Total = total,
+                Page = page,
+                PageSize = limit
+            });
         }
 
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<ActionResult<ProductDto>> Get(Guid id)
         {
            logger.LogInformation("Запит на отримання продукту з ID = {Id}", id);

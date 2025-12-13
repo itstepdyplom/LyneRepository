@@ -15,8 +15,7 @@ export interface CartItem {
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
-  
-  // Actions
+
   addItem: (item: Omit<CartItem, 'id' | 'quantity'> & { quantity?: number }) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
@@ -33,20 +32,19 @@ export const useCartStore = create<CartState>()(
 
       addItem: (newItem) => {
         const { items } = get();
+
         const existingItemIndex = items.findIndex(
-          item => 
-            item.productId === newItem.productId && 
-            item.size === newItem.size && 
+          (item) =>
+            item.productId === newItem.productId &&
+            item.size === newItem.size &&
             item.color === newItem.color
         );
 
         if (existingItemIndex >= 0) {
-          // Update existing item quantity
           const updatedItems = [...items];
           updatedItems[existingItemIndex].quantity += newItem.quantity || 1;
           set({ items: updatedItems });
         } else {
-          // Add new item
           const cartItem: CartItem = {
             ...newItem,
             id: `${newItem.productId}-${newItem.size}-${newItem.color}-${Date.now()}`,
@@ -56,47 +54,22 @@ export const useCartStore = create<CartState>()(
         }
       },
 
-      removeItem: (id) => {
-        const { items } = get();
-        set({ items: items.filter(item => item.id !== id) });
-      },
+      removeItem: (id) => set({ items: get().items.filter((i) => i.id !== id) }),
 
       updateQuantity: (id, quantity) => {
-        if (quantity <= 0) {
-          get().removeItem(id);
-          return;
-        }
-
-        const { items } = get();
-        const updatedItems = items.map(item =>
-          item.id === id ? { ...item, quantity } : item
-        );
-        set({ items: updatedItems });
+        if (quantity <= 0) return get().removeItem(id);
+        set({
+          items: get().items.map((i) => (i.id === id ? { ...i, quantity } : i)),
+        });
       },
 
-      clearCart: () => {
-        set({ items: [] });
-      },
-
-      openCart: () => {
-        set({ isOpen: true });
-      },
-
-      closeCart: () => {
-        set({ isOpen: false });
-      },
-
-      get totalItems() {
-        return get().items.reduce((total, item) => total + item.quantity, 0);
-      },
-
-      get totalPrice() {
-        return get().items.reduce((total, item) => total + (item.price * item.quantity), 0);
-      },
+      clearCart: () => set({ items: [] }),
+      openCart: () => set({ isOpen: true }),
+      closeCart: () => set({ isOpen: false }),
     }),
     {
       name: 'cart-storage',
       partialize: (state) => ({ items: state.items }),
     }
   )
-); 
+);

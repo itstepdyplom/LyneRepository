@@ -20,6 +20,12 @@ public class ProductService(IProductRepository productRepository,IMapper mapper,
         }
         return mapper.Map<List<ProductDto>>(products);
     }
+    public async Task<(List<ProductDto> items, int total)> GetPagedAsync(int page, int limit, string? categoryName)
+    {
+        var (items, total) = await productRepository.GetPagedAsync(page, limit, categoryName);
+        var dtoItems = mapper.Map<List<ProductDto>>(items);
+        return (dtoItems, total);
+    }
 
     public async Task<ProductDto?> GetByIdAsync(Guid id)
     {

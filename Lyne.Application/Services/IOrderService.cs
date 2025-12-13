@@ -9,7 +9,7 @@ public interface IOrderService
 
     public Task<OrderDto?> GetByIdAsync(int id);
 
-    public Task<bool> AddAsync(OrderDto dto);
+    public Task<bool> AddAsync(CreateOrderDto dto, int userId);
 
     public Task<bool> UpdateAsync(OrderDto dto);
 

@@ -10,7 +10,6 @@ namespace Lyne.API.Controllers
     public class CategoriesController(ICategoryService categoryService, ILogger<CategoriesController> logger) : BaseController
     {
         [HttpGet]
-        [Authorize]
         public async Task<ActionResult<List<CategoryDto>>> Get()
         {
             logger.LogInformation("Запит на отримання всіх категорій");
@@ -19,7 +18,6 @@ namespace Lyne.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<ActionResult<CategoryDto>> Get(Guid id)
         {
             logger.LogInformation("Запит на отримання категорії з ID = {Id}", id);
@@ -33,7 +31,6 @@ namespace Lyne.API.Controllers
             return Ok(category);
         }
         [HttpGet("GetByType")]
-        [Authorize]
         public async Task<ActionResult<CategoryDto>> Get([FromQuery]string type)
         {
             logger.LogInformation("Запит на отримання категорії {type}", type);

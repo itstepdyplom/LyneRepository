@@ -2,6 +2,7 @@ using AutoMapper;
 using Lyne.Application.DTO;
 using Lyne.Application.Services;
 using Lyne.Domain.Entities;
+using Lyne.Domain.Enums;
 using Lyne.Domain.IRepositories;
 using Microsoft.Extensions.Logging;
 
@@ -27,30 +28,29 @@ public class OrderService(IOrderRepository orderRepository,IMapper mapper,ILogge
         return mapper.Map<OrderDto>(order);
     }
 
-    public async Task<bool> AddAsync(OrderDto dto)
+    public async Task<bool> AddAsync(CreateOrderDto dto, int userId)
     {
-        try
-        {
-            var order = mapper.Map<Order>(dto);
-            var products = await orderRepository.GetProductsByIdsAsync(dto.ProductIds);
+        if (!dto.Items.Any()) return false;
 
-            order.OrderProducts = products.Select(p => new OrderProduct
+        var order = new Order
+        {
+            UserId = userId,
+            Date = DateTimeOffset.UtcNow,
+            OrderStatus = OrderStatus.Pending,
+
+            ShippingAddressId = dto.ShippingAddressId,
+            PaymentMethod = dto.PaymentMethod,
+
+            OrderProducts = dto.Items.Select(i => new OrderProduct
             {
-                ProductId = p.Id,
-                Quantity = 1,
-                UnitPrice = p.Price 
-            }).ToList();
+                ProductId = i.ProductId,   // Guid
+                Quantity  = i.Quantity,    // int
+                UnitPrice = i.UnitPrice    // decimal
+            }).ToList()
+        };
 
-            if (!await orderRepository.ValidateForCreateAsync(order))
-                return false;
-
-            return await orderRepository.AddAsync(order);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error adding order");
-            return false;
-        }
+        await orderRepository.AddAsync(order);
+        return true;
     }
 
     public async Task<bool> UpdateAsync(OrderDto dto)

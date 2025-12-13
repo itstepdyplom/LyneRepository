@@ -1,6 +1,5 @@
 import axios, {
   AxiosInstance,
-  AxiosRequestConfig,
   AxiosResponse,
   AxiosError,
   InternalAxiosRequestConfig,
@@ -37,8 +36,8 @@ apiClient.interceptors.response.use(
   (error) => {
     if (axios.isAxiosError(error)) {
       console.error("AXIOS ERROR", {
-        code: error.code,           
-        message: error.message,       
+        code: error.code,
+        message: error.message,
         url: error.config?.url,
         method: error.config?.method,
         hasResponse: !!error.response,
@@ -63,34 +62,9 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as AxiosRequestConfig & {
-      _retry?: boolean;
-    };
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = localStorage.getItem("refreshToken");
-        if (refreshToken) {
-          const response = await axios.post(`${BASE_URL}/auth/refresh`, {
-            refreshToken,
-          });
-
-          const { accessToken } = response.data;
-          localStorage.setItem("accessToken", accessToken);
-
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          }
-          return apiClient(originalRequest);
-        }
-      } catch (refreshError) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "/uk/auth/login";
-        return Promise.reject(refreshError);
-      }
+    if (error.response?.status === 401) {
+      localStorage.removeItem("accessToken");
+      window.location.href = "/uk/auth/login";
     }
 
     let errorMessage = "An unexpected error occurred";

@@ -36,7 +36,8 @@ export default function AccountOrdersContactPage() {
   }, [checkAuth]);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+     if (isLoading) return;
+    if (!isAuthenticated) {
       router.push("/uk/auth/login");
     }
   }, [isLoading, isAuthenticated, router]);

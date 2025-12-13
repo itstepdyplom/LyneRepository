@@ -34,26 +34,17 @@ namespace Lyne.API.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult> Post([FromBody] OrderDto dto)
+        public async Task<ActionResult> Post([FromBody] CreateOrderDto dto)
         {
-            logger.LogInformation("Запит на створення нового замовлення");
-            try
-            {
-                var result = await orderService.AddAsync(dto);
-                if (!result)
-                {
-                    logger.LogWarning("Не вдалося створити замовлення: валідація не пройдена");
-                    return BadRequest("Не вдалося створити замовлення.");
-                }
+            var userId = int.Parse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? throw new UnauthorizedAccessException()
+            );
 
-                logger.LogInformation("Замовлення успішно створено");
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Помилка при створенні замовлення");
-                return StatusCode(500, "Внутрішня помилка сервера");
-            }
+            var result = await orderService.AddAsync(dto, userId);
+            if (!result) return BadRequest("Не вдалося створити замовлення");
+
+            return Ok();
         }
 
         [HttpPut("{id}")]
