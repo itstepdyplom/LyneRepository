@@ -5,6 +5,7 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 
+
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://localhost:5050/api";
 
@@ -63,8 +64,15 @@ apiClient.interceptors.response.use(
   },
   async (error: AxiosError) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("accessToken");
-      window.location.href = "/uk/auth/login";
+        const url = error.config?.url ?? "";
+      const path = window.location.pathname;
+      const isAuthPage =
+        path.includes("/auth/login") || path.includes("/auth/register");
+
+ if (url.includes("/auth/user-info")) {
+    localStorage.removeItem("accessToken");
+    if (!isAuthPage) window.location.href = "/uk/auth/login";
+  }
     }
 
     let errorMessage = "An unexpected error occurred";

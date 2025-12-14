@@ -9,7 +9,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const { login, isLoading, loadingAction, error, clearError } = useAuthStore();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -115,10 +115,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={loadingAction==='login'}
             className="w-full bg-black text-white text-xs py-2 rounded-sm font-normal disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Logging in..." : "Log in"}
+            {loadingAction === "login" ? "Logging in..." : "Log in"}
           </button>
         </form>
       </div>

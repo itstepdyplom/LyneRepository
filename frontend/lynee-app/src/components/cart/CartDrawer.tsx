@@ -33,17 +33,19 @@ const CartDrawer: React.FC = () => {
 
   const [addressId, setAddressId] = React.useState<number>();
 
-React.useEffect(() => {
-  const load = async () => {
-    try {
-      const me = await authAPI.me();
-      setAddressId(me.addressId);
-    } catch (e) {
-      
-    }
-  };
-  load();
-}, []);
+  React.useEffect(() => {
+    const load = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+        authAPI
+          .me()
+          .then((me) => setAddressId(me.addressId))
+          .catch(() => {});
+      } catch (e) {}
+    };
+    load();
+  }, []);
 
   const items = useCartStore((s) => s.items);
 
@@ -75,25 +77,24 @@ React.useEffect(() => {
     setIsSubmitting(true);
     try {
       const dto: CreateOrderDto = {
-  shippingAddressId: addressId!,
-  paymentMethod: "Card",
-  items: items.map(i => ({
-    productId: String(i.productId),
-    quantity: i.quantity,
-    unitPrice: i.price,
-  })),
-};
-console.log(dto.items[0].productId);
+        shippingAddressId: addressId!,
+        paymentMethod: "Card",
+        items: items.map((i) => ({
+          productId: String(i.productId),
+          quantity: i.quantity,
+          unitPrice: i.price,
+        })),
+      };
+      console.log(dto.items[0].productId);
 
-
-await ordersAPI.create(dto);
+      await ordersAPI.create(dto);
 
       clearCart();
       closeCart();
 
       // опціонально: редірект
       // router.push(`/${locale}/orders`);  (якщо є така сторінка)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       setError(e?.message ?? "Checkout failed");
     } finally {

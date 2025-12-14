@@ -19,7 +19,7 @@ export default function AccountOrdersContactPage() {
   const [activePage, setActivePage] = useState<"account" | "orders" | "contact">("account");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const { user, isAuthenticated, isLoading, checkAuth, logout } = useAuthStore();
+  const { user, isAuthenticated, loadingAction, hasCheckedAuth, checkAuth, logout } = useAuthStore();
   const router = useRouter();
 
   // orders state
@@ -36,11 +36,12 @@ export default function AccountOrdersContactPage() {
   }, [checkAuth]);
 
   useEffect(() => {
-     if (isLoading) return;
+    if (!hasCheckedAuth) return; 
+    if (loadingAction !== null) return;
     if (!isAuthenticated) {
       router.push("/uk/auth/login");
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [loadingAction, isAuthenticated, hasCheckedAuth, router]);
 
   // fetch orders only when user opens "orders" tab and user is authenticated
   useEffect(() => {
