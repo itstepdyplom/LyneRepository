@@ -1,3 +1,4 @@
+using AutoMapper;
 using Lyne.Domain.Entities;
 using Lyne.Infrastructure.Caching;
 using Lyne.Infrastructure.Persistence;
@@ -15,6 +16,7 @@ public class ProductRepositoryTests : IAsyncLifetime
     private readonly Mock<ILogger<ProductRepository>> _mockLogger;
     private readonly ProductRepository _repository;
     private readonly Mock<ICacheService> _mockCache;
+    private readonly IMapper _mockMapper;
 
     public ProductRepositoryTests()
     {
@@ -27,7 +29,7 @@ public class ProductRepositoryTests : IAsyncLifetime
 
         _mockLogger = new Mock<ILogger<ProductRepository>>();
         _mockCache = new Mock<ICacheService>();
-        _repository = new ProductRepository(_context, _mockLogger.Object,_mockCache.Object);
+        _repository = new ProductRepository(_context, _mockLogger.Object,_mockCache.Object,_mockMapper);
     }
 
     public async Task InitializeAsync()
@@ -235,7 +237,7 @@ public class ProductRepositoryTests : IAsyncLifetime
         };
         
         // Act
-        var result = await _repository.DeleteAsync(product);
+        var result = await _repository.DeleteAsync(product.Id);
         
         // Assert
         Assert.False(result);
@@ -269,7 +271,7 @@ public class ProductRepositoryTests : IAsyncLifetime
         var savedProduct = await _context.Products.FirstAsync(p => p.Id == product.Id);
 
         // Act
-        var result = await _repository.DeleteAsync(savedProduct);
+        var result = await _repository.DeleteAsync(savedProduct.Id);
 
         // Assert
         Assert.True(result);

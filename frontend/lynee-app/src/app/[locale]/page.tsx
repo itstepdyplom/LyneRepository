@@ -23,7 +23,7 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import BrandCarousel from "../../components/BrandCarousel";
 import { productsAPI } from "@/services/api";
-import { useCartStore } from "./cart/cartStore";
+import { useCartStore } from "@/stores/cartStore";
 
 interface ProductCardVm {
   id: string;

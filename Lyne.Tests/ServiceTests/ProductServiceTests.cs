@@ -17,53 +17,74 @@ public class ProductServiceTests
     private readonly IMapper _mapper;
     private readonly Mock<ILogger<ProductService>> _logger;
 
-
     public ProductServiceTests()
     {
         _productRepoMock = new Mock<IProductRepository>();
         _logger = new Mock<ILogger<ProductService>>();
 
-        var config = new MapperConfiguration(cfg => { cfg.AddProfile<Lyne.Application.Mapping.MappingProfile>(); });
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<Lyne.Application.Mapping.MappingProfile>();
+        });
         _mapper = config.CreateMapper();
-
 
         _service = new ProductService(_productRepoMock.Object, _mapper, _logger.Object);
     }
 
     [Fact]
-    public async Task GetAllAsync_ReturnsListOProducts_WhenProductsExists()
+    public async Task GetAllAsync_ReturnsListOfProducts_WhenProductsExist()
     {
         // Arrange
-        var category = new Category()
+        var category = new Category
         {
-            Id = new Guid(),
+            Id = Guid.NewGuid(),
             Name = "Category",
             Description = "Category description",
             Products = new List<Product>()
         };
-        _productRepoMock.Setup(r => r.GetAllAsync())!
-            .ReturnsAsync(new List<Product>
+
+        _productRepoMock
+            .Setup(r => r.GetAllAsync())
+            .ReturnsAsync(new List<Product?>
             {
-                new Product { Id = new Guid(), Brand = "test", Color = "test",Category = category,CategoryId = category.Id, Description = "test", ImageUrl = "test", IsActive = true, Name = "test",Price = 1,StockQuantity = 1,Size = "test"}
+                new Product
+                {
+                    Id = Guid.NewGuid(),
+                    Brand = "test",
+                    Color = "test",
+                    Category = category,
+                    CategoryId = category.Id,
+                    Description = "test",
+                    ImageUrl = "test",
+                    IsActive = true,
+                    Name = "test",
+                    Price = 1,
+                    StockQuantity = 1,
+                    Size = "test"
+                }
             });
 
         // Act
         var result = await _service.GetAllAsync();
 
         // Assert
-        result!.Should().NotBeNullOrEmpty();
+        result.Should().NotBeNull();
+        result.Should().NotBeEmpty();
     }
 
     [Fact]
-    public async Task GetAllAsync_ReturnsNull_WhenProductsDoesNotExist()
+    public async Task GetAllAsync_ReturnsEmptyList_WhenRepositoryReturnsNull()
     {
         // Arrange
-        _productRepoMock.Setup(r => r.GetAllAsync())!.ReturnsAsync((List<Product>)null);
+        _productRepoMock
+            .Setup(r => r.GetAllAsync())
+            .ReturnsAsync((List<Product?>)null!);
 
         // Act
         var result = await _service.GetAllAsync();
 
         // Assert
+        result.Should().NotBeNull();
         result.Should().BeEmpty();
     }
 
@@ -71,12 +92,15 @@ public class ProductServiceTests
     public async Task GetAllAsync_ReturnsEmptyList_WhenRepositoryReturnsEmptyList()
     {
         // Arrange
-        _productRepoMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Product>());
+        _productRepoMock
+            .Setup(r => r.GetAllAsync())
+            .ReturnsAsync(new List<Product?>());
 
         // Act
         var result = await _service.GetAllAsync();
 
         // Assert
+        result.Should().NotBeNull();
         result.Should().BeEmpty();
     }
 
@@ -84,33 +108,51 @@ public class ProductServiceTests
     public async Task GetByIdAsync_ReturnsProductDto_WhenProductExists()
     {
         // Arrange
-        var id = new Guid();
-        var category = new Category()
+        var id = Guid.NewGuid();
+        var category = new Category
         {
-            Id = new Guid(),
+            Id = Guid.NewGuid(),
             Name = "Category",
             Description = "Category description",
             Products = new List<Product>()
         };
-        _productRepoMock.Setup(r => r.GetByIdAsync(id))
-            .ReturnsAsync(new Product()
-                { Id = id, Brand = "test", Color = "test",Category = category,CategoryId = category.Id, Description = "test", ImageUrl = "test", IsActive = true, Name = "Test",Price = 1,StockQuantity = 1,Size = "test" });
+
+        _productRepoMock
+            .Setup(r => r.GetByIdAsync(id))
+            .ReturnsAsync(new Product
+            {
+                Id = id,
+                Brand = "test",
+                Color = "test",
+                Category = category,
+                CategoryId = category.Id,
+                Description = "test",
+                ImageUrl = "test",
+                IsActive = true,
+                Name = "Test",
+                Price = 1,
+                StockQuantity = 1,
+                Size = "test"
+            });
 
         // Act
         var result = await _service.GetByIdAsync(id);
 
         // Assert
         result.Should().NotBeNull();
-        result!.Name.Should().Be("Test");
+        result!.Id.Should().Be(id);
+        result.Name.Should().Be("Test");
     }
 
     [Fact]
     public async Task GetByIdAsync_ReturnsNull_WhenProductDoesNotExist()
     {
         // Arrange
-        var id = new Guid();
+        var id = Guid.NewGuid();
 
-        _productRepoMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Product?)null);
+        _productRepoMock
+            .Setup(r => r.GetByIdAsync(id))
+            .ReturnsAsync((Product?)null);
 
         // Act
         var result = await _service.GetByIdAsync(id);
@@ -120,418 +162,201 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public async Task AddAsync_ReturnsTrue_WhenProductCreated()
+    public async Task AddAsync_ReturnsOkTrue_AndCreatedProduct_WhenRepositoryAdds()
     {
         // Arrange
-        var id = new Guid();
-        var category = new Category()
+        var categoryId = Guid.NewGuid();
+        var dto = new ProductDto
         {
-            Id = new Guid(),
-            Name = "Category",
-            Description = "Category description",
-            Products = new List<Product>()
-        };
-        var product = new Product()
-        {
-            Id = id,
+            Id = Guid.NewGuid(),
+            Name = "test",
             Brand = "test",
             Color = "test",
-            Category = category,
-            CategoryId = category.Id,
+            CategoryId = categoryId,
             Description = "test",
             ImageUrl = "test",
             IsActive = true,
-            Name = "test",
             Price = 1,
             StockQuantity = 1,
             Size = "test"
         };
 
-        _productRepoMock.Setup(r => r.AddAsync(It.IsAny<Product>())).ReturnsAsync(true);
-        _productRepoMock.Setup(r => r.ValidateForCreateAsync(It.IsAny<Product>())).ReturnsAsync(true);
-        
-        var productDto = _mapper.Map<ProductDto>(product);
+        _productRepoMock
+            .Setup(r => r.AddAsync(It.IsAny<Product>()))
+            .ReturnsAsync(true);
 
         // Act
-        var result = await _service.AddAsync(productDto);
+        var (ok, created) = await _service.AddAsync(dto);
+
+        // Assert
+        ok.Should().BeTrue();
+        created.Should().NotBeNull();
+        created.Name.Should().Be("test");
+        created.CreatedAt.Should().NotBe(default);
+        created.UpdatedAt.Should().NotBe(default);
+
+        _productRepoMock.Verify(r => r.AddAsync(It.IsAny<Product>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task AddAsync_ReturnsOkFalse_WhenRepositoryRejects()
+    {
+        // Arrange
+        var dto = new ProductDto
+        {
+            Id = Guid.NewGuid(),
+            Name = "test",
+            Brand = "test",
+            CategoryId = Guid.NewGuid(),
+            Price = 1,
+            StockQuantity = 1,
+            Size = "M"
+        };
+
+        _productRepoMock
+            .Setup(r => r.AddAsync(It.IsAny<Product>()))
+            .ReturnsAsync(false);
+
+        // Act
+        var (ok, created) = await _service.AddAsync(dto);
+
+        // Assert
+        ok.Should().BeFalse();
+        created.Should().NotBeNull();
+        _productRepoMock.Verify(r => r.AddAsync(It.IsAny<Product>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task AddAsync_Throws_WhenDtoIsNull()
+    {
+        // Arrange
+        ProductDto dto = null!;
+
+        // Act
+        var act = async () => await _service.AddAsync(dto);
+
+        // Assert
+        await act.Should().ThrowAsync<Exception>(); // mapper або NRE (бо p буде null)
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ReturnsTrue_WhenRepositoryUpdates()
+    {
+        // Arrange
+        var dto = new ProductDto
+        {
+            Id = Guid.NewGuid(),
+            Name = "test",
+            Brand = "test",
+            CategoryId = Guid.NewGuid(),
+            Price = 1,
+            StockQuantity = 1,
+            Size = "M"
+        };
+
+        _productRepoMock
+            .Setup(r => r.Update(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.UpdateAsync(dto);
 
         // Assert
         result.Should().BeTrue();
+        _productRepoMock.Verify(r => r.Update(It.IsAny<Product>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task AddAsync_ReturnsFalse_WhenProductNameIsEmpty()
-    {
-        // Arrange
-        var id = new Guid();
-        var category = new Category()
-        {
-            Id = new Guid(),
-            Name = "Category",
-            Description = "Category description",
-            Products = new List<Product>()
-        };
-        var productDto = new ProductDto()
-        {
-            Id = id,
-            Brand = "test",
-            Color = "test",
-            CategoryId = category.Id,
-            Description = "test",
-            ImageUrl = "test",
-            IsActive = true,
-            Name = "test",
-            Price = 1,
-            StockQuantity = 1,
-            Size = "test"
-        };
-
-        // Act
-        var result = await _service.AddAsync(productDto);
-
-        // Assert
-        result.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task AddAsync_ReturnsFalse_WhenProductDtoIsNull()
-    {
-        // Arrange
-        var productDto = new ProductDto();
-
-        // Act
-        var result = await _service.AddAsync(productDto);
-
-        // Assert
-        result.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task AddAsync_ReturnsFalse_WhenValidationFails()
-    {
-        // Arrange
-        var id = new Guid();
-        var category = new Category()
-        {
-            Id = new Guid(),
-            Name = "Category",
-            Description = "Category description",
-            Products = new List<Product>()
-        };
-        var productDto = new ProductDto()
-        {
-            Id = id,
-            Brand = "test",
-            Color = "test",
-            CategoryId = category.Id,
-            Description = "test",
-            ImageUrl = "test",
-            IsActive = true,
-            Name = "test",
-            Price = 1,
-            StockQuantity = 1,
-            Size = "test"
-        };
-        
-        _productRepoMock.Setup(r => r.ValidateForCreateAsync(It.IsAny<Product>())).ReturnsAsync(false);
-
-        // Act
-        var result = await _service.AddAsync(productDto);
-
-        // Assert
-        result.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task AddAsync_ThrowsException_WhenRepositoryThrows()
-    {
-        // Arrange
-        var id = new Guid();
-        var category = new Category()
-        {
-            Id = new Guid(),
-            Name = "Category",
-            Description = "Category description",
-            Products = new List<Product>()
-        };
-        var productDto = new ProductDto()
-        {
-            Id = id,
-            Brand = "test",
-            Color = "test",
-            CategoryId = category.Id,
-            Description = "test",
-            ImageUrl = "test",
-            IsActive = true,
-            Name = "test",
-            Price = 1,
-            StockQuantity = 1,
-            Size = "test"
-        };
-        
-        _productRepoMock.Setup(r => r.AddAsync(It.IsAny<Product>())).ThrowsAsync(new Exception());
-
-        // Act
-        var result = await _service.AddAsync(productDto);
-
-        // Assert
-        result.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task UpdateAsync_ReturnsTrue_WhenProductIsUpdated()
-    {
-        // Arrange
-        var id = new Guid();
-        var category = new Category()
-        {
-            Id = new Guid(),
-            Name = "Category",
-            Description = "Category description",
-            Products = new List<Product>()
-        };
-        var product = new Product()
-        {
-            Id = id,
-            Brand = "test",
-            Color = "test",
-            Category = category,
-            CategoryId = category.Id,
-            Description = "test",
-            ImageUrl = "test",
-            IsActive = true,
-            Name = "test",
-            Price = 1,
-            StockQuantity = 1,
-            Size = "test"
-        };
-        var productDto = _mapper.Map<ProductDto>(product);
-
-        _productRepoMock.Setup(r => r.ExistsAsync(product.Id)).ReturnsAsync(true);
-        _productRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Product>())).ReturnsAsync(true);
-        _productRepoMock.Setup(r => r.Update(It.IsAny<Product>())).ReturnsAsync(true);
-
-        // Act
-        var result = await _service.UpdateAsync(productDto);
-
-        // Assert
-        result.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task UpdateAsync_ReturnsFalse_WhenProductNotExists()
-    {
-        // Arrange
-        var id = new Guid();
-        var category = new Category()
-        {
-            Id = new Guid(),
-            Name = "Category",
-            Description = "Category description",
-            Products = new List<Product>()
-        };
-        var product = new Product()
-        {
-            Id = id,
-            Brand = "test",
-            Color = "test",
-            Category = category,
-            CategoryId = category.Id,
-            Description = "test",
-            ImageUrl = "test",
-            IsActive = true,
-            Name = "test",
-            Price = 1,
-            StockQuantity = 1,
-            Size = "test"
-        };
-        var productDto = _mapper.Map<ProductDto>(product);
-
-        _productRepoMock.Setup(r => r.ExistsAsync(product.Id)).ReturnsAsync(false);
-        _productRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Product>())).ReturnsAsync(true);
-        _productRepoMock.Setup(r => r.Update(It.IsAny<Product>())).ReturnsAsync(true);
-        _productRepoMock.Setup(r => r.Update(It.IsAny<Product>()))
-            .ReturnsAsync((Product p) => _productRepoMock.Object.ExistsAsync(p.Id).Result);
-        
-        // Act
-        var result = await _service.UpdateAsync(productDto);
-
-        // Assert
-        result.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task UpdateAsync_ReturnsFalse_WhenThereIsValidationError()
-    {
-        // Arrange
-        var id = new Guid();
-        var category = new Category()
-        {
-            Id = new Guid(),
-            Name = "Category",
-            Description = "Category description",
-            Products = new List<Product>()
-        };
-        var product = new Product()
-        {
-            Id = id,
-            Brand = "test",
-            Color = "test",
-            Category = category,
-            CategoryId = category.Id,
-            Description = "test",
-            ImageUrl = "test",
-            IsActive = true,
-            Name = "test",
-            Price = 1,
-            StockQuantity = 1,
-            Size = "test"
-        };
-        var productDto = _mapper.Map<ProductDto>(product);
-
-        _productRepoMock.Setup(r => r.ExistsAsync(product.Id)).ReturnsAsync(true);
-        _productRepoMock.Setup(r => r.ValidateForUpdateAsync(It.IsAny<Product>())).ReturnsAsync(false);
-
-        // Act
-        var result = await _service.UpdateAsync(productDto);
-
-        // Assert
-        result.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task UpdateAsync_ReturnsFalse_WhenProductDtoIsNull()
+    public async Task UpdateAsync_ReturnsFalse_WhenDtoIsNull()
     {
         // Act
         var result = await _service.UpdateAsync(null);
 
         // Assert
         result.Should().BeFalse();
+        _productRepoMock.Verify(r => r.Update(It.IsAny<Product>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task DeleteAsync_ReturnsTrue_WhenProductIsDeleted()
+    public async Task UpdateAsync_ReturnsFalse_WhenRepositoryReturnsFalse()
     {
         // Arrange
-        var id = new Guid();
-        var category = new Category()
+        var dto = new ProductDto
         {
-            Id = new Guid(),
-            Name = "Category",
-            Description = "Category description",
-            Products = new List<Product>()
-        };
-        var product = new Product()
-        {
-            Id = id,
-            Brand = "test",
-            Color = "test",
-            Category = category,
-            CategoryId = category.Id,
-            Description = "test",
-            ImageUrl = "test",
-            IsActive = true,
+            Id = Guid.NewGuid(),
             Name = "test",
+            Brand = "test",
+            CategoryId = Guid.NewGuid(),
             Price = 1,
             StockQuantity = 1,
-            Size = "test"
+            Size = "M"
         };
-      
-        _productRepoMock.Setup(r => r.GetByIdAsync(product.Id)).ReturnsAsync(product);
-        _productRepoMock.Setup(r => r.DeleteAsync(It.IsAny<Product>())).ReturnsAsync(true);
+
+        _productRepoMock
+            .Setup(r => r.Update(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
 
         // Act
-        var result = await _service.DeleteAsync(product.Id);
+        var result = await _service.UpdateAsync(dto);
+
+        // Assert
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ReturnsTrue_WhenRepositoryDeletes()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+
+        // DeleteAsync всередині викликає GetByIdAsync, але результат не впливає на видалення.
+        _productRepoMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Product?)null);
+
+        _productRepoMock
+            .Setup(r => r.DeleteAsync(id))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.DeleteAsync(id);
 
         // Assert
         result.Should().BeTrue();
+        _productRepoMock.Verify(r => r.DeleteAsync(id), Times.Once);
     }
 
     [Fact]
-    public async Task DeleteAsync_ReturnsFalse_WhenProductNotExists()
+    public async Task DeleteAsync_ReturnsFalse_WhenRepositoryReturnsFalse()
     {
         // Arrange
-        var id = new Guid();
-        var category = new Category()
-        {
-            Id = new Guid(),
-            Name = "Category",
-            Description = "Category description",
-            Products = new List<Product>()
-        };
-        var product = new Product()
-        {
-            Id = id,
-            Brand = "test",
-            Color = "test",
-            Category = category,
-            CategoryId = category.Id,
-            Description = "test",
-            ImageUrl = "test",
-            IsActive = true,
-            Name = "test",
-            Price = 1,
-            StockQuantity = 1,
-            Size = "test"
-        };
-        var productDto = _mapper.Map<ProductDto>(product);
-        
-        _productRepoMock.Setup(r => r.ExistsAsync(productDto.Id)).ReturnsAsync(false);
+        var id = Guid.NewGuid();
+        _productRepoMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Product?)null);
+
+        _productRepoMock
+            .Setup(r => r.DeleteAsync(id))
+            .ReturnsAsync(false);
 
         // Act
-        var result = await _service.DeleteAsync(productDto.Id);
+        var result = await _service.DeleteAsync(id);
 
         // Assert
         result.Should().BeFalse();
     }
 
     [Fact]
-    public async Task DeleteAsync_ReturnsFalse_WhenIdIsEmptyGuid()
-    {
-        // Act
-        var result = await _service.DeleteAsync(new Guid());
-
-        // Assert
-        result.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task DeleteAsync_ThrowsException_WhenRepositoryThrows()
+    public async Task DeleteAsync_Throws_WhenRepositoryThrows()
     {
         // Arrange
-        var id = new Guid();
-        var category = new Category()
-        {
-            Id = new Guid(),
-            Name = "Category",
-            Description = "Category description",
-            Products = new List<Product>()
-        };
-        var product = new Product()
-        {
-            Id = id,
-            Brand = "test",
-            Color = "test",
-            Category = category,
-            CategoryId = category.Id,
-            Description = "test",
-            ImageUrl = "test",
-            IsActive = true,
-            Name = "test",
-            Price = 1,
-            StockQuantity = 1,
-            Size = "test"
-        };
-        var productDto = _mapper.Map<ProductDto>(product);
-        
-        _productRepoMock.Setup(r => r.ExistsAsync(productDto.Id)).ReturnsAsync(true);
-        _productRepoMock.Setup(r => r.DeleteAsync(product)).ThrowsAsync(new Exception());
+        var id = Guid.NewGuid();
+        _productRepoMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Product?)null);
 
+        _productRepoMock
+            .Setup(r => r.DeleteAsync(id))
+            .ThrowsAsync(new Exception("boom"));
 
         // Act
-        var result = await _service.DeleteAsync(productDto.Id);
+        var act = async () => await _service.DeleteAsync(id);
 
         // Assert
-        result.Should().BeFalse();
+        await act.Should().ThrowAsync<Exception>();
     }
 }

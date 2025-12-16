@@ -14,13 +14,14 @@ public class AuthServiceTests
     private readonly Mock<IJwtService> _jwtServiceMock;
     private readonly AuthService _authService;
     private readonly Mock<ILogger<AuthService>> _logger;
+    private readonly IEmailSender _email;
 
     public AuthServiceTests()
     {
         _authRepoMock = new Mock<IAuthRepository>();
         _jwtServiceMock = new Mock<IJwtService>();
         _logger = new Mock<ILogger<AuthService>>();
-        _authService = new AuthService(_authRepoMock.Object, _jwtServiceMock.Object, _logger.Object);
+        _authService = new AuthService(_authRepoMock.Object, _jwtServiceMock.Object, _logger.Object,_email);
     }
 
     [Fact]
@@ -112,7 +113,7 @@ public class AuthServiceTests
             Email = "new@example.com",
             Password = "password123",
             ConfirmPassword = "password123",
-            DateOfBirth = DateTime.UtcNow.AddYears(-20)
+            DateOfBirth = new DateOnly()
         };
 
         var result = await _authService.RegisterAsync(registerRequest);
@@ -134,7 +135,7 @@ public class AuthServiceTests
             Email = "exists@example.com",
             Password = "password123",
             ConfirmPassword = "password123",
-            DateOfBirth = DateTime.UtcNow.AddYears(-20)
+            DateOfBirth = new DateOnly()
         };
 
         var result = await _authService.RegisterAsync(registerRequest);

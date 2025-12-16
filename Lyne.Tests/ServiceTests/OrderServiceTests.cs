@@ -121,12 +121,12 @@ public class OrderServiceTests
     public async Task AddAsync_ReturnsTrue_WhenOrderCreated()
     {
         // Arrange
-        var orderDto = new OrderDto { Id = 1,OrderStatus = OrderStatus.Pending,Date = new DateTime(2000,01,01)};
+        var orderDto = new CreateOrderDto { ShippingAddressId = 1, Items = new List<CreateOrderItemDto>()};
         _orderRepoMock.Setup(r => r.ValidateForCreateAsync(It.IsAny<Order>())).ReturnsAsync(true);
         _orderRepoMock.Setup(r => r.AddAsync(It.IsAny<Order>())).ReturnsAsync(true);
 
         // Act
-        var result = await _service.AddAsync(orderDto);
+        var result = await _service.AddAsync(orderDto,1);
 
         // Assert
         result.Should().BeTrue();
@@ -136,11 +136,11 @@ public class OrderServiceTests
     public async Task AddAsync_ReturnsFalse_WhenValidationFails()
     {
         // Arrange
-        var orderDto = new OrderDto { Id = 1,OrderStatus = OrderStatus.Pending,Date = new DateTime(2000,01,01)};
+        var orderDto = new CreateOrderDto { ShippingAddressId = 1, Items = new List<CreateOrderItemDto>()};
         _orderRepoMock.Setup(r => r.ValidateForCreateAsync(It.IsAny<Order>())).ReturnsAsync(false);
 
         // Act
-        var result = await _service.AddAsync(orderDto);
+        var result = await _service.AddAsync(orderDto,1);
 
         // Assert
         result.Should().BeFalse();
@@ -150,10 +150,10 @@ public class OrderServiceTests
     public async Task AddAsync_ReturnsFalse_WhenOrderDtoIsNull()
     {
         // Arrange
-        var order = new OrderDto(){ Date = new DateTime(2000,01,01), OrderStatus = OrderStatus.Pending};
+        var orderDto = new CreateOrderDto { ShippingAddressId = 1, Items = new List<CreateOrderItemDto>()};
 
         // Act
-        var result = await _service.AddAsync(order);
+        var result = await _service.AddAsync(orderDto,1);
 
         // Assert
         result.Should().BeFalse();
@@ -163,12 +163,12 @@ public class OrderServiceTests
     public async Task AddAsync_ThrowsException_WhenRepositoryThrows()
     {      
         // Arrange
-        var order = new OrderDto(){ Date = new DateTime(2000,01,01), OrderStatus = OrderStatus.Pending};
+        var orderDto = new CreateOrderDto { ShippingAddressId = 1, Items = new List<CreateOrderItemDto>()};
 
         _orderRepoMock.Setup(r => r.AddAsync(It.IsAny<Order>())).ThrowsAsync(new Exception());
 
         // Act
-        var result = await _service.AddAsync(order);
+        var result = await _service.AddAsync(orderDto,1);
 
         // Assert
         result.Should().BeFalse();

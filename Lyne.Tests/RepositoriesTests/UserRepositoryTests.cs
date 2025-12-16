@@ -330,7 +330,7 @@ public class UserRepositoryTests : IAsyncLifetime
             Gender = "M",
             PhoneNumber = "000000000",
             AddressId = 1,
-            DateOfBirth = DateTime.UtcNow,
+            DateOfBirth = new DateOnly(),
             PasswordHash = "test",
             Orders = new List<Order> { new Order() },
             Role = "User"
@@ -354,7 +354,7 @@ public class UserRepositoryTests : IAsyncLifetime
             ForName = "UpdateValid",
             Gender = "F",
             PhoneNumber = "333222111",
-            DateOfBirth = DateTime.UtcNow,
+            DateOfBirth = new DateOnly(),
             PasswordHash = "test",
             Orders = new List<Order>(),
             Role = "User"

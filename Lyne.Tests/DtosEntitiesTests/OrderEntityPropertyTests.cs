@@ -17,13 +17,13 @@ public class OrderEntityPropertyTests
     [Fact]
     public void Products_SetAndGet_Works()
     {
-        var products = new List<Product>
+        var products = new List<OrderProduct>
         {
-            new Product { Id = Guid.NewGuid(), Name = "P1" }
+            new OrderProduct { OrderId = new int(), Quantity = 1 }
         };
         var order = new Order(){Id = 1};
-        order.Products = products;
-        order.Products.Should().BeEquivalentTo(products);
+        order.OrderProducts = products;
+        order.OrderProducts.Should().BeEquivalentTo(products);
     }
 
     [Fact]

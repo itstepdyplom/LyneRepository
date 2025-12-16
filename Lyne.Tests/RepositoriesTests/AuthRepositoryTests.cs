@@ -34,7 +34,7 @@ namespace Lyne.Tests.RepositoriesTests
                 ForName = "Tester",
                 Gender = "M",
                 PhoneNumber = "1234567890",
-                DateOfBirth = System.DateTime.UtcNow,
+                DateOfBirth = new DateOnly(),
                 PasswordHash = "hashedpassword",
                 Role = "User"
             };
@@ -58,7 +58,7 @@ namespace Lyne.Tests.RepositoriesTests
                 ForName = "Finder",
                 Gender = "F",
                 PhoneNumber = "0987654321",
-                DateOfBirth = System.DateTime.UtcNow,
+                DateOfBirth = new DateOnly(),
                 PasswordHash = "hash",
                 Role = "User"
             };
@@ -88,7 +88,7 @@ namespace Lyne.Tests.RepositoriesTests
                 ForName = "Existor",
                 Gender = "M",
                 PhoneNumber = "1111111111",
-                DateOfBirth = System.DateTime.UtcNow,
+                DateOfBirth = new DateOnly(),
                 PasswordHash = "hash",
                 Role = "User"
             };
