@@ -15,7 +15,10 @@ import {
   DeleteForeverOutlined,
   BorderColorOutlined,
 } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useProductsStore } from "@/stores/productStore";
+import CircularProgress from "@mui/material/CircularProgress";
+
 
 const items = [
   {
@@ -51,6 +54,27 @@ export default function ItemsPage() {
   const [value1, setValue1] = useState("Recently Added");
   const [value2, setValue2] = useState("Premium");
   const [value3, setValue3] = useState("Dresses");
+ const { products, loading, error, fetchProducts, deleteProduct } = useProductsStore();
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+  
+ if (loading && products.length === 0) {
+    return (
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#fff",
+        }}
+      >
+        <CircularProgress sx={{color:"gray"}}/>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -155,7 +179,7 @@ export default function ItemsPage() {
               xs: "80px 1fr 1fr 1fr 1fr 1fr 1fr 100px",
               md: "100px 1fr 1fr 1fr 1fr 1fr 1fr 100px",
             },
-            py: 1.5,
+            py: 1,
             background: "#fff",
             borderBottom: "1px solid #e6e6e6",
             fontWeight: 600,
@@ -166,7 +190,7 @@ export default function ItemsPage() {
           <Box />
           <Typography>Name of the item</Typography>
           <Typography>Brand</Typography>
-          <Typography>Code</Typography>
+          <Typography>Size</Typography>
           <Typography>Price</Typography>
           <Typography>Quantity</Typography>
           <Typography>Status</Typography>
@@ -174,9 +198,10 @@ export default function ItemsPage() {
         </Box>
 
         {/* ITEMS */}
-        {items.map((item, i) => (
+        {products.map((item) => (
+         
           <Box
-            key={i}
+            key={item.id}
             sx={{
               display: "grid",
               gridTemplateColumns: {
@@ -184,7 +209,7 @@ export default function ItemsPage() {
                 md: "80px 1fr 1fr 1fr 1fr 1fr 1fr 100px",
               },
               px: { xs: 1, md: 2 },
-              py: 2,
+              py: 1,
               borderBottom: "1px solid #E5E7EB",
               alignItems: "center",
               "&:hover": { backgroundColor: "#fafafa" },
@@ -193,19 +218,20 @@ export default function ItemsPage() {
             {/* IMAGE */}
             <Box
               sx={{
-                width: { xs: 60, md: 80 },
-                height: { xs: 60, md: 80 },
+                width: { xs: 60, md: 90 },
+                height: { xs: 60, md: 90 },
                 position: "relative",
                 backgroundImage: "url(/img/background.png)",
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
               }}
             >
-              <Image
-                src={item.img}
+              <img
+                src={item.imageUrl || "/img/items/1.png"}
                 alt={item.name}
-                fill
-                style={{ objectFit: "cover", borderRadius: 6, }}
+                
+                
+                style={{ objectFit: "cover", borderRadius: 2, width:"90px", height:"90px" }}
               />
             </Box>
 
@@ -224,7 +250,7 @@ export default function ItemsPage() {
             <Typography
               sx={{ fontSize: { xs: 12, sm: 14, md: 16 }, color: "black" }}
             >
-              {item.code}
+              {item.size}
             </Typography>
             <Typography
               sx={{ fontSize: { xs: 12, sm: 14, md: 16 }, color: "black" }}
@@ -234,18 +260,18 @@ export default function ItemsPage() {
             <Typography
               sx={{ fontSize: { xs: 12, sm: 14, md: 16 }, color: "black" }}
             >
-              {item.quantity}
+             {item.stockQuantity}
             </Typography>
-
+              
             {/* STATUS */}
             <Typography
               sx={{
                 fontSize: { xs: 12, sm: 14, md: 15 },
                 fontWeight: 700,
-                color: item.status === "sold out" ? "#000" : "#333",
+                color: item.isActive ? "#000" : "#333",
               }}
             >
-              {item.status}
+              {item.isActive ? "Available" : "Sold out"}
             </Typography>
 
             {/* ICONS */}
@@ -253,15 +279,30 @@ export default function ItemsPage() {
               <IconButton size="small" href="/admin/items/0">
                 <BorderColorOutlined sx={{ fontSize: { xs: 20, sm: 22, md: 24 }, color:"black" }} />
               </IconButton>
-              <IconButton size="small">
-                <DeleteForeverOutlined
-                  sx={{ fontSize: { xs: 20, sm: 22, md: 24 }, color:"black" }}
-                />
-              </IconButton>
+               <IconButton
+              size="small"
+              disabled={loading}
+              onClick={() => {
+                if (confirm("Delete this product?")) {
+                  deleteProduct(item.id);
+                }
+              }}
+            >
+              {loading ? (
+                <CircularProgress size={18} />
+              ) : (
+                <DeleteForeverOutlined sx={{ color: "black" }} />
+              )}
+            </IconButton>
             </Box>
           </Box>
         ))}
       </Box>
+      {error && (
+        <Typography sx={{ color: "red", mt: 2 }}>
+          {error}
+        </Typography>
+      )}
     </Box>
   );
 }

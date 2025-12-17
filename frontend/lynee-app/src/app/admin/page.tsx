@@ -11,12 +11,69 @@ import {
   Divider,
   FormControl,
   Select,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "next/navigation";
+import { ordersAPI } from "@/services/api"; // <-- перевір шлях
+import { OrderDto } from "@/utils/constants";
 
 export default function AdminMain() {
   const [value, setValue] = useState("Month");
+  const {
+    user,
+    isAuthenticated,
+    loadingAction,
+    hasCheckedAuth,
+    checkAuth,
+    logout,
+  } = useAuthStore();
+  const router = useRouter();
+
+  // orders state
+  const [orders, setOrders] = useState<OrderDto[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
+
+  const ran = useRef(false);
+
+  useEffect(() => {
+    if (ran.current) return;
+    ran.current = true;
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (!hasCheckedAuth) return;
+    if (loadingAction !== null) return;
+    if (!isAuthenticated) {
+      router.push("/uk/auth/login");
+    }
+  }, [loadingAction, isAuthenticated, hasCheckedAuth, router]);
+
+  // fetch orders only when user opens "orders" tab and user is authenticated
+  useEffect(() => {
+    const load = async () => {
+      if (!isAuthenticated) return;
+
+      setOrdersLoading(true);
+      setOrdersError(null);
+
+      try {
+        const data = await ordersAPI.getMyOrders();
+        setOrders(Array.isArray(data) ? data : []);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        setOrders([]);
+        setOrdersError(e?.message ?? "Failed to load orders");
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+
+    load();
+  }, [isAuthenticated]);
   return (
     <Box
       sx={{
@@ -28,7 +85,15 @@ export default function AdminMain() {
     >
       {/* MAIN CONTENT */}
       <Box sx={{ flex: 1, p: 4, overflowY: "auto" }}>
-        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between",  alignItems: { xs: "flex-start", sm: "center" }, mb: 4 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "space-between",
+            alignItems: { xs: "flex-start", sm: "center" },
+            mb: 4,
+          }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -37,24 +102,46 @@ export default function AdminMain() {
               color: "black",
             }}
           >
-            
             <Typography sx={{ fontSize: 20, fontWeight: 500 }}>
               Your stats
             </Typography>
-            <Box sx={{ml: "auto", mr: 5}}>
-            <FormControl size="small" sx={{ minWidth: 170, borderBottom:"1px solid black", }}>
-              <Select
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                displayEmpty
-                sx={{fontSize:"18px", fontWeight:"500"}}
+            <Box sx={{ ml: "auto", mr: 5 }}>
+              <FormControl
+                size="small"
+                sx={{ minWidth: 170, borderBottom: "1px solid black" }}
               >
-                <MenuItem value="Month" sx={{fontSize:"18px", fontWeight:"500"}}>Month</MenuItem>
-                <MenuItem value="Year" sx={{fontSize:"18px", fontWeight:"500"}}>Year</MenuItem>
-                <MenuItem value="Week" sx={{fontSize:"18px", fontWeight:"500"}}>Week</MenuItem>
-                <MenuItem value="Day" sx={{fontSize:"18px", fontWeight:"500"}}>Day</MenuItem>
-              </Select>
-            </FormControl>
+                <Select
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  displayEmpty
+                  sx={{ fontSize: "18px", fontWeight: "500" }}
+                >
+                  <MenuItem
+                    value="Month"
+                    sx={{ fontSize: "18px", fontWeight: "500" }}
+                  >
+                    Month
+                  </MenuItem>
+                  <MenuItem
+                    value="Year"
+                    sx={{ fontSize: "18px", fontWeight: "500" }}
+                  >
+                    Year
+                  </MenuItem>
+                  <MenuItem
+                    value="Week"
+                    sx={{ fontSize: "18px", fontWeight: "500" }}
+                  >
+                    Week
+                  </MenuItem>
+                  <MenuItem
+                    value="Day"
+                    sx={{ fontSize: "18px", fontWeight: "500" }}
+                  >
+                    Day
+                  </MenuItem>
+                </Select>
+              </FormControl>
             </Box>
           </Box>
         </Box>
@@ -90,7 +177,7 @@ export default function AdminMain() {
 
           <Box
             sx={{
-             height: { xs: 200, sm: 260 },
+              height: { xs: 200, sm: 260 },
               borderRadius: 2,
               p: 2,
               display: "flex",
@@ -152,61 +239,59 @@ export default function AdminMain() {
               color: "black",
               display: "flex",
               justifyContent: "space-between",
-              
             }}
           >
-            <Grid sx={{ xs: 4 }}>Name</Grid>
-            <Grid sx={{ xs: 4 }}>Amount of money</Grid>
+            <Grid sx={{ xs: 4 }}>Number</Grid>
+            <Grid sx={{ xs: 4 }}>Payment</Grid>
             <Grid sx={{ xs: 4 }}>Status</Grid>
           </Grid>
           <Divider sx={{ mb: 2 }} />
 
-          {["Elena Mobith", "Martha Hock", "Roberto Umbrace", "Katy Holms"].map(
-            (name, i) => (
-              <Grid
-                key={i}
-                container
-                sx={{
-                  py: 1,
-                  alignItems: "center",
-                  color: "black",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  overflowX: "auto",
-                  overflowY: "auto",
-                }}
-              >
-                <Grid sx={{ xs: 4, width: "130px" }}>{name}</Grid>
-                <Grid sx={{ xs: 4 }}>{(i + 1) * 80}$</Grid>
-                <Grid sx={{ xs: 4 }}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{
-                      color: "black",
-                      bgcolor:
-                        i === 0
-                          ? "#A1B9C7"
-                          : i === 1
-                          ? "#DEB6AC"
-                          : i === 2
-                          ? "#FECDBE"
-                          : "#F57C7C",
-                      width: "120px",
-                    }}
-                  >
-                    {i === 0
-                      ? "Deliver"
-                      : i === 1
-                      ? "Pending"
-                      : i === 2
-                      ? "New order"
-                      : "Cancelled"}
-                  </Button>
-                </Grid>
+          {orders.map((item) => (
+            <Grid
+              key={item.id}
+              container
+              sx={{
+                py: 1,
+                alignItems: "center",
+                color: "black",
+                display: "flex",
+                justifyContent: "space-between",
+                overflowX: "auto",
+              }}
+            >
+              <Grid sx={{ width: "130px" }}>Order #{item.id}</Grid>
+
+              <Grid>{item.paymentMethod}</Grid>
+
+              <Grid>
+                <Button
+                  variant="contained"
+                  size="small"
+                  sx={{
+                    color: "black",
+                    bgcolor:
+                      item.orderStatus === 0
+                        ? "#A1B9C7"
+                        : item.orderStatus === 1
+                        ? "#DEB6AC"
+                        : item.orderStatus === 2
+                        ? "#FECDBE"
+                        : "#F57C7C",
+                    width: "120px",
+                  }}
+                >
+                  {item.orderStatus === 0
+                    ? "Deliver"
+                    : item.orderStatus === 1
+                    ? "Pending"
+                    : item.orderStatus === 2
+                    ? "New order"
+                    : "Cancelled"}
+                </Button>
               </Grid>
-            )
-          )}
+            </Grid>
+          ))}
         </Box>
       </Box>
 

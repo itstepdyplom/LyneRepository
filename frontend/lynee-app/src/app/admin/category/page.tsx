@@ -21,6 +21,8 @@ import {
 } from "@mui/icons-material";
 import { useState } from "react";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useCategoryStore } from "@/stores/categoryStore";
 
 const filters = [
   "Mass Market",
@@ -110,6 +112,17 @@ const categories = [
 export default function CategoryPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const toggleOpen = (index: number) => setOpenIndex(openIndex === index ? null : index);
+  const {
+    categories,
+    loading,
+    error,
+    fetchCategories,
+    deleteCategory,
+  } = useCategoryStore();
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   return (
     <Box sx={{ p: { xs: 2, sm: 4 }, backgroundColor: "#fff" }}>
@@ -181,8 +194,8 @@ export default function CategoryPage() {
         }}
       >
         <Stack spacing={3}>
-          {categories.map((cat, i) => (
-            <Box key={i}>
+          {categories.map((cat) => (
+            <Box key={cat.id}>
               {/* CATEGORY ITEM */}
               <Box
                 sx={{
@@ -194,24 +207,25 @@ export default function CategoryPage() {
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Box
+                  {/*<Box
                     component="img"
-                    src={cat.image}
+                    //src={cat.image}
                     sx={{
                       width: { xs: 50, sm: 58 },
                       height: { xs: 58, sm: 68 },
                       objectFit: "cover",
                       borderRadius: 1,
                     }}
-                  />
+                  />*/}
                   <Typography sx={{ fontWeight: 500, fontSize: { xs: 16, sm: 20 }, color: "black" }}>
                     {cat.name}
                   </Typography>
                 </Box>
 
                 {/* Buttons */}
+                
                 <Stack direction="row" spacing={1} mt={{ xs: 1, sm: 0 }}>
-                  {cat.subcategories && (
+                  {/*{cat.subcategories && (
                     <IconButton onClick={() => toggleOpen(i)}>
                       <ExpandMoreIcon
                         sx={{
@@ -221,19 +235,25 @@ export default function CategoryPage() {
                         }}
                       />
                     </IconButton>
-                  )}
-                  <Link href={`/admin/category/${i}`} style={{ display: "flex" }}>
+                  )}*/}
+                  <Link href={`/admin/category/${cat.id}`} style={{ display: "flex" }}>
                     <IconButton>
                       <BorderColorOutlined sx={{ color: "black" }} />
                     </IconButton>
                   </Link>
-                  <IconButton>
+                  <IconButton disabled={loading}
+              onClick={() => {
+                if (confirm("Delete this category?")) {
+                  deleteCategory(cat.id);
+                }
+              }}>
                     <DeleteForeverOutlined sx={{ color: "black" }} />
                   </IconButton>
                 </Stack>
               </Box>
 
               {/* SUBCATEGORIES */}
+              {/*
               {cat.subcategories && openIndex === i && (
                 <Box
                   sx={{
@@ -286,7 +306,7 @@ export default function CategoryPage() {
                     </Box>
                   ))}
                 </Box>
-              )}
+              )}*/}
             </Box>
           ))}
         </Stack>

@@ -10,6 +10,15 @@ import ViewListIcon from "@mui/icons-material/ViewList";
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import { useState } from "react";
+import { productsAPI } from "@/services/api";
+interface ProductCardVm {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  image: string;
+  background?: string;
+}
 const menItems = [
   {
     id: 1,
@@ -93,6 +102,49 @@ const [view, setView] = useState<"four" | "two">("four");
 
   const handleChangePage = (_: any, value: number) => setPage(value);
 
+  const [loadingNew, setLoadingNew] = React.useState(true);
+  const [errorNew, setErrorNew] = React.useState<string | null>(null);
+  const [products, setProducts] = React.useState<ProductCardVm[]>([]);
+
+const toCardVm = React.useCallback(
+      (p: import("@/services/api").Product): ProductCardVm => ({
+        id: String(p.id),
+        name: p.name,
+        brand: p.brand,
+        price: p.price,
+        image: p.imageUrl || "/img/placeholder.png",
+        background: "/img/background.png",
+      }),
+      []
+    );
+React.useEffect(() => {
+  const controller = new AbortController();
+
+  const load = async () => {
+    setLoadingNew(true);
+    setErrorNew(null);
+
+    try {
+      const res = await productsAPI.getAll(
+        { page: 1, limit: 4, categoryName: "For Him" },
+        controller.signal
+      );
+
+      const list = res.items ?? [];
+      setProducts(list.map(toCardVm));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      if (e?.name === "CanceledError" || e?.code === "ERR_CANCELED") return;
+
+      setErrorNew("Failed to load products");
+      setProducts([]);
+      console.error(e);
+    } finally {
+      setLoadingNew(false);
+    }
+  };load();
+  return () => controller.abort();
+}, [toCardVm]);
   return (
     <Box sx={{ width: "100%", p: 3 }}>
       {/* Header */}
@@ -137,7 +189,7 @@ const [view, setView] = useState<"four" | "two">("four");
           gap: 3,
         }}
       >
-        {menItems.slice(0, page * itemsPerPage).map((item) => (
+        {products.slice(0, page * itemsPerPage).map((item) => (
           <Box
             key={item.id}
             sx={{

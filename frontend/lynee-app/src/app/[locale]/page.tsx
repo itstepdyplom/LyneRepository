@@ -160,6 +160,7 @@ const HomePage: React.FC = () => {
   const { locale } = useParams();
 
 const [newArrivals, setNewArrivals] = React.useState<ProductCardVm[]>([]);
+const [otherCollections, setOtherCollection] = React.useState<ProductCardVm[]>([]);
 const [loadingNew, setLoadingNew] = React.useState(true);
 const [errorNew, setErrorNew] = React.useState<string | null>(null);
 
@@ -174,6 +175,16 @@ const [errorNew, setErrorNew] = React.useState<string | null>(null);
     }),
     []
   );
+  const toCardOc = React.useCallback(
+    (p: import("@/services/api").Product): ProductCardVm => ({
+      id: String(p.id),
+      name: p.name,
+      brand: p.brand,
+      price: p.price,
+      image: p.imageUrl || "/img/placeholder.png",
+    }),
+    []
+  );
 
 React.useEffect(() => {
   const controller = new AbortController();
@@ -184,7 +195,7 @@ React.useEffect(() => {
 
     try {
       const res = await productsAPI.getAll(
-        { page: 1, limit: 4, categoryName: "MEN" },
+        { page: 1, limit: 4, categoryName: "WOMEN" },
         controller.signal
       );
 
@@ -206,6 +217,37 @@ React.useEffect(() => {
   return () => controller.abort();
 }, [toCardVm]);
 
+React.useEffect(() => {
+  const controller = new AbortController();
+
+  const load = async () => {
+    setLoadingNew(true);
+    setErrorNew(null);
+
+    try {
+      const res = await productsAPI.getAll(
+        { page: 1, limit: 4, categoryName: "Dresses & Sets" },
+        controller.signal
+      );
+
+      const list = res.items ?? [];
+      setOtherCollection(list.map(toCardOc));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      if (e?.name === "CanceledError" || e?.code === "ERR_CANCELED") return;
+
+      setErrorNew("Failed to load products");
+      setOtherCollection([]);
+      console.error(e);
+    } finally {
+      setLoadingNew(false);
+    }
+  };
+
+  load();
+  return () => controller.abort();
+}, [toCardOc]);
+
   // const newArrivals = [
   //   { id: '1', name: 'Cropped shirt', brand: 'Ralph Lauren', price: 980, image: '/img/newArrivals/1.png', background:'/img/background.png'},
   //   { id: '2', name: 'Cotton t-shirt', brand: 'Burberry', price: 12300, image: '/img/newArrivals/2.png', background:'/img/background.png' },
@@ -213,7 +255,7 @@ React.useEffect(() => {
   //   { id: '4', name: 'Zoey', brand: 'Jimmy Choo', price: 44730, image: '/img/newArrivals/4.png', background:'/img/background.png' },
   // ];
 
-  const otherCollections = [
+  /*const otherCollections = [
     {
       id: "391c507e-73f4-4f24-bb54-0070ef05bf88",
       name: "White dress",
@@ -242,7 +284,7 @@ React.useEffect(() => {
       price: 2099,
       image: "/img/otherColl/4.png",
     },
-  ];
+  ];*/
 
   const brands = [
     { id: "1", name: "Brand 1", image: "/img/brands/1.png" },
