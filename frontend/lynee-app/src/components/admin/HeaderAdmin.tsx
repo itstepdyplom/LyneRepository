@@ -5,8 +5,10 @@ import {
   AccountCircleOutlined,
   NotificationsNoneOutlined,
 } from "@mui/icons-material";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function HeaderAdmin() {
+  const { user } = useAuthStore();
   return (
     <Box
       sx={{
@@ -36,9 +38,9 @@ export default function HeaderAdmin() {
         <Typography
           sx={{ fontSize: 16, fontWeight: 400, color: "black", mt: 3 }}
         >
-          Maria Shatanska
+          {user?.name || "Unknown User"}
         </Typography>
-        <Typography sx={{ fontSize: 14, fontWeight: 400, color: "black" }}>admin</Typography>
+        <Typography sx={{ fontSize: 14, fontWeight: 400, color: "black" }}> {user?.role || "user"}</Typography>
       </Box>
       <Box sx={{ ml: "auto", mr: 5  }}>
         <NotificationsNoneOutlined sx={{ color: "black", fontSize: 28 }} />

@@ -20,9 +20,18 @@ import {
   PanoramaFishEyeOutlined,
   WestOutlined,
 } from "@mui/icons-material";
+import { useUsersStore } from "@/stores/userStore";
+import { useEffect } from "react";
 
 export default function UsersPage() {
-  const users = [
+  const { users, loading, fetchUsers, deleteUser } = useUsersStore();
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  //if (loading) return <p>Loading...</p>;
+  const userss = [
     {
       name: "Mark Wilson",
       email: "MarkWilson@gmail.com",
@@ -72,6 +81,7 @@ export default function UsersPage() {
   };
 
   return (
+    
     <Box sx={{ p: { xs: 2, md: 4 }, backgroundColor: "#FFFFFF" }}>
       <IconButton sx={{ mb: { xs: 1, sm: 2 } }}>
         <PanoramaFishEyeOutlined fontSize="large" sx={{ color: "black" }} />
@@ -218,14 +228,14 @@ export default function UsersPage() {
             <Box sx={{ flex: 2 }}>User</Box>
             <Box sx={{ flex: 2 }}>Email address</Box>
             <Box sx={{ flex: 1 }}>City</Box>
-            <Box sx={{ flex: 1 }}>Created Date</Box>
-            <Box sx={{ flex: 1 }}>Status</Box>
+            <Box sx={{ flex: 1 }}>Role</Box>
+            {/*<Box sx={{ flex: 1 }}>Status</Box>*/}
             <Box sx={{ width: 100 }}></Box>
           </Stack>
 
           {/* Rows */}
           {users.map((u, i) => {
-            const status = getStatusColor(u.status);
+            //const status = getStatusColor(u.isActive);
             return (
               <Stack
                 key={i}
@@ -246,16 +256,16 @@ export default function UsersPage() {
                     gap: 2,
                   }}
                 >
-                  <Box
+                  {/*<Box
                     component="img"
-                    src={u.avatar}
+                    //src={u.avatar}
                     sx={{
                       width: 60,
                       height: 60,
                       borderRadius: "50%",
                       objectFit: "cover",
                     }}
-                  />
+                  />*/}
                   <Typography sx={{ color: "black", fontSize: 16 }}>
                     {u.name}
                   </Typography>
@@ -268,34 +278,38 @@ export default function UsersPage() {
 
                 {/* City */}
                 <Box sx={{ flex: 1, color: "black", fontSize: 16 }}>
-                  {u.city}
+                  {u.address?.city}
                 </Box>
 
                 {/* Date */}
                 <Box sx={{ flex: 1, color: "black", fontSize: 16 }}>
-                  {u.date}
+                  {u.role}
                 </Box>
 
                 {/* Status */}
-                <Box sx={{ flex: 1 }}>
+                {/*<Box sx={{ flex: 1 }}>
                   <Chip
-                    label={u.status}
+                    label={u.isActive}
                     sx={{
-                      background: status.bg,
-                      color: status.color,
+                      //background: status.bg,
+                      //color: status.color,
                       fontWeight: 500,
                       fontSize: 16,
                       borderRadius: 2,
                     }}
                   />
-                </Box>
+                </Box>*/}
 
                 {/* Icons */}
                 <Stack direction="row" sx={{ width: 100 }} spacing={1}>
                   <IconButton>
                     <EditOutlined />
                   </IconButton>
-                  <IconButton>
+                  <IconButton onClick={() => {
+                if (confirm("Delete this user?")) {
+                  deleteUser(u.id);
+                }
+              }}>
                     <DeleteForeverOutlined />
                   </IconButton>
                 </Stack>

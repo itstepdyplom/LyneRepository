@@ -5,6 +5,11 @@ import {
   PanoramaFishEyeOutlined,
   WestOutlined
 } from "@mui/icons-material";
+import { useState, useEffect, useRef } from "react";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "next/navigation";
+import { ordersAPI } from "@/services/api"; // <-- перевір шлях
+import { OrderDto } from "@/utils/constants";
 
 const items = [
   { name: "Elena Mobith", price: "2500$", payment: "Paid", status: "Deliver" },
@@ -14,6 +19,59 @@ const items = [
 ];
 
 export default function ItemsPage() {
+  const {
+      user,
+      isAuthenticated,
+      loadingAction,
+      hasCheckedAuth,
+      checkAuth,
+      logout,
+    } = useAuthStore();
+    const router = useRouter();
+  
+    // orders state
+    const [orders, setOrders] = useState<OrderDto[]>([]);
+    const [ordersLoading, setOrdersLoading] = useState(false);
+    const [ordersError, setOrdersError] = useState<string | null>(null);
+  
+    const ran = useRef(false);
+  
+    useEffect(() => {
+      if (ran.current) return;
+      ran.current = true;
+      checkAuth();
+    }, [checkAuth]);
+  
+    useEffect(() => {
+      if (!hasCheckedAuth) return;
+      if (loadingAction !== null) return;
+      if (!isAuthenticated) {
+        router.push("/uk/auth/login");
+      }
+    }, [loadingAction, isAuthenticated, hasCheckedAuth, router]);
+  
+    // fetch orders only when user opens "orders" tab and user is authenticated
+    useEffect(() => {
+      const load = async () => {
+        if (!isAuthenticated) return;
+  
+        setOrdersLoading(true);
+        setOrdersError(null);
+  
+        try {
+          const data = await ordersAPI.getMyOrders();
+          setOrders(Array.isArray(data) ? data : []);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+          setOrders([]);
+          setOrdersError(e?.message ?? "Failed to load orders");
+        } finally {
+          setOrdersLoading(false);
+        }
+      };
+  
+      load();
+    }, [isAuthenticated]);
   return (
     <Box sx={{ width: "100%", height: "100vh", backgroundColor: "#fff", p: 2 }}>
       
@@ -55,16 +113,16 @@ export default function ItemsPage() {
               color: "black",
             }}
           >
-            <Typography sx={{ fontWeight: 600, fontSize: 18 }}>Name</Typography>
-            <Typography sx={{ fontWeight: 600, fontSize: 18 }}>Amount of money</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: 18 }}>Number</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: 18 }}>Date</Typography>
             <Typography sx={{ fontWeight: 600, fontSize: 18 }}>Payment</Typography>
             <Typography sx={{ fontWeight: 600, fontSize: 18 }}>Status</Typography>
           </Box>
 
           {/* ROWS */}
-          {items.map((item, i) => (
+          {orders.map((item) => (
             <Box
-              key={i}
+              key={item.id}
               sx={{
                 display: "grid",
                 gridTemplateColumns: {
@@ -81,9 +139,9 @@ export default function ItemsPage() {
                 color: "black",
               }}
             >
-              <Typography sx={{ fontSize: 16 }}>{item.name}</Typography>
-              <Typography sx={{ fontSize: 16 }}>{item.price}</Typography>
-              <Typography sx={{ fontSize: 16 }}>{item.payment}</Typography>
+              <Typography sx={{ fontSize: 16 }}>Order #{item.id}</Typography>
+              <Typography sx={{ fontSize: 16 }}> {new Date(item.date).toLocaleDateString()}</Typography>
+              <Typography sx={{ fontSize: 16 }}>{item.paymentMethod}</Typography>
 
               <Button
                 variant="contained"
@@ -91,18 +149,24 @@ export default function ItemsPage() {
                 sx={{
                   color: "black",
                   bgcolor:
-                    i === 0
+                    item.orderStatus === 0
                       ? "#A1B9C7"
-                      : i === 1
+                      : item.orderStatus === 1
                       ? "#DEB6AC"
-                      : i === 2
+                      : item.orderStatus === 2
                       ? "#FECDBE"
                       : "#F57C7C",
                   width: { xs: "100px", md: "140px" },
                   fontSize: { xs: "12px", md: "14px" },
                 }}
               >
-                {item.status}
+                  {item.orderStatus === 0
+                    ? "Deliver"
+                    : item.orderStatus === 1
+                    ? "Pending"
+                    : item.orderStatus === 2
+                    ? "New order"
+                    : "Cancelled"}
               </Button>
             </Box>
           ))}

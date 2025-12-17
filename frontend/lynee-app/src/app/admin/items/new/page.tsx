@@ -19,14 +19,80 @@ import {
   PanoramaFishEyeOutlined,
   WestOutlined,
 } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StatusModal from "../StatusModal";
+import { uploadImage } from "@/services/api";
+import { useProductsStore } from "@/stores/productStore";
+import { useCategoryStore } from "@/stores/categoryStore";
 
 export default function NewItemPage() {
   const [statusOpen, setStatusOpen] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    brand: "",
+    categoryId: "",
+    imageUrl: "",
+    size: "",
+    color: "",
+    stockQuantity: "",
+    isActive: true,
+  });
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
+    try {
+      setUploading(true);
+      const url = await uploadImage(file);
+      update("imageUrl", url);
+    } catch (e) {
+      alert("Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+  const handleSubmit = async () => {
+    if (!form.imageUrl) {
+      alert("Upload image first");
+      return;
+    }
+
+    try {
+      await createProduct({
+        name: form.name,
+        description: form.description,
+        price: Number(form.price),
+        brand: form.brand,
+        categoryId: form.categoryId,
+        imageUrl: form.imageUrl,
+        size: form.size,
+        color: form.color,
+        stockQuantity: Number(form.stockQuantity),
+        isActive: form.isActive,
+      });
+
+      setStatusOpen(true);
+    } catch {
+      alert("Failed to create product");
+    }
+  };
+
+  const update = (key: string, value: any) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+  const { createProduct, loading } = useProductsStore();
+  const [uploading, setUploading] = useState(false);
+  const { categories, fetchCategories } = useCategoryStore();
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
   return (
-    <Box sx={{ p: { xs: 2, sm: 4 }, backgroundColor: "#FFFFFF", color: "black" }}>
+    <Box
+      sx={{ p: { xs: 2, sm: 4 }, backgroundColor: "#FFFFFF", color: "black" }}
+    >
       {/* Header */}
       <IconButton sx={{ mb: { xs: 1, sm: 2 } }}>
         <PanoramaFishEyeOutlined fontSize="large" sx={{ color: "black" }} />
@@ -42,7 +108,11 @@ export default function NewItemPage() {
           mb: { xs: 2, sm: 4 },
         }}
       >
-        <Typography variant="h5" fontWeight={500} sx={{ fontSize: { xs: 20, sm: 24 } }}>
+        <Typography
+          variant="h5"
+          fontWeight={500}
+          sx={{ fontSize: { xs: 20, sm: 24 } }}
+        >
           New item
         </Typography>
 
@@ -69,16 +139,35 @@ export default function NewItemPage() {
         }}
       >
         {/* LEFT COLUMN */}
-        <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: { xs: 2, sm: 3 } }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: { xs: 2, sm: 3 },
+          }}
+        >
           <Box>
-            <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+            <Typography
+              mb={1}
+              sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+            >
               Name of item
             </Typography>
-            <TextField fullWidth size="small" sx={{ backgroundColor: "#F6F6F6" }} />
+            <TextField
+              fullWidth
+              size="small"
+              value={form.name}
+              onChange={(e) => update("name", e.target.value)}
+              sx={{ backgroundColor: "#F6F6F6" }}
+            />
           </Box>
 
           <Box>
-            <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+            <Typography
+              mb={1}
+              sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+            >
               Short Description
             </Typography>
             <TextField
@@ -86,68 +175,147 @@ export default function NewItemPage() {
               size="small"
               multiline
               minRows={3}
+              value={form.description}
+              onChange={(e) => update("description", e.target.value)}
               sx={{ backgroundColor: "#F6F6F6" }}
             />
           </Box>
 
           {/* Brand / Color */}
-          <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              flexDirection: { xs: "column", sm: "row" },
+            }}
+          >
             <Box sx={{ flex: 1 }}>
-              <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+              <Typography
+                mb={1}
+                sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+              >
                 Brand
               </Typography>
-              <Select fullWidth size="small" sx={{ backgroundColor: "#F6F6F6" }}>
-                <MenuItem value="brand">Brand</MenuItem>
-              </Select>
+              <TextField
+                fullWidth
+                size="small"
+                value={form.brand}
+                onChange={(e) => update("brand", e.target.value)}
+                sx={{ backgroundColor: "#F6F6F6" }}
+              />
+              
             </Box>
 
             <Box sx={{ flex: 1 }}>
-              <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+              <Typography
+                mb={1}
+                sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+              >
                 Color
               </Typography>
-              <Select fullWidth size="small" sx={{ backgroundColor: "#F6F6F6" }}>
-                <MenuItem value="color">Color</MenuItem>
-              </Select>
+              <TextField
+                fullWidth
+                size="small"
+                value={form.color}
+                onChange={(e) => update("color", e.target.value)}
+                sx={{ backgroundColor: "#F6F6F6" }}
+              />
             </Box>
           </Box>
 
           {/* Quantity / Size */}
-          <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              flexDirection: { xs: "column", sm: "row" },
+            }}
+          >
             <Box sx={{ flex: 1 }}>
-              <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+              <Typography
+                mb={1}
+                sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+              >
                 Quantity
               </Typography>
-              <Select fullWidth size="small" sx={{ backgroundColor: "#F6F6F6" }}>
-                <MenuItem value="1">1</MenuItem>
-              </Select>
+              <TextField
+                fullWidth
+                size="small"
+                value={form.stockQuantity}
+                onChange={(e) => update("stockQuantity", e.target.value)}
+                sx={{ backgroundColor: "#F6F6F6" }}
+              />
+                
             </Box>
 
             <Box sx={{ flex: 1 }}>
-              <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+              <Typography
+                mb={1}
+                sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+              >
                 Size
               </Typography>
-              <Select fullWidth size="small" sx={{ backgroundColor: "#F6F6F6" }}>
-                <MenuItem value="size">M</MenuItem>
-              </Select>
+              <TextField
+                fullWidth
+                size="small"
+                value={form.size}
+                onChange={(e) => update("size", e.target.value)}
+                sx={{ backgroundColor: "#F6F6F6" }}
+              />
+                
             </Box>
           </Box>
 
           {/* Code / Price */}
-          <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              flexDirection: { xs: "column", sm: "row" },
+            }}
+          >
             <Box sx={{ flex: 1 }}>
-              <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
-                Code
+              <Typography
+                mb={1}
+                sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+              >
+                Category
               </Typography>
-              <TextField fullWidth size="small" sx={{ backgroundColor: "#F6F6F6" }} />
+              <Select
+                fullWidth
+                size="small"
+                value={form.categoryId}
+                onChange={(e) => update("categoryId", e.target.value)}
+                sx={{ backgroundColor: "#F6F6F6" }}
+                displayEmpty
+              >
+                <MenuItem value="">
+                  
+                </MenuItem>
+
+                {categories.map((cat) => (
+                  <MenuItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
+              </Select>
             </Box>
 
             <Box sx={{ flex: 1 }}>
-              <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+              <Typography
+                mb={1}
+                sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+              >
                 Price
               </Typography>
-              <Select fullWidth size="small" sx={{ backgroundColor: "#F6F6F6" }}>
-                <MenuItem value="100">100</MenuItem>
-              </Select>
+              <TextField
+                fullWidth
+                size="small"
+                value={form.price}
+                onChange={(e) => update("price", e.target.value)}
+                sx={{ backgroundColor: "#F6F6F6" }}
+              />
+                
             </Box>
           </Box>
 
@@ -156,28 +324,55 @@ export default function NewItemPage() {
             Add discount %
           </Typography>
 
-          <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              flexDirection: { xs: "column", sm: "row" },
+            }}
+          >
             <Box sx={{ flex: 1 }}>
-              <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+              <Typography
+                mb={1}
+                sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+              >
                 Amount of discount, %
               </Typography>
-              <TextField fullWidth size="small" sx={{ backgroundColor: "#F6F6F6" }} />
+              <TextField
+                fullWidth
+                size="small"
+                sx={{ backgroundColor: "#F6F6F6" }}
+              />
             </Box>
 
             <Box sx={{ flex: 1 }}>
-              <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+              <Typography
+                mb={1}
+                sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+              >
                 Start date
               </Typography>
-              <Select fullWidth size="small" sx={{ backgroundColor: "#F6F6F6" }}>
+              <Select
+                fullWidth
+                size="small"
+                sx={{ backgroundColor: "#F6F6F6" }}
+              >
                 <MenuItem value="start">Start</MenuItem>
               </Select>
             </Box>
 
             <Box sx={{ flex: 1 }}>
-              <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+              <Typography
+                mb={1}
+                sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+              >
                 End date
               </Typography>
-              <Select fullWidth size="small" sx={{ backgroundColor: "#F6F6F6" }}>
+              <Select
+                fullWidth
+                size="small"
+                sx={{ backgroundColor: "#F6F6F6" }}
+              >
                 <MenuItem value="end">End</MenuItem>
               </Select>
             </Box>
@@ -185,7 +380,11 @@ export default function NewItemPage() {
 
           {/* Promote */}
           <Box>
-            <Typography fontWeight={500} mb={1} sx={{ fontSize: { xs: 16, sm: 20 } }}>
+            <Typography
+              fontWeight={500}
+              mb={1}
+              sx={{ fontSize: { xs: 16, sm: 20 } }}
+            >
               Promote the item
             </Typography>
             <FormControlLabel
@@ -211,31 +410,49 @@ export default function NewItemPage() {
           }}
         >
           <Box>
-            <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+            <Typography
+              mb={1}
+              sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+            >
               Fabric composition
             </Typography>
-            <TextField fullWidth size="small" multiline minRows={5} sx={{ backgroundColor: "#F6F6F6" }} />
+            <TextField
+              fullWidth
+              size="small"
+              multiline
+              minRows={5}
+              sx={{ backgroundColor: "#F6F6F6" }}
+            />
           </Box>
 
           <Box>
-            <Typography mb={1} sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}>
+            <Typography
+              mb={1}
+              sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+            >
               Add photos & video
             </Typography>
 
             {/* Main preview */}
-            <Paper
-              sx={{
-                height: { xs: 150, sm: 200 },
-                borderRadius: 2,
-                border: "1px solid #ddd",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#F6F6F6",
-              }}
-            >
-              <InsertPhotoOutlined sx={{ width: 130, height: { xs: 100, sm: 200 }, color: "gray" }} />
-            </Paper>
+            {form.imageUrl && (
+              <Box mt={2}>
+                <Typography mb={1} fontSize={14}>
+                  Preview
+                </Typography>
+                <Box
+                  component="img"
+                  src={form.imageUrl}
+                  alt="Preview"
+                  sx={{
+                    width: 120,
+                    height: 160,
+                    objectFit: "cover",
+                    borderRadius: 1,
+                    border: "1px solid #e0e0e0",
+                  }}
+                />
+              </Box>
+            )}
           </Box>
 
           {/* Small previews */}
@@ -253,7 +470,13 @@ export default function NewItemPage() {
                   backgroundColor: "#F6F6F6",
                 }}
               >
-                <InsertPhotoOutlined sx={{ width: 130, height: { xs: 80, sm: 100 }, color: "gray" }} />
+                <InsertPhotoOutlined
+                  sx={{
+                    width: 130,
+                    height: { xs: 80, sm: 100 },
+                    color: "gray",
+                  }}
+                />
               </Paper>
             ))}
           </Box>
@@ -268,18 +491,37 @@ export default function NewItemPage() {
               alignItems: "center",
             }}
           >
-            <Button
+            {/*<Button
+              component="label"
               startIcon={<FileUploadOutlined />}
-              sx={{
-                textTransform: "none",
-                fontWeight: 400,
-                fontSize: { xs: 12, sm: 14 },
-                color: "black",
-                width: { xs: "100%", sm: "auto" },
-              }}
+              disabled={uploading}
             >
-              Upload from your computer
-            </Button>
+              {uploading ? "Uploading..." : "Upload from your computer"}
+
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </Button>*/}
+            <Box sx={{ flex: 1 }}>
+              <Typography
+                mb={1}
+                sx={{ fontWeight: 400, fontSize: { xs: 14, sm: 16 } }}
+              >
+                Image URL
+              </Typography>
+
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="https://..."
+                value={form.imageUrl}
+                onChange={(e) => update("imageUrl", e.target.value)}
+                sx={{ backgroundColor: "#F6F6F6" }}
+              />
+            </Box>
 
             <Button
               endIcon={<Add />}
@@ -299,7 +541,8 @@ export default function NewItemPage() {
 
           {/* Add Item button */}
           <Button
-            onClick={() => setStatusOpen(true)}
+            onClick={handleSubmit}
+            disabled={loading || uploading}
             fullWidth
             variant="contained"
             sx={{
@@ -315,7 +558,7 @@ export default function NewItemPage() {
           >
             Add the item
           </Button>
-          
+
           <StatusModal
             open={statusOpen}
             image="/img/newArrivals/1.png"

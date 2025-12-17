@@ -6,6 +6,7 @@ export interface User {
   email: string;
   name: string;
   avatar?: string;
+  role?: "Admin" | "User";
   addressId?: number;
   address?: Address;
 }
@@ -17,7 +18,12 @@ export interface Address {
   zip: string;
   country: string;
 }
-
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+  productIds: string[];
+}
 export interface Product {
   id: string;
   name: string;
@@ -28,6 +34,7 @@ export interface Product {
   imageUrl: string;
   size?: string;
   color?: string;
+  stockQuantity?: string;
   isActive: boolean;
 }
 export interface PagedResult<T> {
@@ -81,6 +88,19 @@ export const authAPI = {
     return response.data;
   },
 };
+export interface CreateProductDto {
+  name: string;
+  description?: string;
+  price: number;
+  brand: string;
+  categoryId: string;
+  imageUrl: string;
+  size?: string;
+  color?: string;
+  stockQuantity?: number;
+  isActive: boolean;
+}
+
 export interface PagedProductsResponse {
   products: Product[];
   total: number;
@@ -118,6 +138,24 @@ export const productsAPI = {
     const response = await apiClient.get('/products/brands');
     return response.data;
   },
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/products/${id}`);
+  },
+create: async (dto: CreateProductDto): Promise<void> => {
+  await apiClient.post("/products", dto);
+},
+};
+export const uploadImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await apiClient.post("/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return res.data.url;
 };
 
 export type CreateOrderDto = {
@@ -136,9 +174,52 @@ export const ordersAPI = {
   const response = await apiClient.get('/orders/my');
   return response.data;
 },
-
+getAll: async (): Promise<OrderDto[]> => {
+    const response = await apiClient.get("/orders");
+    return response.data;
+  },
   getById: async (id: string) => {
     const response = await apiClient.get(`/orders/${id}`);
     return response.data;
   },
 }; 
+export interface UserListItem {
+  id: string;
+  email: string;
+  name: string;
+  forName: string | null;
+  role?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  address?: Address | null;
+}
+
+export const usersAPI = {
+  getAll: async (): Promise<UserListItem[]> => {
+    const response = await apiClient.get("/users");
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<UserListItem[]> => {
+    const response = await apiClient.get(`/users/${id}`);
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/users/${id}`);
+  },
+
+  toggleActive: async (id: string): Promise<void> => {
+    await apiClient.patch(`/users/${id}/toggle-active`);
+  },
+};
+
+export const categoriesAPI = {
+  getAll: async (): Promise<Category[]> => {
+    const response = await apiClient.get("/categories");
+    return response.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/categories/${id}`);
+  },
+};
